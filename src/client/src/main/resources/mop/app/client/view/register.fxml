@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.image.Image?>
+<?import java.net.URL?>
+<?import javafx.collections.FXCollections?>
+<?import java.lang.String?>
+
+<AnchorPane prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="mop.app.client.controller.RegisterController">
+    <stylesheets>
+        <URL value="@../css/style.css"/>
+        <URL value="@../css/register.css"/>
+    </stylesheets>
+
+    <children>
+        <HBox nodeOrientation="LEFT_TO_RIGHT" styleClass="right-side" AnchorPane.bottomAnchor="0.0"
+              AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <children>
+                <VBox alignment="CENTER" prefHeight="600.0" prefWidth="250.0" styleClass="left-side">
+                    <children>
+                        <ImageView fitHeight="80.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true"
+                                   styleClass="app-icon">
+                            <image>
+                                <Image url="@../images/app-icon.png"/>
+                            </image>
+                        </ImageView>
+                        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="text" text="MOP"
+                              textAlignment="CENTER">
+                            <VBox.margin>
+                                <Insets top="10.0"/>
+                            </VBox.margin>
+                        </Text>
+                    </children>
+                </VBox>
+                <VBox alignment="CENTER" prefHeight="200.0" prefWidth="750.0" styleClass="right-side">
+                    <children>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="text" text="Get started with MOP"
+                              textAlignment="CENTER">
+                            <VBox.margin>
+                                <Insets bottom="60.0"/>
+                            </VBox.margin>
+                        </Text>
+
+                        <GridPane alignment="CENTER" hgap="20.0" vgap="20.0">
+                            <columnConstraints>
+                                <ColumnConstraints minWidth="100" prefWidth="150"/>
+                                <ColumnConstraints minWidth="200" prefWidth="300"/>
+                            </columnConstraints>
+                            <children>
+                                <!-- Email -->
+                                <Label styleClass="form-text" text="Email:" GridPane.columnIndex="0"
+                                       GridPane.rowIndex="0"/>
+                                <TextField fx:id="emailField" promptText="Enter your email" styleClass="input-field"
+                                           GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+                                <!-- Username -->
+                                <Label styleClass="form-text" text="Username:" GridPane.columnIndex="0"
+                                       GridPane.rowIndex="1"/>
+                                <TextField fx:id="usernameField" promptText="Choose a username" styleClass="input-field"
+                                           GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+                                <!-- Password -->
+                                <Label styleClass="form-text" text="Password:" GridPane.columnIndex="0"
+                                       GridPane.rowIndex="2"/>
+                                <PasswordField fx:id="passwordField" promptText="Choose a password"
+                                               styleClass="input-field" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+                                <!-- Full Name -->
+                                <Label styleClass="form-text" text="Full Name:" GridPane.columnIndex="0"
+                                       GridPane.rowIndex="3"/>
+                                <TextField fx:id="fullNameField" promptText="Enter your full name"
+                                           styleClass="input-field" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+
+                                <!-- Date of Birth -->
+                                <Label styleClass="form-text" text="Date of Birth:" GridPane.columnIndex="0"
+                                       GridPane.rowIndex="4"/>
+                                <DatePicker fx:id="dateOfBirthPicker" promptText="Select your date of birth"
+                                            styleClass="date-picker" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+
+                                <!-- Address -->
+                                <Label styleClass="form-text" text="Address:" GridPane.columnIndex="0"
+                                       GridPane.rowIndex="5" GridPane.valignment="TOP">
+                                    <padding>
+                                        <Insets top="5"/>
+                                    </padding>
+                                </Label>
+                                <TextArea fx:id="addressArea" prefRowCount="3" promptText="Enter your address"
+                                          styleClass="text-area" wrapText="true" GridPane.columnIndex="1"
+                                          GridPane.rowIndex="5"/>
+                            </children>
+                            <rowConstraints>
+                                <RowConstraints/>
+                                <RowConstraints/>
+                                <RowConstraints/>
+                                <RowConstraints/>
+                                <RowConstraints/>
+                                <RowConstraints/>
+                            </rowConstraints>
+                        </GridPane>
+
+                        <!-- Already have an account? -->
+                        <Hyperlink alignment="CENTER" onAction="#handleLogin"
+                                   style="-fx-text-fill: #0084ff; -fx-font-size: 14px; -fx-border-width: 0; hover:-fx-text-fill #0056b3;"
+                                   text="Already have an account?" underline="true"/>
+
+                        <!-- Register Button -->
+                        <VBox alignment="CENTER" maxWidth="480.0">
+                            <children>
+                                <Button fx:id="registerButton" alignment="CENTER" mnemonicParsing="false"
+                                        prefWidth="480.0" styleClass="register-button" text="Register"
+                                        textAlignment="CENTER">
+                                    <VBox.margin>
+                                        <Insets top="30.0"/>
+                                    </VBox.margin>
+                                </Button>
+                            </children>
+                        </VBox>
+                    </children>
+                    <padding>
+                        <Insets bottom="40.0" left="40.0" right="40.0" top="40.0"/>
+                    </padding>
+                </VBox>
+            </children>
+        </HBox>
+    </children>
+
+</AnchorPane>

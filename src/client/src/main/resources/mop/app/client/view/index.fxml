@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<VBox alignment="CENTER" spacing="20" styleClass="container" xmlns="http://javafx.com/javafx/8"
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="mop.app.client.controller.IndexController"
+      prefWidth="920" prefHeight="640" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity">
+    <stylesheets>
+        <URL value="@../css/style.css"/>
+    </stylesheets>
+
+    <children>
+        <HBox spacing="10">
+            <padding>
+                <Insets left="20" top="20"/>
+            </padding>
+
+            <Button styleClass="arrow-button">
+                <graphic>
+                    <de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView glyphName="ARROW_LEFT"
+                                                                        size="20"
+                                                                        styleClass="inactive-icon"/>
+                    <!--                    <Button>Button</Button>-->
+                </graphic>
+            </Button>
+
+            <Button styleClass="arrow-button" onAction="#handleLogin">
+                <graphic>
+                    <de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView glyphName="ARROW_RIGHT"
+                                                                        size="20"
+                                                                        styleClass="next-icon"/>
+                    <!--                    <Button>Button</Button>-->
+                </graphic>
+            </Button>
+        </HBox>
+
+        <ImageView fitHeight="80" fitWidth="80" styleClass="app-icon">
+            <image>
+                <Image url="@../images/app-icon.png"/>
+            </image>
+            <VBox.margin>
+                <Insets/>
+            </VBox.margin>
+        </ImageView>
+
+        <Label styleClass="welcome-text" text="Welcome to MOP"/>
+        <Label alignment="CENTER" styleClass="subtitle-text" text="The simple way to chat right from your desktop."
+               wrapText="true">
+            <VBox.margin>
+                <Insets bottom="40.0"/>
+            </VBox.margin>
+        </Label>
+
+        <VBox alignment="CENTER" maxWidth="400" spacing="20.0">
+            <children>
+                <Button maxWidth="Infinity" onAction="#handleGoogleLogin" styleClass="google-button"
+                        text="Log in with Google"/>
+
+                <Button maxWidth="Infinity" onAction="#handleLogin" styleClass="email-username-button"
+                        text="Log in with email or username"/>
+            </children>
+        </VBox>
+    </children>
+    <padding>
+        <Insets bottom="40.0" left="40.0" right="40.0" top="40.0"/>
+    </padding>
+</VBox>

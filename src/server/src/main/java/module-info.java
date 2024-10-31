@@ -10,8 +10,12 @@ module mop.app.server {
     requires org.kordamp.bootstrapfx.core;
     requires eu.hansolo.tilesfx;
 
+    requires org.slf4j;
+
     requires static lombok;
 
     opens mop.app.server to javafx.fxml;
+    opens mop.app.server.controller to javafx.fxml;
     exports mop.app.server;
+    exports mop.app.server.controller;
 }

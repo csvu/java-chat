@@ -1,0 +1,102 @@
+.container {
+    -fx-background-color: #0e1621;
+}
+
+.app-icon {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 2);
+    -fx-alignment: center;
+}
+
+.welcome-text {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.subtitle-text {
+    -fx-font-size: 14px;
+    -fx-text-fill: #a0a0a0;
+    -fx-text-alignment: center;
+    -fx-max-width: 400;
+}
+
+.google-button {
+    -fx-background-color: #0084ff;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-padding: 12px;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+}
+
+.google-button:hover {
+    -fx-background-color: #0073e6;
+}
+
+.email-username-button {
+    -fx-background-color: #3a3a3a;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-padding: 12px;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+}
+
+.email-button:hover {
+    -fx-background-color: #454545;
+}
+
+.arrow-button {
+    -fx-background-color: transparent;
+    -fx-cursor: hand;
+    -fx-padding: 10;
+}
+
+.arrow-button:hover {
+    -fx-opacity: 0.8;
+}
+
+.back-icon, .next-icon {
+    -fx-fill: white;
+}
+
+.arrow-button:hover .back-icon {
+    -fx-fill: #cccccc;
+}
+
+.arrow-button:hover .next-icon {
+    -fx-fill: #cccccc;
+}
+
+
+.inactive-icon {
+    -fx-fill: #8c9fb0;
+}
+
+.input-field {
+    -fx-background-color: #3a3a3a;
+    -fx-text-fill: white;
+    -fx-prompt-text-fill: #808080;
+    -fx-padding: 12px;
+    -fx-background-radius: 5;
+    -fx-font-size: 14px;
+    -fx-border-color: #f0f8ff;
+    -fx-border-radius: 10;
+}
+
+.input-field:focused {
+    -fx-background-color: #454545;
+}
+
+.continue-button {
+    -fx-background-color: #0084ff;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-padding: 12px;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+}
+
+.continue-button:hover {
+    -fx-background-color: #0073e6;
+}

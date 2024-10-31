@@ -1,4 +1,4 @@
-package mop.app.client;
+package mop.app.client.controller;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;

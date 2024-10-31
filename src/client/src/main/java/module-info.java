@@ -10,8 +10,13 @@ module mop.app.client {
     requires org.kordamp.bootstrapfx.core;
     requires eu.hansolo.tilesfx;
 
+    requires org.slf4j;
+    requires jakarta.mail;
+
     requires static lombok;
 
     opens mop.app.client to javafx.fxml;
+    opens mop.app.client.controller to javafx.fxml;
     exports mop.app.client;
+    exports mop.app.client.controller;
 }
