@@ -21,7 +21,7 @@
                 <Insets left="20" top="20"/>
             </padding>
 
-            <Button styleClass="arrow-button">
+            <Button styleClass="navigation-button">
                 <graphic>
                     <de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView glyphName="ARROW_LEFT"
                                                                         size="20"
@@ -30,7 +30,7 @@
                 </graphic>
             </Button>
 
-            <Button styleClass="arrow-button" onAction="#handleLogin">
+            <Button styleClass="navigation-button" onAction="#handleLogin">
                 <graphic>
                     <de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView glyphName="ARROW_RIGHT"
                                                                         size="20"

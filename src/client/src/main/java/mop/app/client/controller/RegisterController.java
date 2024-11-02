@@ -1,6 +1,7 @@
 package mop.app.client.controller;
 
 import java.io.IOException;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -22,6 +23,33 @@ public class RegisterController {
     public DatePicker dateOfBirthPicker;
     public TextArea addressArea;
     public Button registerButton;
+    public ComboBox<String> genderComboBox;
+
+    @FXML
+    private void initialize() {
+        // CSS styling for the genderComboBox after choosing a value
+        genderComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+            Platform.runLater(() -> {
+                if (newValue != null) {
+                    logger.info("New value: " + newValue);
+                    Node textNode = genderComboBox.lookup(".text");
+                    if (textNode != null) {
+                        textNode.setStyle("-fx-fill: white;");
+                    }
+                } else {
+                    Node textNode = genderComboBox.lookup(".text");
+                    if (textNode != null) {
+                        textNode.setStyle("-fx-fill: #808080;");
+                    }
+                }
+            });
+        });
+
+        Node textNode = genderComboBox.lookup(".text");
+        if (textNode != null) {
+            textNode.setStyle("-fx-fill: #808080;");
+        }
+    }
 
     @FXML
     private void handleLogin(ActionEvent event) {
@@ -54,5 +82,4 @@ public class RegisterController {
         alert.setContentText(content);
         alert.showAndWait();
     }
-    
 }
