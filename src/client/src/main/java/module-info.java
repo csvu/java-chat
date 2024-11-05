@@ -16,6 +16,8 @@ module mop.app.client {
     requires static lombok;
 
     opens mop.app.client to javafx.fxml;
+    opens mop.app.client.controller.user;
+    exports mop.app.client.controller.user;
     opens mop.app.client.controller to javafx.fxml;
     exports mop.app.client;
     exports mop.app.client.controller;
