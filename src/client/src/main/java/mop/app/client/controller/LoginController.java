@@ -103,7 +103,7 @@ public class LoginController {
 
             Scene scene = new Scene(root);
 
-            currentStage.setResizable(true);
+            currentStage.setResizable(false);
             currentStage.setScene(scene);
             currentStage.show();
         } catch (IOException e) {
