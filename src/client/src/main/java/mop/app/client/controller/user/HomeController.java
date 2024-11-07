@@ -16,9 +16,10 @@ import javafx.scene.layout.HBox;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import mop.app.client.Client;
+import mop.app.client.model.user.Conversation;
 
 import java.io.IOException;
-import java.net.URL;
+
 
 public class HomeController {
     @FXML
@@ -31,12 +32,12 @@ public class HomeController {
     private double oldHeight = 0;
 
     @FXML
-    private ListView<URL> listViewCol1;
+    private ListView<Conversation> listViewCol1;
     @FXML
-    private ListView<URL> listViewCol2;
+    private ListView<Conversation> listViewCol2;
 
-    ObservableList<URL> friendList;
-    ObservableList<URL> groupChad;
+    ObservableList<Conversation> dmList;
+    ObservableList<Conversation> groupChad;
 
     @FXML
     public void initialize() {
@@ -44,58 +45,55 @@ public class HomeController {
         Circle clip = new Circle(dmNav.getX() + radius, dmNav.getY() + radius, radius);
         dmNav.setClip(clip);
 
-        friendList = FXCollections.observableArrayList();
+        dmList = FXCollections.observableArrayList();
         for (int i = 0; i < 30; i++) {
-            friendList.add(Client.class.getResource("images/place-holder.png"));
+            dmList.add(new Conversation(i, "PAIR", Client.class.getResource("images/place-holder.png"), "hiha", false));
         }
 
         groupChad = FXCollections.observableArrayList();
         for (int i = 0; i < 30; i++) {
-            groupChad.add(Client.class.getResource("images/place-holder.png"));
+            groupChad.add(new Conversation(i, "PAIR", Client.class.getResource("images/place-holder.png"), "hiha", false));
         }
 
-        listViewCol1.setCellFactory(param -> new ListCell<URL>() {
+        listViewCol1.setCellFactory(param -> new ListCell<>() {
             @Override
-            protected void updateItem(URL item, boolean empty) {
+            protected void updateItem(Conversation item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty || item == null) {
                     setText(null);
                     setGraphic(null);
                 } else {
                     setAlignment(Pos.CENTER);
-                    setGraphic(new CircleImage(new Image(item.toString())));
+                    setGraphic(new CircleImage(new Image(item.getIcon().toString())));
                 }
             }
         });
 
 
-        listViewCol2.setCellFactory(param -> new ListCell<URL>() {
+        listViewCol2.setCellFactory(param -> new ListCell<>() {
             @Override
-            protected void updateItem(URL item, boolean empty) {
+            protected void updateItem(Conversation item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty || item == null) {
                     setText(null);
                     setGraphic(null);
                 } else {
-                    setGraphic(new CircleImage(new Image(item.toString())));
+                    setGraphic(new CircleImage(new Image(item.getIcon().toString())));
                 }
             }
         });
 
         listViewCol1.setItems(groupChad);
-        listViewCol2.setItems(friendList);
+        listViewCol2.setItems(dmList);
         chatArea.setPrefSize(200, 40);
 
         sizeHelper.textProperty().bind(chatArea.textProperty());
-        sizeHelper.layoutBoundsProperty().addListener(new ChangeListener<Bounds>() {
-            @Override
-            public void changed(ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) {
-                if (oldHeight != newValue.getHeight()) {
-                    oldHeight = newValue.getHeight();
-                    chatArea.setPrefHeight(sizeHelper.getLayoutBounds().getHeight());
-                    HBox par = (HBox) chatArea.getParent();
-                    par.setPrefHeight(chatArea.getPrefHeight() + par.getPadding().getBottom() + par.getPadding().getTop());
-                }
+        sizeHelper.layoutBoundsProperty().addListener((observable, oldValue, newValue) -> {
+            if (oldHeight != newValue.getHeight()) {
+                oldHeight = newValue.getHeight();
+                chatArea.setPrefHeight(sizeHelper.getLayoutBounds().getHeight());
+                HBox par = (HBox) chatArea.getParent();
+                par.setPrefHeight(chatArea.getPrefHeight() + par.getPadding().getBottom() + par.getPadding().getTop());
             }
         });
 

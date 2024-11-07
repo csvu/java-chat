@@ -1,13 +1,17 @@
 package mop.app.client.model.user;
 
+import java.net.URL;
+import java.time.ZonedDateTime;
+
 public class Conversation {
     private int conversationID;
     private String type;
-    private String icon;
+    private URL icon;
     private String name;
     private boolean seen;
+//    private ZonedDateTime lastMessageDateTime;
 
-    public Conversation(int conversationID, String type, String icon, String name, boolean seen) {
+    public Conversation(int conversationID, String type, URL icon, String name, boolean seen) {
         this.conversationID = conversationID;
         this.type = type;
         this.icon = icon;
@@ -23,7 +27,7 @@ public class Conversation {
         return type;
     }
 
-    public String getIcon() {
+    public URL getIcon() {
         return icon;
     }
 
@@ -43,7 +47,7 @@ public class Conversation {
         this.type = type;
     }
 
-    public void setIcon(String icon) {
+    public void setIcon(URL icon) {
         this.icon = icon;
     }
 

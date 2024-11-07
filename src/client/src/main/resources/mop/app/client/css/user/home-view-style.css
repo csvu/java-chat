@@ -34,8 +34,12 @@ ListView .scroll-bar {
     -fx-pref-width: 8px;
 }
 
-ListView .scroll-bar:horizontal {
-    -fx-scale-y: 0;
+#listViewCol1 .scroll-bar:horizontal {
+    -fx-pref-height: 0px;
+}
+
+#listViewCol1 .scroll-bar:vertical {
+    -fx-pref-width: 0px;
 }
 
 ListView .scroll-bar .thumb {
@@ -48,4 +52,12 @@ ListView .corner {
 
 ListView .list-cell:hover {
     -fx-background-color: rgba(255, 255, 255, 0.1);
+}
+
+ListView .increment-button {
+    -fx-opacity: 0;
+}
+
+ListView .decrement-button {
+    -fx-opacity: 0;
 }
