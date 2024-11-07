@@ -1,0 +1,51 @@
+#dmNavWrapper:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+}
+
+.text-area {
+    -fx-background-color: #17212B;
+    -fx-text-fill: rgb(221, 221, 221);
+}
+
+.text-area .content {
+    -fx-background-color: #17212B;
+    -fx-background-radius: 0;
+}
+
+.text-area:focused .content {
+    -fx-background-color: #17212B;
+    -fx-background-radius: 0;
+}
+
+.text-area:focused {
+    -fx-text-fill: white;
+}
+
+.text-area .scroll-bar {
+    -fx-opacity: 0;
+}
+
+ListView .list-cell {
+    -fx-background-color: transparent;
+}
+
+ListView .scroll-bar {
+    -fx-background-color: transparent;
+    -fx-pref-width: 8px;
+}
+
+ListView .scroll-bar:horizontal {
+    -fx-scale-y: 0;
+}
+
+ListView .scroll-bar .thumb {
+    -fx-background-color: rgba(255, 255, 255, 0.125)
+}
+
+ListView .corner {
+    -fx-background-color: transparent
+}
+
+ListView .list-cell:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+}

@@ -28,7 +28,7 @@ public class Client extends Application {
     public void start(Stage stage) throws IOException {
         instance = stage;
         logger.info("Starting JavaFX Application");
-        FXMLLoader fxmlLoader = new FXMLLoader(Client.class.getResource("view/index.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(Client.class.getResource("view/user/home-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
 
         try {

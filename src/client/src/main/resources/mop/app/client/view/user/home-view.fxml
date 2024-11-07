@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.web.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.image.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<GridPane hgap="2.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1200.0" style="-fx-background-color: black;" stylesheets="@../../css/user/home-view-style.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mop.app.client.controller.user.HomeController">
+  <columnConstraints>
+    <ColumnConstraints fillWidth="false" maxWidth="74.0" minWidth="74.0" prefWidth="74.0" />
+    <ColumnConstraints hgrow="SOMETIMES" maxWidth="1090.0" minWidth="10.0" percentWidth="20.0" prefWidth="215.0" />
+      <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="896.0" />
+  </columnConstraints>
+  <rowConstraints>
+    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+  </rowConstraints>
+   <children>
+      <VBox prefHeight="200.0" prefWidth="100.0" style="-fx-background-color: #0E1621;">
+         <children>
+            <HBox id="dmNavWrapper">
+               <children>
+                  <ImageView fx:id="dmNav" fitHeight="54.0" fitWidth="54.0" onMouseClicked="#onTopBarCol3Clicked" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/app-icon.png" />
+                     </image>
+                  </ImageView>
+               </children>
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </padding>
+            </HBox>
+            <ListView fx:id="listViewCol1" focusTraversable="false" prefHeight="200.0" style="-fx-background-color: transparent;" VBox.vgrow="ALWAYS" />
+         </children>
+      </VBox>
+      <VBox style="-fx-background-color: #17212B;" GridPane.columnIndex="1">
+         <children>
+            <HBox alignment="CENTER_LEFT" prefHeight="65.0" prefWidth="240.0">
+               <children>
+                  <Label text="Direct Messages" textFill="#c9c9c9" />
+               </children>
+               <padding>
+                  <Insets bottom="10.0" left="20.0" right="10.0" top="10.0" />
+               </padding>
+            </HBox>
+            <ListView fx:id="listViewCol2" focusTraversable="false" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #17212B;" GridPane.columnIndex="1" VBox.vgrow="ALWAYS" />
+         </children>
+      </VBox>
+      <VBox prefHeight="200.0" prefWidth="100.0" spacing="2.0" GridPane.columnIndex="2">
+         <children>
+            <HBox fx:id="topBarCol3" focusTraversable="true" maxHeight="74.0" minHeight="74.0" prefHeight="74.0" prefWidth="896.0" style="-fx-background-color: #17212B;" VBox.vgrow="NEVER">
+               <children>
+                  <VBox alignment="CENTER_LEFT" prefHeight="74.0" prefWidth="230.0">
+                     <children>
+                        <Label text="Label" textFill="WHITE">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                        </Label>
+                        <Label text="Label" textFill="WHITE" />
+                     </children>
+                     <HBox.margin>
+                        <Insets left="30.0" />
+                     </HBox.margin>
+                  </VBox>
+               </children>
+            </HBox>
+            <ListView prefHeight="566.0" prefWidth="883.0" style="-fx-background-color: #0E1621;" VBox.vgrow="ALWAYS" />
+            <HBox alignment="CENTER" fillHeight="false" maxHeight="600.0" prefHeight="40.0" prefWidth="883.0" spacing="20.0" style="-fx-background-color: #17212B;" VBox.vgrow="NEVER">
+               <children>
+                  <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" />
+                  <TextArea fx:id="chatArea" maxHeight="600.0" prefHeight="40.0" prefWidth="200.0" promptText="Write a message" stylesheets="@../../css/user/home-view-style.css" wrapText="true" HBox.hgrow="ALWAYS" />
+                  <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" />
+               </children>
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </padding>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</GridPane>

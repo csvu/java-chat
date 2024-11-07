@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.shape.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.image.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root alignment="CENTER_LEFT" prefHeight="74.0" prefWidth="896.0" spacing="20.0" style="-fx-background-color: #17212B;" stylesheets="@../../css/user/friends-style.css" type="javafx.scene.layout.HBox" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label text="Friends" textFill="WHITE">
+         <HBox.margin>
+            <Insets bottom="20.0" left="20.0" top="20.0" />
+         </HBox.margin>
+         <font>
+            <Font size="17.0" />
+         </font>
+      </Label>
+      <Separator opacity="0.33" orientation="VERTICAL">
+         <HBox.margin>
+            <Insets bottom="20.0" top="20.0" />
+         </HBox.margin></Separator>
+      <Button mnemonicParsing="false" text="Pending" textFill="WHITE">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Button>
+      <Button mnemonicParsing="false" text="All" textFill="WHITE">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Button>
+      <Button mnemonicParsing="false" text="Blocked" textFill="WHITE">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Button>
+      <Button mnemonicParsing="false" text="Online" textFill="WHITE">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Button>
+      <Button mnemonicParsing="false" text="Add Friend" textFill="WHITE">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Button>
+   </children>
+</fx:root>
