@@ -1,16 +1,12 @@
-package mop.app.client.controller;
+package mop.app.client.controller.auth;
 
 import java.io.IOException;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.stage.Stage;
-import mop.app.client.Client;
+import mop.app.client.util.ViewHelper;
 import org.slf4j.Logger;
 
 public class RegisterController {
@@ -54,13 +50,7 @@ public class RegisterController {
     @FXML
     private void handleLogin(ActionEvent event) {
         try {
-            FXMLLoader loader = new FXMLLoader(Client.class.getResource("view/login.fxml"));
-            Parent root = loader.load();
-
-            Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            currentStage.setScene(new Scene(root));
-            currentStage.setResizable(false);
-            currentStage.show();
+            ViewHelper.getLoginScene(event);
         } catch (IOException e) {
             logger.error("Could not load login page", e);
             showError("Navigation Error", "Could not load email login page.");

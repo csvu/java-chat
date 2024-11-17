@@ -8,40 +8,33 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import mop.app.client.util.ViewFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Client extends Application {
     private static final Logger logger = LoggerFactory.getLogger(Client.class);
 
-    public static Stage instance;
-
-    private static final class StageHolder {
-        private static final Stage INSTANCE = new Stage();
-    }
-
-    public static Stage getInstance() {
-        return StageHolder.INSTANCE;
-    }
-
     @Override
     public void start(Stage stage) throws IOException {
-        instance = stage;
         logger.info("Starting JavaFX Application");
+//        ViewFactory viewFactory = new ViewFactory();
+//        viewFactory.getAdminView();
+//        FXMLLoader fxmlLoader = new FXMLLoader(Client.class.getResource("view/index.fxml"));
         FXMLLoader fxmlLoader = new FXMLLoader(Client.class.getResource("view/user/home-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
 
         try {
-            instance.getIcons().add(new Image(
+            stage.getIcons().add(new Image(
                 Objects.requireNonNull(getClass().getResourceAsStream("images/app-icon.png"))));
         } catch (Exception e) {
             logger.error("Failed to load application icon", e);
         }
 
-        instance.setTitle("MOP Application");
-        instance.setResizable(false);
-        instance.setScene(scene);
-        instance.show();
+        stage.setTitle("MOP Application");
+        stage.setResizable(false);
+        stage.setScene(scene);
+        stage.show();
     }
 
     public static void main(String[] args) {

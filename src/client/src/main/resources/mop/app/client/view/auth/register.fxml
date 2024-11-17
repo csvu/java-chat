@@ -17,10 +17,10 @@
 <?import java.lang.String?>
 
 <AnchorPane prefHeight="700.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="mop.app.client.controller.RegisterController">
+            fx:controller="mop.app.client.controller.auth.RegisterController">
     <stylesheets>
-        <URL value="@../css/style.css"/>
-        <URL value="@../css/register.css"/>
+        <URL value="@../../css/style.css"/>
+        <URL value="@../../css/register.css"/>
     </stylesheets>
 
     <children>
@@ -32,7 +32,7 @@
                         <ImageView fitHeight="80.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true"
                                    styleClass="app-icon">
                             <image>
-                                <Image url="@../images/app-icon.png"/>
+                                <Image url="@../../images/app-icon.png"/>
                             </image>
                         </ImageView>
                         <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="mop-text" text="MOP"
@@ -41,7 +41,8 @@
                                 <Insets top="10.0"/>
                             </VBox.margin>
                         </Text>
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="slogan-text" text="Connect - Chat - Share"
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="slogan-text"
+                              text="Connect - Chat - Share"
                               textAlignment="CENTER">
                             <VBox.margin>
                                 <Insets top="10.0"/>

@@ -1,27 +1,15 @@
 package mop.app.client.controller.user;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextArea;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import mop.app.client.Client;
-import mop.app.client.controller.IndexController;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -94,8 +82,6 @@ public class HomeController {
         chatHBox.getStyleClass().add("PressedWrapper");
 
     }
-
-
 
 
 }

@@ -1,17 +1,12 @@
-package mop.app.client.controller;
+package mop.app.client.controller.auth;
 
 import java.io.IOException;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
-import mop.app.client.Client;
+import mop.app.client.util.ViewHelper;
 import org.slf4j.Logger;
 
 public class ResetPasswordController {
@@ -26,16 +21,7 @@ public class ResetPasswordController {
     @FXML
     private void handleBack(ActionEvent event) {
         try {
-            Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-
-            FXMLLoader loader = new FXMLLoader(Client.class.getResource("view/login.fxml"));
-            Parent root = loader.load();
-
-            Scene scene = new Scene(root);
-
-            currentStage.setResizable(false);
-            currentStage.setScene(scene);
-            currentStage.show();
+            ViewHelper.getLoginScene(event);
         } catch (IOException e) {
             logger.error("Could not navigate to the previous page.", e);
             showError("Navigation Error", "Could not navigate to the previous page.");

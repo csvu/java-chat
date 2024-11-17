@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane prefHeight="700.0" prefWidth="1000.0" styleClass="container" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mop.app.client.controller.admin.UserDetailsController">
+    <stylesheets>
+        <URL value="@../../css/admin.css" />
+        <URL value="@../../css/register.css" />
+        <URL value="@../../css/style.css" />
+    </stylesheets>
+    <padding>
+        <Insets left="40.0" right="20.0" />
+    </padding>
+    <VBox layoutX="20" layoutY="20" spacing="10" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="20.0">
+
+        <!-- Existing username label -->
+        <!--        <Label fx:id="userNameLabel" styleClass="header-text" text="Username: " />-->
+        <!--      <Line endX="291.29290771484375" endY="0.6213218569755554" startX="-100.0" styleClass="line" />-->
+
+        <!-- Identity Section -->
+        <Label styleClass="header-text" text="Identity">
+            <padding>
+                <Insets bottom="5" />
+            </padding>
+        </Label>
+
+        <GridPane hgap="20" vgap="10">
+            <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="400" minWidth="200" />
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="400" minWidth="200" />
+            </columnConstraints>
+
+            <!-- First Name -->
+            <VBox spacing="5" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                <Label styleClass="field-label" text="Username *" />
+                <TextField fx:id="usernameField" styleClass="input-field" />
+            </VBox>
+
+            <!-- Last Name -->
+            <VBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                <Label styleClass="field-label" text="Display Name *" />
+                <TextField fx:id="displayNameField" styleClass="input-field" />
+            </VBox>
+
+            <!-- Email -->
+            <VBox spacing="5" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                <Label styleClass="field-label" text="Email *" />
+                <TextField fx:id="emailField" styleClass="input-field" />
+            </VBox>
+
+            <!-- Gender -->
+            <VBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                <Label styleClass="field-label" text="Gender *" />
+                <ComboBox fx:id="genderComboBox" prefWidth="500" />
+            </VBox>
+
+            <!-- Birthday -->
+            <VBox spacing="5" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                <Label styleClass="field-label" text="Birthday" />
+                <DatePicker fx:id="birthdayPicker" prefWidth="500" styleClass="date-picker" />
+            </VBox>
+
+            <!-- Role -->
+            <VBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                <Label styleClass="field-label" text="Role *" />
+                <ComboBox fx:id="roleComboBox" prefWidth="500" />
+            </VBox>
+            <rowConstraints>
+                <RowConstraints />
+                <RowConstraints />
+                <RowConstraints />
+            </rowConstraints>
+        </GridPane>
+
+        <!-- Address Section -->
+        <Label styleClass="header-text" text="Address">
+            <padding>
+                <Insets bottom="5" />
+            </padding>
+        </Label>
+
+        <VBox maxWidth="500.0" prefHeight="150.0" spacing="5">
+            <Label styleClass="field-label" text="Address *" />
+            <TextArea fx:id="addressArea" styleClass="text-area" />
+        </VBox>
+
+        <!-- Change Password Section -->
+        <Label styleClass="header-text" text="Change Password">
+            <padding>
+                <Insets bottom="5" />
+            </padding>
+        </Label>
+        <GridPane hgap="20" vgap="10">
+            <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="400" minWidth="200" />
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="400" minWidth="200" />
+            </columnConstraints>
+
+            <!-- Password -->
+            <VBox spacing="5" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                <Label styleClass="field-label" text="Password *" />
+                <TextField fx:id="passwordField" styleClass="input-field" />
+            </VBox>
+
+            <!-- Confirm Password -->
+            <VBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                <Label styleClass="field-label" text="Confirm Password *" />
+                <TextField fx:id="confirmPasswordField" styleClass="input-field" />
+            </VBox>
+            <rowConstraints>
+                <RowConstraints />
+            </rowConstraints>
+        </GridPane>
+        <HBox alignment="CENTER_LEFT">
+            <padding>
+                <Insets top="10" />
+            </padding>
+            <Button fx:id="saveButton" onAction="#handleSave" styleClass="save-button" text="SAVE" />
+<!--            <Region HBox.hgrow="ALWAYS" />-->
+            <Button fx:id="deleteButton" onAction="#handleDelete" styleClass="delete-button" text="DELETE">
+            <HBox.margin>
+               <Insets left="695.0" />
+            </HBox.margin></Button>
+         <VBox.margin>
+            <Insets />
+         </VBox.margin>
+        </HBox>
+    </VBox>
+</AnchorPane>

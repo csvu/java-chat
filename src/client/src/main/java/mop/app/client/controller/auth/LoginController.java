@@ -1,17 +1,12 @@
-package mop.app.client.controller;
+package mop.app.client.controller.auth;
 
 import java.io.IOException;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
-import mop.app.client.Client;
+import mop.app.client.util.ViewHelper;
 import org.slf4j.Logger;
 
 public class LoginController {
@@ -26,16 +21,7 @@ public class LoginController {
     @FXML
     private void handleBack(ActionEvent event) {
         try {
-            Stage currentStage = (Stage)((Node) event.getSource()).getScene().getWindow();
-
-            FXMLLoader loader = new FXMLLoader(Client.class.getResource("view/index.fxml"));
-            Parent root = loader.load();
-
-            Scene scene = new Scene(root);
-
-            currentStage.setResizable(false);
-            currentStage.setScene(scene);
-            currentStage.show();
+            ViewHelper.getIndexScene(event);
         } catch (IOException e) {
             logger.error("Could not navigate to the previous page.", e);
             showError("Navigation Error", "Could not navigate to the previous page.");
@@ -56,18 +42,9 @@ public class LoginController {
     }
 
     @FXML
-    private void handleForgotPassword() {
+    private void handleForgotPassword(ActionEvent event) {
         try {
-            Stage currentStage = (Stage) emailField.getScene().getWindow();
-
-            FXMLLoader loader = new FXMLLoader(Client.class.getResource("view/forgot-password.fxml"));
-            Parent root = loader.load();
-
-            Scene scene = new Scene(root);
-
-            currentStage.setResizable(true);
-            currentStage.setScene(scene);
-            currentStage.show();
+            ViewHelper.getForgotPasswordScene(event);
         } catch (IOException e) {
             logger.error("Could not navigate to the forgot password page.", e);
             showError("Navigation Error", "Could not navigate to the forgot password page.");
@@ -75,18 +52,9 @@ public class LoginController {
     }
 
     @FXML
-    private void handleResetPassword() {
+    private void handleResetPassword(ActionEvent event) {
         try {
-            Stage currentStage = (Stage) emailField.getScene().getWindow();
-
-            FXMLLoader loader = new FXMLLoader(Client.class.getResource("view/reset-password.fxml"));
-            Parent root = loader.load();
-
-            Scene scene = new Scene(root);
-
-            currentStage.setResizable(true);
-            currentStage.setScene(scene);
-            currentStage.show();
+            ViewHelper.getResetPasswordScene(event);
         } catch (IOException e) {
             logger.error("Could not navigate to the reset password page.", e);
             showError("Navigation Error", "Could not navigate to the reset password page.");
@@ -94,18 +62,9 @@ public class LoginController {
     }
 
     @FXML
-    private void handleRegister() {
+    private void handleRegister(ActionEvent event) {
         try {
-            Stage currentStage = (Stage) emailField.getScene().getWindow();
-
-            FXMLLoader loader = new FXMLLoader(Client.class.getResource("view/register.fxml"));
-            Parent root = loader.load();
-
-            Scene scene = new Scene(root);
-
-            currentStage.setResizable(false);
-            currentStage.setScene(scene);
-            currentStage.show();
+            ViewHelper.getRegisterScene(event);
         } catch (IOException e) {
             logger.error("Could not navigate to the register page.", e);
             showError("Navigation Error", "Could not navigate to the register page.");

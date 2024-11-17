@@ -3,13 +3,8 @@ package mop.app.client.controller;
 import java.io.IOException;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.stage.Stage;
-import mop.app.client.Client;
+import mop.app.client.util.ViewHelper;
 import org.slf4j.Logger;
 
 public class IndexController {
@@ -23,12 +18,7 @@ public class IndexController {
     @FXML
     private void handleLogin(ActionEvent event) {
         try {
-            FXMLLoader loader = new FXMLLoader(Client.class.getResource("view/login.fxml"));
-            Parent root = loader.load();
-            Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            currentStage.setScene(new Scene(root));
-            currentStage.setResizable(false);
-            currentStage.show();
+            ViewHelper.getLoginScene(event);
         } catch (IOException e) {
             logger.error("Could not load login page", e);
             showError("Navigation Error", "Could not load email login page.");

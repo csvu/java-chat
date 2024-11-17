@@ -8,6 +8,7 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <VBox alignment="CENTER" spacing="20" styleClass="container" xmlns="http://javafx.com/javafx/8"
       xmlns:fx="http://javafx.com/fxml/1" fx:controller="mop.app.client.controller.IndexController"
       prefWidth="920" prefHeight="640" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity">
@@ -23,19 +24,17 @@
 
             <Button styleClass="navigation-button">
                 <graphic>
-                    <de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView glyphName="ARROW_LEFT"
-                                                                        size="20"
-                                                                        styleClass="inactive-icon"/>
-                    <!--                    <Button>Button</Button>-->
+                    <FontAwesomeIconView glyphName="ARROW_LEFT"
+                                         size="20"
+                                         styleClass="inactive-icon"/>
                 </graphic>
             </Button>
 
             <Button styleClass="navigation-button" onAction="#handleLogin">
                 <graphic>
-                    <de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView glyphName="ARROW_RIGHT"
-                                                                        size="20"
-                                                                        styleClass="next-icon"/>
-                    <!--                    <Button>Button</Button>-->
+                    <FontAwesomeIconView glyphName="ARROW_RIGHT"
+                                         size="20"
+                                         styleClass="next-icon"/>
                 </graphic>
             </Button>
         </HBox>

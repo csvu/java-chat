@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.chart.*?>
+<?import javafx.geometry.Insets?>
+<?import java.net.URL?>
+
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="mop.app.client.controller.admin.StatisticsController"
+            prefHeight="700.0" prefWidth="1000.0" styleClass="container">
+    <stylesheets>
+        <URL value="@../../css/admin.css"/>
+    </stylesheets>
+    <padding>
+        <Insets left="40.0" right="20.0"/>
+    </padding>
+    <VBox layoutX="20" layoutY="20" spacing="10" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+          AnchorPane.topAnchor="20.0">
+        <Label styleClass="header-text" text="Statistics"/>
+        <HBox spacing="30.0">
+            <ComboBox fx:id="filterComboBox" prefWidth="200" promptText="Filter Type"/>
+            <ComboBox fx:id="yearComboBox" prefWidth="200" promptText="Choose year" styleClass="data-filter"/>
+            <Button onAction="#applyFilter" prefWidth="100" styleClass="apply-button" text="Apply"/>
+        </HBox>
+        <BarChart fx:id="barChart" prefWidth="750" prefHeight="580">
+            <xAxis>
+                <CategoryAxis fx:id="monthAxis" label="Month"/>
+            </xAxis>
+            <yAxis>
+                <NumberAxis fx:id="userAxis" label="New Registrations"/>
+            </yAxis>
+        </BarChart>
+    </VBox>
+</AnchorPane>
