@@ -9,7 +9,7 @@ public class Conversation {
     private URL icon;
     private String name;
     private boolean seen;
-//    private ZonedDateTime lastMessageDateTime;
+    private ZonedDateTime lastMessageDateTime;
 
     public Conversation(int conversationID, String type, URL icon, String name, boolean seen) {
         this.conversationID = conversationID;

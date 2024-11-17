@@ -25,7 +25,6 @@ public class IndexController {
         try {
             FXMLLoader loader = new FXMLLoader(Client.class.getResource("view/login.fxml"));
             Parent root = loader.load();
-
             Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             currentStage.setScene(new Scene(root));
             currentStage.setResizable(false);

@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<fx:root hgap="2.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1200.0" style="-fx-background-color: #0E1621;" stylesheets="@home-view-style.css" type="javafx.scene.layout.GridPane" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
+  <columnConstraints>
+      <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" />
+      <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" percentWidth="20.0" />
+  </columnConstraints>
+  <rowConstraints>
+    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+  </rowConstraints>
+   <children>
+      <VBox fx:id="col2" spacing="2.0">
+         <children>
+            <HBox alignment="CENTER_LEFT" maxHeight="74.0" minHeight="74.0" prefHeight="74.0" prefWidth="896.0" style="-fx-background-color: #17212B;" VBox.vgrow="NEVER">
+               <children>
+                  <VBox fx:id="topBarCol3" alignment="CENTER_LEFT" prefHeight="74.0">
+                     <children>
+                        <Label text="AHHEHE" textFill="WHITE">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                        </Label>
+                        <Label text="Label" textFill="WHITE" />
+                     </children>
+                     <HBox.margin>
+                        <Insets />
+                     </HBox.margin>
+                  </VBox>
+                  <HBox prefHeight="100.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+               </children>
+            </HBox>
+            <ListView fx:id="msgWindow" focusTraversable="false" prefHeight="566.0" prefWidth="883.0" style="-fx-background-color: #0E1621;" VBox.vgrow="ALWAYS" />
+            <HBox alignment="CENTER" fillHeight="false" maxHeight="600.0" prefHeight="40.0" prefWidth="883.0" spacing="20.0" style="-fx-background-color: #17212B;" VBox.vgrow="NEVER">
+               <children>
+                  <TextArea fx:id="chatArea" maxHeight="600.0" prefHeight="40.0" prefWidth="200.0" promptText="Write a message" wrapText="true" HBox.hgrow="ALWAYS" />
+                  <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" />
+                  <Button mnemonicParsing="false" styleClass="HoverWrapper">
+                     <graphic>
+                        <FontAwesomeIconView fill="WHITE" glyphName="SEND" selectionEnd="0" selectionStart="0" size="20" />
+                     </graphic>
+                     <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </padding>
+                  </Button>
+               </children>
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="20.0" top="10.0" />
+               </padding>
+            </HBox>
+         </children>
+      </VBox>
+      <VBox fx:id="col3" layoutX="327.0" layoutY="10.0" spacing="2.0" GridPane.columnIndex="1">
+         <children>
+            <HBox fx:id="topBarCol31" alignment="CENTER" focusTraversable="true" maxHeight="74.0" minHeight="74.0" prefHeight="74.0" style="-fx-background-color: #17212B;" VBox.vgrow="NEVER">
+               <children>
+                  <Label text="Chat Info" textFill="WHITE">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                  </Label>
+               </children>
+            </HBox>
+            <VBox alignment="TOP_CENTER" spacing="4.0" style="-fx-background-color: #17212B;" VBox.vgrow="ALWAYS">
+               <children>
+                  <VBox alignment="CENTER" prefHeight="100.0" spacing="20.0" style="-fx-background-color: #17212B;">
+                     <children>
+                        <ImageView fitHeight="54.0" fitWidth="54.0" pickOnBounds="true">
+                           <image>
+                              <Image url="@../../images/place-holder.png" />
+                           </image>
+                        </ImageView>
+                        <HBox alignment="CENTER" prefHeight="100.0">
+                           <children>
+                              <HBox alignment="CENTER" fillHeight="false" maxHeight="30.0" maxWidth="30.0" prefHeight="60.0" prefWidth="0.0" styleClass="HoverWrapper">
+                                 <children>
+                                    <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true">
+                                       <image>
+                                          <Image url="@search-alt-2-svgrepo-com.png" />
+                                       </image>
+                                    </ImageView>
+                                 </children>
+                                 <padding>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                 </padding>
+                              </HBox>
+                              <HBox alignment="CENTER" fillHeight="false" layoutX="106.0" layoutY="18.0" maxHeight="30.0" maxWidth="30.0" prefHeight="60.0" prefWidth="0.0" styleClass="HoverWrapper">
+                                 <children>
+                                    <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true">
+                                       <image>
+                                          <Image url="@people-svgrepo-com.png" />
+                                       </image>
+                                    </ImageView>
+                                 </children>
+                                 <padding>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                 </padding>
+                              </HBox>
+                              <HBox alignment="CENTER" fillHeight="false" layoutX="130.0" layoutY="10.0" maxHeight="30.0" maxWidth="30.0" prefHeight="60.0" prefWidth="0.0" styleClass="HoverWrapper">
+                                 <children>
+                                    <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true">
+                                       <image>
+                                          <Image url="@add-friend-basic-outline-svgrepo-com.png" />
+                                       </image>
+                                    </ImageView>
+                                 </children>
+                                 <padding>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                 </padding>
+                              </HBox>
+                           </children>
+                        </HBox>
+                     </children>
+                     <padding>
+                        <Insets bottom="10.0" top="20.0" />
+                     </padding>
+                  </VBox>
+                  <VBox prefHeight="200.0" prefWidth="100.0" VBox.vgrow="ALWAYS" />
+                  <VBox alignment="CENTER" layoutX="10.0" layoutY="10.0" style="-fx-background-color: #17212B;">
+                     <children>
+                        <HBox alignment="CENTER_LEFT" fillHeight="false" spacing="10.0" styleClass="HoverWrapper">
+                           <children>
+                              <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true">
+                                 <image>
+                                    <Image url="@decline-svgrepo-com.png" />
+                                 </image>
+                              </ImageView>
+                              <Label text="Block" textFill="WHITE" />
+                           </children>
+                           <padding>
+                              <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                           </padding>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT" fillHeight="false" layoutX="10.0" layoutY="20.0" spacing="10.0" styleClass="HoverWrapper">
+                           <children>
+                              <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true">
+                                 <image>
+                                    <Image url="@report-svgrepo-com.png" />
+                                 </image>
+                              </ImageView>
+                              <Label text="Report" textFill="WHITE" />
+                           </children>
+                           <padding>
+                              <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                           </padding>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT" fillHeight="false" spacing="10.0" styleClass="HoverWrapper">
+                           <children>
+                              <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true">
+                                 <image>
+                                    <Image url="@trash-circle-svgrepo-com.png" />
+                                 </image>
+                              </ImageView>
+                              <Label text="Delete Chat" textFill="WHITE" />
+                           </children>
+                           <padding>
+                              <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                           </padding>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT" fillHeight="false" layoutX="10.0" layoutY="43.0" spacing="10.0" styleClass="HoverWrapper">
+                           <children>
+                              <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true">
+                                 <image>
+                                    <Image url="@logout-2-svgrepo-com.png" />
+                                 </image>
+                              </ImageView>
+                              <Label text="Leave Chat" textFill="WHITE" />
+                           </children>
+                           <padding>
+                              <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                           </padding>
+                        </HBox>
+                     </children>
+                     <padding>
+                        <Insets bottom="10.0" top="10.0" />
+                     </padding>
+                  </VBox>
+               </children>
+            </VBox>
+         </children>
+      </VBox>
+   </children>
+</fx:root>

@@ -1,109 +1,101 @@
 package mop.app.client.controller.user;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventType;
 import javafx.fxml.FXML;
-import javafx.geometry.Bounds;
-import javafx.geometry.Pos;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
 import mop.app.client.Client;
-import mop.app.client.model.user.Conversation;
+import mop.app.client.controller.IndexController;
+import org.slf4j.Logger;
 
 import java.io.IOException;
 
 
 public class HomeController {
+    private FriendController friendController;
+    private ChatController chatController;
+    @FXML
+    private HBox friendsHBox;
+    @FXML
+    private HBox chatHBox;
     @FXML
     private ImageView dmNav;
     @FXML
-    private HBox topBarCol3;
-    @FXML
-    private TextArea chatArea;
-    private final Text sizeHelper = new Text();;
-    private double oldHeight = 0;
+    private VBox col2;
+    private static final Logger logger = org.slf4j.LoggerFactory.getLogger(HomeController.class);
+
+    public HomeController() throws IOException {
+    }
 
     @FXML
-    private ListView<Conversation> listViewCol1;
-    @FXML
-    private ListView<Conversation> listViewCol2;
+    public void initialize() throws IOException {
+        chatController = new ChatController();
+        friendController = new FriendController();
 
-    ObservableList<Conversation> dmList;
-    ObservableList<Conversation> groupChad;
+        //Event handling
+        friendsHBox.setOnMouseClicked((e) -> {
+            chatHBox.getStyleClass().clear();
+            chatHBox.getStyleClass().add("HoverWrapper");
+            friendsHBox.getStyleClass().clear();
+            friendsHBox.getStyleClass().add("PressedWrapper");
 
-    @FXML
-    public void initialize() {
+            col2.getChildren().clear();
+            col2.getChildren().add(friendController);
+        });
+        chatHBox.setOnMouseClicked((e) -> {
+            friendsHBox.getStyleClass().clear();
+            friendsHBox.getStyleClass().add("HoverWrapper");
+            chatHBox.getStyleClass().clear();
+            chatHBox.getStyleClass().add("PressedWrapper");
+
+            col2.getChildren().clear();
+            col2.getChildren().add(chatController);
+        });
+        dmNav.setOnMouseClicked(e -> {
+            Stage stage = new Stage();
+            FXMLLoader fxmlLoader = new FXMLLoader(Client.class.getResource("view/user/edit-profile.fxml"));
+
+            try {
+                Scene scene = new Scene(fxmlLoader.load());
+                stage.setScene(scene);
+                stage.setResizable(false);
+                stage.show();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+
+        });
+
+
+        //Clip
         double radius = dmNav.getFitHeight() / 2;
         Circle clip = new Circle(dmNav.getX() + radius, dmNav.getY() + radius, radius);
         dmNav.setClip(clip);
-
-        dmList = FXCollections.observableArrayList();
-        for (int i = 0; i < 30; i++) {
-            dmList.add(new Conversation(i, "PAIR", Client.class.getResource("images/place-holder.png"), "hiha", false));
-        }
-
-        groupChad = FXCollections.observableArrayList();
-        for (int i = 0; i < 30; i++) {
-            groupChad.add(new Conversation(i, "PAIR", Client.class.getResource("images/place-holder.png"), "hiha", false));
-        }
-
-        listViewCol1.setCellFactory(param -> new ListCell<>() {
-            @Override
-            protected void updateItem(Conversation item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                    setGraphic(null);
-                } else {
-                    setAlignment(Pos.CENTER);
-                    setGraphic(new CircleImage(new Image(item.getIcon().toString())));
-                }
-            }
-        });
-
-
-        listViewCol2.setCellFactory(param -> new ListCell<>() {
-            @Override
-            protected void updateItem(Conversation item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                    setGraphic(null);
-                } else {
-                    setGraphic(new CircleImage(new Image(item.getIcon().toString())));
-                }
-            }
-        });
-
-        listViewCol1.setItems(groupChad);
-        listViewCol2.setItems(dmList);
-        chatArea.setPrefSize(200, 40);
-
-        sizeHelper.textProperty().bind(chatArea.textProperty());
-        sizeHelper.layoutBoundsProperty().addListener((observable, oldValue, newValue) -> {
-            if (oldHeight != newValue.getHeight()) {
-                oldHeight = newValue.getHeight();
-                chatArea.setPrefHeight(sizeHelper.getLayoutBounds().getHeight());
-                HBox par = (HBox) chatArea.getParent();
-                par.setPrefHeight(chatArea.getPrefHeight() + par.getPadding().getBottom() + par.getPadding().getTop());
-            }
-        });
+        // Set components
+        col2.getChildren().add(chatController);
+        VBox.setVgrow(chatController, Priority.ALWAYS);
+        chatHBox.getStyleClass().clear();
+        chatHBox.getStyleClass().add("PressedWrapper");
 
     }
 
 
-    @FXML
-    private void onTopBarCol3Clicked() throws IOException {
-        topBarCol3.getChildren().clear();
-        topBarCol3.getChildren().add(new FriendsControl(topBarCol3));
-    }
+
 
 }

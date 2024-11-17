@@ -1,5 +1,22 @@
-#dmNavWrapper:hover {
+.HoverWrapper:hover {
     -fx-background-color: rgba(255, 255, 255, 0.1);
+}
+.HoverWrapper {
+    -fx-background-color: transparent;
+}
+.PressedWrapper {
+    -fx-background-color: rgba(255, 255, 255, 0.2);
+}
+
+
+TextField {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+}
+
+.scroll-pane {
+    -fx-background: #0E1621;
+    -fx-border-color: #0E1621;
 }
 
 .text-area {
@@ -29,22 +46,30 @@ ListView .list-cell {
     -fx-background-color: transparent;
 }
 
-ListView .scroll-bar {
+.scroll-bar {
     -fx-background-color: transparent;
     -fx-pref-width: 8px;
 }
 
-#listViewCol1 .scroll-bar:horizontal {
+.scroll-bar:horizontal {
     -fx-pref-height: 0px;
+}
+
+* {
+    -fx-focus-traversable: true;
+    -fx-focus-color: transparent;
+    -fx-min-width: 50px;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: rgba(255, 255, 255, 0.125)
 }
 
 #listViewCol1 .scroll-bar:vertical {
     -fx-pref-width: 0px;
 }
 
-ListView .scroll-bar .thumb {
-    -fx-background-color: rgba(255, 255, 255, 0.125)
-}
+
 
 ListView .corner {
     -fx-background-color: transparent
@@ -54,10 +79,16 @@ ListView .list-cell:hover {
     -fx-background-color: rgba(255, 255, 255, 0.1);
 }
 
-ListView .increment-button {
+#listF .list-cell:hover {
+    -fx-background-color: transparent;
+}
+
+.increment-button {
+    -fx-pref-height: 0;
     -fx-opacity: 0;
 }
 
-ListView .decrement-button {
+.decrement-button {
+    -fx-pref-height: 0;
     -fx-opacity: 0;
 }

@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<fx:root hgap="2.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1200.0" style="-fx-background-color: black;" stylesheets="@home-view-style.css" type="javafx.scene.layout.GridPane" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
+  <columnConstraints>
+    <ColumnConstraints hgrow="SOMETIMES" maxWidth="1090.0" minWidth="10.0" percentWidth="20.0" />
+      <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" />
+  </columnConstraints>
+  <rowConstraints>
+    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+  </rowConstraints>
+   <children>
+      <VBox style="-fx-background-color: #17212B;">
+         <children>
+            <HBox alignment="CENTER_LEFT" prefHeight="65.0" spacing="10.0">
+               <children>
+                  <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@search-alt-2-svgrepo-com.png" />
+                     </image>
+                  </ImageView>
+                  <TextField promptText="Search" />
+               </children>
+               <padding>
+                  <Insets bottom="10.0" left="20.0" right="10.0" top="10.0" />
+               </padding>
+            </HBox>
+            <VBox prefHeight="200.0" prefWidth="100.0" VBox.vgrow="ALWAYS">
+               <children>
+                  <HBox fx:id="friendList" alignment="CENTER_LEFT" maxHeight="74.0" minHeight="74.0" prefHeight="74.0" prefWidth="896.0" spacing="10.0" styleClass="HoverWrapper">
+                     <children>
+                        <Button mnemonicParsing="false" style="-fx-background-color: transparent;" textFill="WHITE">
+                           <graphic>
+                              <FontAwesomeIconView fill="WHITE" glyphName="USERS" size="20" />
+                           </graphic>
+                        </Button>
+                        <Label text="Friend List" textFill="WHITE">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Label>
+                     </children>
+                     <padding>
+                        <Insets left="20.0" right="20.0" />
+                     </padding>
+                  </HBox>
+                  <HBox fx:id="friendRequests" alignment="CENTER_LEFT" layoutX="10.0" layoutY="10.0" maxHeight="74.0" minHeight="74.0" prefHeight="74.0" prefWidth="896.0" spacing="10.0" styleClass="HoverWrapper">
+                     <children>
+                        <Button mnemonicParsing="false" style="-fx-background-color: transparent;" textFill="WHITE">
+                           <graphic>
+                              <FontAwesomeIconView fill="WHITE" glyphName="BELL" size="20" />
+                           </graphic>
+                        </Button>
+                        <Label fx:id="friendList1" text="Friend Requests" textFill="WHITE">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Label>
+                     </children>
+                     <padding>
+                        <Insets left="20.0" right="20.0" />
+                     </padding>
+                  </HBox>
+               </children>
+            </VBox>
+         </children>
+      </VBox>
+      <VBox fx:id="col2" spacing="2.0" GridPane.columnIndex="1">
+         <children>
+            <HBox fx:id="topBarCol3" alignment="CENTER_LEFT" maxHeight="74.0" minHeight="74.0" prefHeight="74.0" prefWidth="896.0" style="-fx-background-color: #17212B;" VBox.vgrow="NEVER">
+               <children>
+                  <Label fx:id="curOption" text="Label" textFill="WHITE">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                     <HBox.margin>
+                        <Insets />
+                     </HBox.margin>
+                  </Label>
+                  <HBox prefHeight="100.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+               </children>
+               <padding>
+                  <Insets left="20.0" right="20.0" />
+               </padding>
+            </HBox>
+            <HBox fx:id="friendListAllOnl" alignment="CENTER" layoutX="10.0" layoutY="10.0" maxHeight="50.0" minHeight="50.0" prefHeight="50.0" prefWidth="896.0" style="-fx-background-color: #17212B;">
+               <children>
+                  <HBox alignment="CENTER" HBox.hgrow="ALWAYS">
+                     <HBox.margin>
+                        <Insets />
+                     </HBox.margin>
+                     <children>
+                        <Button mnemonicParsing="false" styleClass="HoverWrapper" text="ALL" textFill="WHITE">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                        </Button>
+                     </children>
+                  </HBox>
+                  <Separator maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" opacity="0.2" orientation="VERTICAL" />
+                  <HBox alignment="CENTER" HBox.hgrow="ALWAYS">
+                     <children>
+                        <Button mnemonicParsing="false" styleClass="HoverWrapper" text="ONLINE" textFill="WHITE">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                        </Button>
+                     </children>
+                  </HBox>
+               </children>
+               <padding>
+                  <Insets left="20.0" right="20.0" />
+               </padding>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" prefHeight="65.0" spacing="10.0" style="-fx-background-color: #0E1621;">
+               <children>
+                  <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@search-alt-2-svgrepo-com.png" />
+                     </image>
+                  </ImageView>
+                  <TextField promptText="Search" />
+               </children>
+               <padding>
+                  <Insets bottom="10.0" left="20.0" right="10.0" top="10.0" />
+               </padding>
+            </HBox>
+            <ListView fx:id="listF" focusTraversable="false" prefHeight="566.0" prefWidth="883.0" style="-fx-background-color: #0E1621;" VBox.vgrow="ALWAYS" />
+         </children>
+      </VBox>
+   </children>
+</fx:root>

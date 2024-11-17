@@ -14,6 +14,7 @@ module mop.app.client {
     requires jakarta.mail;
 
     requires static lombok;
+    requires java.desktop;
 
     opens mop.app.client to javafx.fxml;
     opens mop.app.client.controller.user;
