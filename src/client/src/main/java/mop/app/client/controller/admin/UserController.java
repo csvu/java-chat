@@ -31,9 +31,9 @@ public class UserController {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @FXML
-    public TableView<User> userTable;
+    private TableView<User> userTable;
     @FXML
-    public TextField filterField;
+    private TextField filterField;
     @FXML
     private ComboBox<String> actionComboBox;
     @FXML
@@ -49,7 +49,7 @@ public class UserController {
     @FXML
     private TableColumn<User, String> addressCol;
     @FXML
-    public TableColumn<User, String> updateCol;
+    private TableColumn<User, String> updateCol;
 
     private ObservableList<User> userList;
 

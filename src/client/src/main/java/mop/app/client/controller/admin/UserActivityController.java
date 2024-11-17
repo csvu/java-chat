@@ -207,6 +207,7 @@ public class UserActivityController {
             activities.add(new LoginTime(
                 faker.name().username(),
                 faker.internet().emailAddress(),
+                faker.name().fullName(),
                 date
             ));
         }

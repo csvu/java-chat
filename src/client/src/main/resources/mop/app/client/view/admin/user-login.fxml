@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.geometry.Insets?>
+<?import java.net.URL?>
+<AnchorPane prefHeight="700.0" prefWidth="1000.0" styleClass="container" xmlns="http://javafx.com/javafx/23.0.1"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="mop.app.client.controller.admin.UserLoginController">
+    <stylesheets>
+        <URL value="@../../css/admin.css"/>
+    </stylesheets>
+    <padding>
+        <Insets left="40.0" right="20.0"/>
+    </padding>
+    <VBox layoutX="20" layoutY="20" spacing="10" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="20.0">
+        <Label styleClass="header-text" text="User Login Activity"/>
+    </VBox>
+    <TableView fx:id="userLoginTable" layoutX="14.0" layoutY="100.0" prefHeight="500" prefWidth="1000.0"
+               AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+               AnchorPane.topAnchor="60.0">
+        <columns>
+            <TableColumn fx:id="usernameCol" prefWidth="200" text="Username"/>
+            <TableColumn fx:id="displayNameCol" prefWidth="200" text="Display Name"/>
+            <TableColumn fx:id="loginDateCol" prefWidth="200" text="Login Date"/>
+        </columns>
+    </TableView>
+
+</AnchorPane>

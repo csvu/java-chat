@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<AnchorPane prefHeight="700.0" prefWidth="1000.0" styleClass="container" xmlns="http://javafx.com/javafx/23.0.1"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="mop.app.client.controller.admin.NewUserController">
+    <stylesheets>
+        <URL value="@../../css/admin.css"/>
+    </stylesheets>
+    <padding>
+        <Insets left="40.0" right="40.0" top="20.0"/>
+    </padding>
+    <VBox layoutX="20" layoutY="20" spacing="10" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="20.0">
+        <Label styleClass="header-text" text="New Registration"/>
+        <HBox spacing="30.0">
+            <ComboBox fx:id="filterComboBox" prefWidth="200" promptText="Filter"/>
+            <Button onAction="#applyFilter" prefWidth="100" styleClass="apply-button" text="Apply"/>
+        </HBox>
+    </VBox>
+    <TableView fx:id="newUserTable" layoutX="14.0" layoutY="100.0" prefHeight="500" prefWidth="1000.0"
+               AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+               AnchorPane.topAnchor="120.0">
+        <columns>
+            <TableColumn fx:id="usernameCol" prefWidth="200" text="Username"/>
+            <TableColumn fx:id="emailCol" prefWidth="200" text="Email"/>
+            <TableColumn fx:id="displayNameCol" prefWidth="200" text="Display Name"/>
+            <TableColumn fx:id="createdCol" prefWidth="300" text="Created At"/>
+        </columns>
+    </TableView>
+
+</AnchorPane>

@@ -2,6 +2,7 @@ package mop.app.client.controller.admin;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.layout.BorderPane;
 import mop.app.client.util.ViewModel;
@@ -11,7 +12,8 @@ import org.slf4j.LoggerFactory;
 public class AdminController implements Initializable {
     private static final Logger logger = LoggerFactory.getLogger(AdminController.class);
 
-    public BorderPane borderPane;
+    @FXML
+    private BorderPane borderPane;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -19,14 +21,22 @@ public class AdminController implements Initializable {
             switch (newValue) {
                 case "Dashboard":
                     // 5 => New User Registration (Number of Users) => Detailed New User Registration
-                    // 8 => Active Users (Number of Users) => Detailed Active Users
                     // 2 => Login Activity => Detailed Login Activity
                     // 6 => Statistic View User Registration This Year
                     borderPane.setCenter(ViewModel.getInstance().getViewFactory().getDashboardView());
                     break;
+                case "UserLogin":
+                    // 2 => Login Activity => Detailed Login Activity
+                    borderPane.setCenter(ViewModel.getInstance().getViewFactory().getUserLoginView());
+                    break;
+                case "NewUser":
+                    // 5 => New User Registration (Number of Users) => Detailed New User Registration
+                    borderPane.setCenter(ViewModel.getInstance().getViewFactory().getNewUserView());
+                    break;
                 case "User":
                     // 1 => User View (Add User) => Detailed User View (Update User, Delete User)
                     // 7 => Friend List (Number of Friends) => Detailed Friend List
+                    // 8 => Active Users (Number of Users) => Detailed Active Users
                     borderPane.setCenter(ViewModel.getInstance().getViewFactory().getUserView());
                     break;
                 case "Group":

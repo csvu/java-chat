@@ -10,5 +10,6 @@ import lombok.NoArgsConstructor;
 public class LoginTime {
     private String username;
     private String email;
+    private String displayName;
     private String loginDate;
 }

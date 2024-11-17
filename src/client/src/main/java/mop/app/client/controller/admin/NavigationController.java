@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import mop.app.client.util.ViewHelper;
@@ -14,11 +15,17 @@ import org.slf4j.LoggerFactory;
 
 public class NavigationController implements Initializable {
     private static final Logger logger = LoggerFactory.getLogger(NavigationController.class);
-    public Button dashboardButton;
-    public Button userButton;
-    public Button groupButton;
-    public Button statisticButton;
-    public Button spamButton;
+
+    @FXML
+    private Button dashboardButton;
+    @FXML
+    private Button userButton;
+    @FXML
+    private Button groupButton;
+    @FXML
+    private Button statisticButton;
+    @FXML
+    private Button spamButton;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {

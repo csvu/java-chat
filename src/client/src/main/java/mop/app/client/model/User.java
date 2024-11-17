@@ -1,5 +1,6 @@
 package mop.app.client.model;
 
+import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,6 +16,7 @@ public class User {
     private String gender;
     private String birthday;
     private String address;
+    private String createdAt;
     private boolean admin;
 
     public User(String username, String email, String displayName, String birthday) {
@@ -22,6 +24,14 @@ public class User {
         this.email = email;
         this.displayName = displayName;
         this.birthday = birthday;
+    }
+
+    public User(String username, String email, String displayName, String birthday, String createdAt) {
+        this.username = username;
+        this.email = email;
+        this.displayName = displayName;
+        this.birthday = birthday;
+        this.createdAt = createdAt;
     }
 
     public User(String username, String email, String displayName, String birthday, boolean isAdmin) {

@@ -8,23 +8,26 @@ import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
+import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import mop.app.client.model.Group;
 import mop.app.client.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GroupDetailsController {
-    private static final Logger logger = LoggerFactory.getLogger(GroupDetailsController.class);
-
-    @FXML
-    private Label groupNameLabel;
+public class NewUserController {
+    private static final Logger logger = LoggerFactory.getLogger(NewUserController.class);
     @FXML
     private ComboBox<String> filterComboBox;
     @FXML
-    private TableView<User> groupUserTable;
+    private TableView<User> newUserTable;
     @FXML
     private TableColumn<User, String> usernameCol;
     @FXML
@@ -32,47 +35,38 @@ public class GroupDetailsController {
     @FXML
     private TableColumn<User, String> displayNameCol;
     @FXML
-    private TableColumn<User, String> birthdayCol;
+    private TableColumn<User, String> createdCol;
 
     private ObservableList<User> userList;
 
-    public GroupDetailsController() {
+    public NewUserController() {
+        logger.info("Initializing NewUserController");
         userList = FXCollections.observableArrayList();
 
         Faker faker = new Faker(Locale.ENGLISH);
-        for (int i = 0; i < 10; i++) {
-            String username = faker.name().username();
-            String email = faker.internet().emailAddress();
-            String displayName = faker.name().fullName();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        for (int i = 0; i < 50; i++) {
+            String name = faker.team().name();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy - HH:mm:ss");
             Date randomDate = faker.date().past(30, TimeUnit.DAYS);
-            String birthday = dateFormat.format(randomDate);
-            boolean isAdmin = faker.bool().bool();
-            userList.add(new User(username, email, displayName, birthday, isAdmin));
+            String date = dateFormat.format(randomDate);
+            userList.add(new User(name, faker.internet().emailAddress(), faker.name().fullName(), date, date));
         }
-
-        logger.info("GroupDetailController initialized");
-    }
-
-    public void setGroupId(long groupId) {
-//        groupNameLabel.setText("Group: " + groupId);
-        logger.info("GroupDetailController initialized for group {}", groupId);
-    }
-
-    public void setGroupName(String groupName) {
-        groupNameLabel.setText("Group: " + groupName);
     }
 
     @FXML
     public void initialize() {
-        groupUserTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
+        filterComboBox.getItems().addAll("1 day ago", "1 week ago", "1 month ago", "1 year ago", "All time");
+        filterComboBox.getSelectionModel().select("All time");
+
+        logger.info("Initializing NewUserController");
+        newUserTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
 
         usernameCol.setCellValueFactory(new PropertyValueFactory<>("username"));
         emailCol.setCellValueFactory(new PropertyValueFactory<>("email"));
         displayNameCol.setCellValueFactory(new PropertyValueFactory<>("displayName"));
-        birthdayCol.setCellValueFactory(new PropertyValueFactory<>("birthday"));
+        createdCol.setCellValueFactory(new PropertyValueFactory<>("createdAt"));
 
-        List<TableColumn<User, String>> columns = List.of(usernameCol, emailCol, displayNameCol, birthdayCol);
+        List<TableColumn<User, String>> columns = List.of(usernameCol, emailCol, displayNameCol, createdCol);
 
         columns.forEach(column -> column.setCellFactory(stringTableColumn -> new TableCell<>() {
             @Override
@@ -93,9 +87,9 @@ public class GroupDetailsController {
             }
         }));
 
-        groupUserTable.setItems(userList);
+        newUserTable.setItems(userList);
 
-        groupUserTable.setRowFactory(param -> {
+        newUserTable.setRowFactory(param -> {
             TableRow<User> row = new TableRow<>();
             row.setPrefHeight(50);
             return row;
@@ -105,19 +99,6 @@ public class GroupDetailsController {
         filterComboBox.getSelectionModel().select("All");
     }
 
-    @FXML
-    private void applyFilter() {
-        String selectedRole = filterComboBox.getValue();
-        ObservableList<User> filteredList = FXCollections.observableArrayList();
-
-        for (User user : userList) {
-            if ("All".equals(selectedRole) ||
-                ("Admin".equals(selectedRole) && user.isAdmin()) ||
-                ("User".equals(selectedRole) && !user.isAdmin())) {
-                filteredList.add(user);
-            }
-        }
-
-        groupUserTable.setItems(filteredList);
+    public void applyFilter(ActionEvent event) {
     }
 }

@@ -31,19 +31,19 @@ public class GroupController {
     private static final Logger logger = LoggerFactory.getLogger(GroupController.class);
 
     @FXML
-    public TextField filterField;
+    private TextField filterField;
     @FXML
-    public TableView<Group> groupTable;
+    private TableView<Group> groupTable;
     @FXML
-    public TableColumn<Group, String> groupNameCol;
+    private TableColumn<Group, String> groupNameCol;
     @FXML
-    public TableColumn<Group, String> creationDateCol;
+    private TableColumn<Group, String> creationDateCol;
     @FXML
-    public TableColumn<Group, Integer> membersCol;
+    private TableColumn<Group, Integer> membersCol;
     @FXML
-    public TableColumn<Group, Integer> adminCol;
+    private TableColumn<Group, Integer> adminCol;
     @FXML
-    public TableColumn<Group, String> detailsCol;
+    private TableColumn<Group, String> detailsCol;
 
     private ObservableList<Group> groups;
 

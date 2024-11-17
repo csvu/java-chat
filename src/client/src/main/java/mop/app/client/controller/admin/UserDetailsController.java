@@ -14,23 +14,23 @@ public class UserDetailsController {
     private static final Logger logger = LoggerFactory.getLogger(UserDetailsController.class);
 
     @FXML
-    public TextField usernameField;
+    private TextField usernameField;
     @FXML
-    public TextField displayNameField;
+    private TextField displayNameField;
     @FXML
-    public TextField emailField;
+    private TextField emailField;
     @FXML
-    public ComboBox<String> genderComboBox;
+    private ComboBox<String> genderComboBox;
     @FXML
-    public DatePicker birthdayPicker;
+    private DatePicker birthdayPicker;
     @FXML
-    public ComboBox<String> roleComboBox;
+    private ComboBox<String> roleComboBox;
     @FXML
-    public TextArea addressArea;
+    private TextArea addressArea;
     @FXML
-    public TextField passwordField;
+    private TextField passwordField;
     @FXML
-    public TextField confirmPasswordField;
+    private TextField confirmPasswordField;
 
     public void handleSave(ActionEvent event) {
         logger.info("Save button clicked");

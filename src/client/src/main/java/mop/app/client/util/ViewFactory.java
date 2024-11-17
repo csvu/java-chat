@@ -3,6 +3,7 @@ package mop.app.client.util;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.layout.AnchorPane;
 import lombok.Getter;
 import mop.app.client.Client;
@@ -17,28 +18,18 @@ public class ViewFactory {
     private static final Logger logger = LoggerFactory.getLogger(ViewFactory.class);
 
     private FXMLLoader groupDetailsLoader;
-
     private FXMLLoader userDetailsLoader;
-
     private FXMLLoader userActivityLoader;
-
-    @Getter
-    private final StringProperty selectedView;
-
+    @Getter private final StringProperty selectedView;
     private AnchorPane dashboardView;
-
     private AnchorPane userView;
-
     private AnchorPane userDetailsView;
-
     private AnchorPane userActivityView;
-
+    private AnchorPane userLoginView;
+    private AnchorPane newUserView;
     private AnchorPane groupView;
-
     private AnchorPane groupDetailView;
-
     private AnchorPane statisticView;
-
     private AnchorPane spamView;
 
     public ViewFactory() {
@@ -178,5 +169,29 @@ public class ViewFactory {
             }
         }
         return userActivityView;
+    }
+
+    public AnchorPane getUserLoginView() {
+        logger.info("User Login view requested");
+        if (userLoginView == null) {
+            try {
+                userLoginView = ViewHelper.getView(ViewPath.USER_LOGIN.getPath());
+            } catch (Exception e) {
+                logger.error("Could not load user login view.", e);
+            }
+        }
+        return userLoginView;
+    }
+
+    public AnchorPane getNewUserView() {
+        logger.info("New User view requested");
+        if (newUserView == null) {
+            try {
+                newUserView = ViewHelper.getView(ViewPath.NEW_USER.getPath());
+            } catch (Exception e) {
+                logger.error("Could not load new user view.", e);
+            }
+        }
+        return newUserView;
     }
 }
