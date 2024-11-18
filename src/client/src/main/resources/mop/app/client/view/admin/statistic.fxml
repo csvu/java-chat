@@ -16,18 +16,24 @@
     <stylesheets>
         <URL value="@../../css/admin.css"/>
     </stylesheets>
-    <padding>
-        <Insets left="40.0" right="20.0"/>
-    </padding>
-    <VBox layoutX="20" layoutY="20" spacing="10" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-          AnchorPane.topAnchor="20.0">
+
+    <!-- Header Area -->
+    <VBox styleClass="header-area" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <padding>
+            <Insets left="40.0" right="40.0" top="20.0" bottom="20.0"/>
+        </padding>
         <Label styleClass="header-text" text="Statistics"/>
+    </VBox>
+
+    <!-- Content Area -->
+    <VBox spacing="20" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="100.0">
         <HBox spacing="30.0">
             <ComboBox fx:id="filterComboBox" prefWidth="200" promptText="Filter Type"/>
             <ComboBox fx:id="yearComboBox" prefWidth="200" promptText="Choose year" styleClass="data-filter"/>
             <Button onAction="#applyFilter" prefWidth="100" styleClass="apply-button" text="Apply"/>
         </HBox>
-        <BarChart fx:id="barChart" prefWidth="750" prefHeight="580">
+
+        <BarChart fx:id="barChart" prefWidth="750" prefHeight="550">
             <xAxis>
                 <CategoryAxis fx:id="monthAxis" label="Month"/>
             </xAxis>

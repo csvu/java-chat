@@ -18,23 +18,23 @@ public class Client extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         logger.info("Starting JavaFX Application");
-        ViewFactory viewFactory = new ViewFactory();
-        viewFactory.getAdminView();
-//        FXMLLoader fxmlLoader = new FXMLLoader(Client.class.getResource("view/index.fxml"));
+//        ViewFactory viewFactory = new ViewFactory();
+//        viewFactory.getAdminView();
+        FXMLLoader fxmlLoader = new FXMLLoader(Client.class.getResource("view/index.fxml"));
 //        FXMLLoader fxmlLoader = new FXMLLoader(Client.class.getResource("view/user/home-view.fxml"));
-//        Scene scene = new Scene(fxmlLoader.load());
-//
-//        try {
-//            stage.getIcons().add(new Image(
-//                Objects.requireNonNull(getClass().getResourceAsStream("images/app-icon.png"))));
-//        } catch (Exception e) {
-//            logger.error("Failed to load application icon", e);
-//        }
-//
-//        stage.setTitle("MOP Application");
-//        stage.setResizable(false);
-//        stage.setScene(scene);
-//        stage.show();
+        Scene scene = new Scene(fxmlLoader.load());
+
+        try {
+            stage.getIcons().add(new Image(
+                Objects.requireNonNull(getClass().getResourceAsStream("images/app-icon.png"))));
+        } catch (Exception e) {
+            logger.error("Failed to load application icon", e);
+        }
+
+        stage.setTitle("MOP Application");
+        stage.setResizable(false);
+        stage.setScene(scene);
+        stage.show();
     }
 
     public static void main(String[] args) {

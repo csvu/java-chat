@@ -14,19 +14,24 @@
     <stylesheets>
         <URL value="@../../css/admin.css"/>
     </stylesheets>
-    <padding>
-        <Insets left="40.0" right="20.0"/>
-    </padding>
-    <VBox layoutX="20" layoutY="20" spacing="10" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="20.0">
+
+    <!-- Header Area -->
+    <VBox styleClass="header-area" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <padding>
+            <Insets left="40.0" right="40.0" top="20.0" bottom="20.0"/>
+        </padding>
         <Label fx:id="groupNameLabel" styleClass="header-text" text="Group: "/>
+    </VBox>
+
+    <VBox layoutX="20" layoutY="20" spacing="10" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="100.0">
         <HBox spacing="30.0">
             <ComboBox fx:id="filterComboBox" prefWidth="200" promptText="Filter"/>
             <Button onAction="#applyFilter" prefWidth="100" styleClass="apply-button" text="Apply"/>
         </HBox>
     </VBox>
     <TableView fx:id="groupUserTable" layoutX="14.0" layoutY="100.0" prefHeight="500" prefWidth="1000.0"
-               AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-               AnchorPane.topAnchor="120.0">
+               AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="0.0"
+               AnchorPane.topAnchor="160.0">
         <columns>
             <TableColumn fx:id="usernameCol" prefWidth="200" text="Username"/>
             <TableColumn fx:id="emailCol" prefWidth="200" text="Email"/>

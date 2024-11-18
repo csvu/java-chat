@@ -16,10 +16,16 @@
 <AnchorPane prefHeight="700.0" prefWidth="1000.0" styleClass="container" xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml" fx:controller="mop.app.client.controller.admin.SpamController">
     <children>
-        <VBox layoutX="20" layoutY="20" spacing="10" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-              AnchorPane.topAnchor="20.0">
-            <Label styleClass="header-text" text="Spam Report"/>
-            <Line endX="39.292877197265625" endY="-6.949901489861077E-6" startX="-100.0" styleClass="line"/>
+        <!-- Header Area -->
+        <VBox styleClass="header-area" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <padding>
+                <Insets left="40.0" top="20.0" bottom="20.0"/>
+            </padding>
+            <Label styleClass="header-text" text="Spam Reports"/>
+        </VBox>
+
+        <VBox layoutX="20" layoutY="20" spacing="10" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0"
+              AnchorPane.topAnchor="100.0">
             <HBox spacing="30.0">
                 <TextField prefWidth="200" promptText="Filter by username" styleClass="data-filter"/>
                 <DatePicker prefWidth="200" promptText="Filter by date"/>
@@ -30,8 +36,8 @@
             </HBox>
         </VBox>
         <TableView fx:id="spamReportsTable" layoutX="14.0" layoutY="149.0" prefHeight="300" prefWidth="1000.0"
-                   AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-                   AnchorPane.topAnchor="120.0">
+                   AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="0.0"
+                   AnchorPane.topAnchor="160.0">
             <columns>
                 <TableColumn fx:id="userReportedCol" prefWidth="150" text="User Reported"/>
                 <TableColumn fx:id="reportedByCol" prefWidth="150" text="Reported By"/>
@@ -44,7 +50,4 @@
     <stylesheets>
         <URL value="@../../css/admin.css"/>
     </stylesheets>
-    <padding>
-        <Insets left="40.0" right="20.0"/>
-    </padding>
 </AnchorPane>

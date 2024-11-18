@@ -12,10 +12,17 @@
     <stylesheets>
         <URL value="@../../css/admin.css"/>
     </stylesheets>
+    <!-- Header Area -->
+    <VBox styleClass="header-area" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <padding>
+            <Insets left="40.0" right="40.0" top="20.0" bottom="20.0"/>
+        </padding>
+        <Label fx:id="usernameLabel" styleClass="header-text" text="Username: "/>
+    </VBox>
+
     <children>
-        <VBox spacing="10" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
+        <VBox spacing="10" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="100.0">
             <children>
-                <Label fx:id="usernameLabel" styleClass="header-text" text="Username: "/>
                 <HBox spacing="30.0">
                     <children>
                         <ComboBox fx:id="filterComboBox" prefWidth="200" promptText="Filter"/>
@@ -24,6 +31,6 @@
                 </HBox>
             </children>
         </VBox>
-        <AnchorPane fx:id="contentPane" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="100.0" />
+        <AnchorPane fx:id="contentPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="160.0" />
     </children>
 </AnchorPane>

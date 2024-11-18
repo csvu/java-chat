@@ -17,44 +17,45 @@
     <stylesheets>
         <URL value="@../../css/admin.css"/>
     </stylesheets>
-    <padding>
-        <Insets left="40.0" right="40.0" top="20.0"/>
-    </padding>
 
-    <VBox layoutX="20" layoutY="20" spacing="10" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-          AnchorPane.topAnchor="20.0">
-        <Label styleClass="header-text" text="Dashboard"/>
+    <!-- Header Area -->
+    <VBox styleClass="header-area" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <padding>
+            <Insets left="40.0" right="40.0" top="20.0" bottom="20.0"/>
+        </padding>
+        <Label styleClass="header-text" text="Admin Dashboard"/>
     </VBox>
 
-    <!-- Metrics Cards -->
-    <HBox spacing="20.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="80.0">
-        <!-- Today's Registrations Card -->
-        <StackPane styleClass="metric-card, clickable-card" fx:id="todayRegistrationsCard" onMouseClicked="#showTodayRegistrations">
-            <padding>
-                <Insets top="15.0" right="20.0" bottom="15.0" left="20.0"/>
-            </padding>
-            <VBox>
-                <Label styleClass="metric-label" text="New Users Today"/>
-                <Label fx:id="todayRegistrationsLabel" styleClass="metric-value" text="0"/>
-                <Label styleClass="metric-subtitle" text="Click to view more details"/>
-            </VBox>
-        </StackPane>
+    <!-- Content Area -->
+    <VBox spacing="20" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="100.0">
+        <!-- Metrics Cards -->
+        <HBox spacing="20.0">
+            <!-- Today's Registrations Card -->
+            <StackPane styleClass="metric-card, clickable-card" fx:id="todayRegistrationsCard" onMouseClicked="#showTodayRegistrations">
+                <padding>
+                    <Insets top="15.0" right="20.0" bottom="15.0" left="20.0"/>
+                </padding>
+                <VBox>
+                    <Label styleClass="metric-label" text="New Users Today"/>
+                    <Label fx:id="todayRegistrationsLabel" styleClass="metric-value" text="0"/>
+                    <Label styleClass="metric-subtitle" text="Click to view more details"/>
+                </VBox>
+            </StackPane>
 
-        <!-- Active Users Card -->
-        <StackPane styleClass="metric-card, clickable-card" fx:id="activeUsersCard" onMouseClicked="#showActiveUsers">
-            <padding>
-                <Insets top="15.0" right="20.0" bottom="15.0" left="20.0"/>
-            </padding>
-            <VBox>
-                <Label styleClass="metric-label" text="Active Users"/>
-                <Label fx:id="activeUsersLabel" styleClass="metric-value" text="0"/>
-                <Label styleClass="metric-subtitle" text="Click to view more details"/>
-            </VBox>
-        </StackPane>
-    </HBox>
+            <!-- Active Users Card -->
+            <StackPane styleClass="metric-card, clickable-card" fx:id="activeUsersCard" onMouseClicked="#showActiveUsers">
+                <padding>
+                    <Insets top="15.0" right="20.0" bottom="15.0" left="20.0"/>
+                </padding>
+                <VBox>
+                    <Label styleClass="metric-label" text="Active Users"/>
+                    <Label fx:id="activeUsersLabel" styleClass="metric-value" text="0"/>
+                    <Label styleClass="metric-subtitle" text="Click to view more details"/>
+                </VBox>
+            </StackPane>
+        </HBox>
 
-    <!-- Registration Chart Section -->
-    <VBox AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="250.0">
+        <!-- Registration Chart Section -->
         <BarChart fx:id="barChart" prefHeight="400" prefWidth="900">
             <xAxis>
                 <CategoryAxis fx:id="monthAxis" label="Month"/>

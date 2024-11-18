@@ -2,12 +2,18 @@
     -fx-background-color: #0e1621;
 }
 
-/* Spam */
+.header-area {
+    -fx-background-color: #17212b;
+    -fx-min-height: 60px;
+}
+
 .header-text {
-    -fx-text-fill: #f5f5f5;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
     -fx-font-size: 2em;
 }
 
+/* Spam */
 .table-view {
     /* Table Border */
     -fx-background-color: transparent;

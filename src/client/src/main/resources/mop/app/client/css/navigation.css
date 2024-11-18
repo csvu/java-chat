@@ -1,6 +1,8 @@
 .nav {
     -fx-background-color: #17212b;
     -fx-padding: 10 0;
+    -fx-border-width: 0 3 0 0;
+    -fx-border-color: black;
 }
 
 .nav-button {

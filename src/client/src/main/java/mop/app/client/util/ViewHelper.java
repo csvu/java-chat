@@ -1,11 +1,13 @@
 package mop.app.client.util;
 
 import java.io.IOException;
+import java.util.Objects;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import lombok.Getter;
@@ -33,6 +35,15 @@ public class ViewHelper {
             logger.error("Failed to load scene", e);
         }
         Stage stage = new Stage();
+
+        try {
+            stage.getIcons().add(new Image(
+                Objects.requireNonNull(Client.class.getResourceAsStream("images/app-icon.png"))));
+        } catch (Exception e) {
+            logger.error("Failed to load application icon", e);
+        }
+
+        stage.setTitle("MOP Application");
         stage.setResizable(resizable);
         stage.setScene(scene);
         stage.show();
