@@ -74,22 +74,26 @@ public class ChatController extends GridPane {
         getChildren().add(chatWindowController);
 
         // Scroll
-        listViewCol2.setCellFactory(param -> {
-            ListCell<Conversation> listCell = new ListCell<>() {
-                @Override
-                protected void updateItem(Conversation item, boolean empty) {
-                    super.updateItem(item, empty);
-                    if (empty || item == null) {
-                        setText(null);
-                        setGraphic(null);
+        listViewCol2.setCellFactory(param -> new ListCell<>() {
+            IconLabel iconLabel = null;
+            @Override
+            protected void updateItem(Conversation item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    ObservableList<Message> lastMsg = convMsg.get(item.getConversationID());
+                    if (iconLabel == null) {
+                        iconLabel = new IconLabel(placeholder, item.getName(), null, lastMsg == null || lastMsg.isEmpty() ? "No message yet" : lastMsg.get(0).getContent());
                     } else {
-                        ObservableList<Message> lastMsg = convMsg.get(item.getConversationID());
-                        setGraphic(new IconLabel(placeholder, item.getName(), null, lastMsg == null || lastMsg.isEmpty() ? "No message yet" : lastMsg.get(0).getContent()));
-                    }
-                }
-            };
+                        iconLabel.update(placeholder, item.getName(), null, lastMsg == null || lastMsg.isEmpty() ? "No message yet" : lastMsg.get(0).getContent());
 
-            return listCell;
+                    }
+                    setGraphic(iconLabel);
+
+                }
+            }
         });
 
         listViewCol2.setOnMouseClicked(mouseEvent -> chatWindowController.changeCurConv(listViewCol2.getSelectionModel().getSelectedItem()));

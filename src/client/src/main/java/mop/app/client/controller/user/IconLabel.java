@@ -20,35 +20,57 @@ class CustomLabel extends Label {
 }
 
 public class IconLabel extends HBox {
+    VBox vbox;
+    Label titleLabel;
+    HBox hbox;
+    Label titleSideLabel;
+    Label contentLabel;
+    CircleImage circleImage;
 
     public IconLabel(URL icon, String title, String titleSide, String content) {
         setPadding(new Insets(10, 10, 10, 10));
         setSpacing(10);
 
 
-        VBox vbox = new VBox();
+        vbox = new VBox();
 
-        HBox hbox = new HBox();
-        Label titleLabel = new CustomLabel(title);
+        hbox = new HBox();
+        titleLabel = new CustomLabel(title);
         titleLabel.setStyle("-fx-font-weight: bold;");
-        Label titleSideLabel = new CustomLabel(titleSide);
+        titleSideLabel = new CustomLabel(titleSide);
         titleSideLabel.setFont(Font.font("Verdana", FontWeight.NORMAL, 10));
         hbox.setSpacing(10);
         hbox.getChildren().add(titleLabel);
         hbox.getChildren().add(titleSideLabel);
         vbox.getChildren().add(hbox);
 
-        Label contentLabel = new CustomLabel(content);
+        contentLabel = new CustomLabel(content);
         if (content != null) vbox.getChildren().add(contentLabel);
         vbox.setAlignment(Pos.CENTER_LEFT);
 
         if (icon != null) {
-            getChildren().add(new CircleImage(icon.toString()));
+            circleImage = new CircleImage(icon.toString());
+            getChildren().add(circleImage);
         }
         if (title != null || titleSide != null) getChildren().add(vbox);
         setPadding(new Insets(10));
 
 
+    }
+
+    public void update(URL icon, String title, String titleSide, String content) {
+        if (icon != null) {
+            circleImage.update(icon.toString());
+        }
+        if (title != null) {
+            titleLabel.setText(title);
+        }
+        if (titleSide != null) {
+            titleSideLabel.setText(titleSide);
+        }
+        if (content != null) {
+            contentLabel.setText(content);
+        }
     }
 
 

@@ -20,7 +20,7 @@ public class Client extends Application {
         logger.info("Starting JavaFX Application");
 //        ViewFactory viewFactory = new ViewFactory();
 //        viewFactory.getAdminView();
-        FXMLLoader fxmlLoader = new FXMLLoader(Client.class.getResource("view/index.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(Client.class.getResource("view/user/home-view.fxml"));
 //        FXMLLoader fxmlLoader = new FXMLLoader(Client.class.getResource("view/user/home-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
 

@@ -16,6 +16,7 @@ import mop.app.client.Client;
 import mop.app.client.model.user.Conversation;
 import mop.app.client.model.user.Message;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDateTime;
@@ -73,6 +74,7 @@ public class ChatWindowController extends GridPane {
 
 
         msgWindow.setCellFactory(params -> new ListCell<>(){
+            IconLabel iconLabel = null;
             @Override
             protected void updateItem(Message item, boolean empty) {
                 super.updateItem(item, empty);
@@ -80,7 +82,12 @@ public class ChatWindowController extends GridPane {
                     setText(null);
                     setGraphic(null);
                 } else {
-                    setGraphic(new IconLabel(item.getSenderIcon(), item.getSender(), item.getSentAt().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT, FormatStyle.SHORT)), item.getContent()));
+                    if (iconLabel == null) {
+                        iconLabel = new IconLabel(item.getSenderIcon(), item.getSender(), item.getSentAt().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT, FormatStyle.SHORT)), item.getContent());
+                    } else {
+                        iconLabel.update(item.getSenderIcon(), item.getSender(), item.getSentAt().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT, FormatStyle.SHORT)), item.getContent());
+                    }
+                    setGraphic(iconLabel);
                 }
             }
         });

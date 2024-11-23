@@ -2,19 +2,17 @@ package mop.app.client.controller.user;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
+import javafx.util.Pair;
 import mop.app.client.Client;
 import mop.app.client.model.user.Conversation;
 import mop.app.client.model.user.Message;
@@ -26,7 +24,9 @@ import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
+import java.util.function.Consumer;
 
 public class FriendController extends GridPane {
     private static final Logger log = LoggerFactory.getLogger(FriendController.class);
@@ -59,36 +59,30 @@ public class FriendController extends GridPane {
         fxmlLoader.load();
         URL placeholder = Client.class.getResource("images/place-holder.png");
 
-        Callback<ListView<Conversation>, ListCell<Conversation>> friendListFactory = param -> {
-            ListCell<Conversation> listCell = new ListCell<>() {
-                @Override
-                protected void updateItem(Conversation item, boolean empty) {
-                    super.updateItem(item, empty);
-                    if (empty || item == null) {
-                        setText(null);
-                        setGraphic(null);
-                    } else {
-                        setGraphic(iconLabelWrapper(new IconLabel(item.getIcon(), item.getName(), null, "Online"), item, "view/user/unfriend-svgrepo-com.png"));
-                    }
-                }};
-
-            return listCell;
+        Consumer<Conversation> changeToChat = item -> {
+            curConversation = item;
+            chatWindowController.changeCurConv(item);
+            getChildren().remove(1);
+            setConstraints(chatWindowController, 1, 0);
+            getChildren().add(chatWindowController);
         };
-        Callback<ListView<Conversation>, ListCell<Conversation>> friendRequestsFactory = param -> {
-            ListCell<Conversation> listCell = new ListCell<>() {
-                @Override
-                protected void updateItem(Conversation item, boolean empty) {
-                    super.updateItem(item, empty);
-                    if (empty || item == null) {
-                        setText(null);
-                        setGraphic(null);
-                    } else {
-                        setGraphic(iconLabelWrapper(new IconLabel(item.getIcon(), item.getName(), null, "Online"), item, "view/user/accept-svgrepo-com.png"));
-                    }
-                }};
 
-            return listCell;
-        };
+        Callback<ListView<Conversation>, ListCell<Conversation>> friendListFactory = param -> new ListCellWithButtons(
+                changeToChat,
+                Arrays.asList(new Pair<String, Consumer<Conversation>>(
+                                "view/user/decline-svgrepo-com.png", item -> {}),
+                        new Pair<String, Consumer<Conversation>>(
+                                "view/user/unfriend-svgrepo-com.png", item -> {})
+                )
+        );
+        Callback<ListView<Conversation>, ListCell<Conversation>> friendRequestsFactory = param -> new ListCellWithButtons(
+                changeToChat,
+                Arrays.asList(new Pair<String, Consumer<Conversation>>(
+                        "view/user/accept-svgrepo-com.png", item -> {}),
+                        new Pair<String, Consumer<Conversation>>(
+                        "view/user/decline-svgrepo-com.png", item -> {})
+                )
+        );
 
 
 
@@ -174,30 +168,6 @@ public class FriendController extends GridPane {
     private void hideFriendListAllOnl() {
         col2.getChildren().remove(friendListAllOnl);
     }
-
-    private HBox iconLabelWrapper(IconLabel iconLabel, Conversation item, String leftIcon) {
-        HBox hbox = new HBox();
-        iconLabel.getStyleClass().add("HoverWrapper");
-        iconLabel.setOnMouseClicked(mouseEvent -> {
-            curConversation = item;
-            chatWindowController.changeCurConv(item);
-            getChildren().remove(1);
-            setConstraints(chatWindowController, 1, 0);
-            getChildren().add(chatWindowController);
-        });
-        HBox.setHgrow(iconLabel, Priority.ALWAYS);
-        hbox.getChildren().add(iconLabel);
-
-        Arrays.asList(leftIcon, "view/user/decline-svgrepo-com.png").forEach(e -> {
-            IconLabel icon = new IconLabel(Client.class.getResource(e), null, null, null);
-            icon.getStyleClass().add("HoverWrapper");
-            hbox.getChildren().add(icon);
-        });
-
-        return hbox;
-    }
-
-
 
     public class FriendsControl extends HBox {
         public FriendsControl() throws IOException {

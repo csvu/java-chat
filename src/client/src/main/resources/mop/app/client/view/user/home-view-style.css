@@ -46,6 +46,10 @@ ListView .list-cell {
     -fx-background-color: transparent;
 }
 
+#listViewCol2 .list-cell:selected {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+}
+
 .scroll-bar {
     -fx-background-color: transparent;
     -fx-pref-width: 8px;

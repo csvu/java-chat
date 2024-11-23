@@ -16,4 +16,8 @@ public class CircleImage extends ImageView {
         setClip(clip);
 
     }
+
+    public void update(String image) {
+        setImage(new Image(image));
+    }
 }
