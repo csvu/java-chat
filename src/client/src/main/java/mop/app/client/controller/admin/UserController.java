@@ -1,99 +1,125 @@
 package mop.app.client.controller.admin;
 
-import com.github.javafaker.Faker;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.concurrent.TimeUnit;
+import java.text.SimpleDateFormat;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableRow;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.StackPane;
-import javafx.util.Callback;
-import mop.app.client.model.Group;
-import mop.app.client.model.User;
+import mop.app.client.dao.UserManagementDAO;
+import mop.app.client.dto.UserDTO;
 import mop.app.client.util.ViewModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class UserController {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @FXML
-    private TableView<User> userTable;
+    private TableView<UserDTO> userTable;
     @FXML
     private TextField filterField;
     @FXML
     private ComboBox<String> actionComboBox;
     @FXML
-    private TableColumn<User, String> userNameCol;
+    private TableColumn<UserDTO, String> userNameCol;
     @FXML
-    private TableColumn<User, String> emailCol;
+    private TableColumn<UserDTO, String> emailCol;
     @FXML
-    private TableColumn<User, String> displayNameCol;
+    private TableColumn<UserDTO, String> displayNameCol;
     @FXML
-    private TableColumn<User, String> birthdayCol;
+    private TableColumn<UserDTO, Date> birthdayCol;
     @FXML
-    private TableColumn<User, String> genderCol;
+    private TableColumn<UserDTO, String> genderCol;
     @FXML
-    private TableColumn<User, String> addressCol;
+    private TableColumn<UserDTO, String> addressCol;
     @FXML
-    private TableColumn<User, String> updateCol;
-
-    private ObservableList<User> userList;
+    public TableColumn<UserDTO, Boolean> blockCol;
+    @FXML
+    private TableColumn<UserDTO, String> updateCol;
+    private final ObservableList<UserDTO> userList;
+    private final UserManagementDAO userManagementDAO;
 
     public UserController() {
+        userManagementDAO = new UserManagementDAO();
         userList = FXCollections.observableArrayList();
-
-        Faker faker = new Faker(Locale.ENGLISH);
-        for (int i = 0; i < 20; i++) {
-            String username = faker.name().username();
-            String email = faker.internet().emailAddress();
-            String displayName = faker.name().fullName();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-            Date randomDate = faker.date().past(30, TimeUnit.DAYS);
-            String birthday = dateFormat.format(randomDate);
-            int randNumber = faker.number().numberBetween(0, 3);
-            String gender;
-            if (randNumber == 1) {
-                gender = "Male";
-            } else if (randNumber == 2) {
-                gender = "Female";
-            } else {
-                gender = "Other";
-            }
-            String address = faker.address().fullAddress();
-            userList.add(new User(i, username, email, displayName, birthday, gender, address));
-        }
-
-        logger.info("UserController initialized");
     }
 
     @FXML
     public void initialize() {
-        userTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
+        setupTableColumns();
+        setupTableView();
+        loadUsersAsync();
+    }
 
-        List<TableColumn<User, String>> columns =
-            List.of(userNameCol, emailCol, displayNameCol, birthdayCol, genderCol, addressCol);
+    private void setupTableColumns() {
+        List<TableColumn<UserDTO, String>> strColumns =
+            List.of(userNameCol, emailCol, displayNameCol, genderCol, addressCol);
+
         userNameCol.setCellValueFactory(new PropertyValueFactory<>("username"));
         emailCol.setCellValueFactory(new PropertyValueFactory<>("email"));
         displayNameCol.setCellValueFactory(new PropertyValueFactory<>("displayName"));
-        birthdayCol.setCellValueFactory(new PropertyValueFactory<>("birthday"));
+        birthdayCol.setCellValueFactory(new PropertyValueFactory<>("birthDate"));
         genderCol.setCellValueFactory(new PropertyValueFactory<>("gender"));
         addressCol.setCellValueFactory(new PropertyValueFactory<>("address"));
+        blockCol.setCellValueFactory(new PropertyValueFactory<>("isBanned"));
 
-        columns.forEach(column -> column.setCellFactory(stringTableColumn -> new TableCell<>() {
+        strColumns.forEach(this::styleTableColumn);
+
+        birthdayCol.setCellFactory(param -> new TableCell<>() {
+            @Override
+            protected void updateItem(Date item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd-yyyy");
+                    String formattedDate = dateFormat.format(item);
+                    setText(formattedDate);
+
+                    setAlignment(Pos.CENTER_LEFT);
+                    setStyle(
+                        "-fx-text-fill: white; " +
+                            "-fx-font-weight: bold; " +
+                            "-fx-font-size: 12px;"
+                    );
+                }
+            }
+        });
+
+        blockCol.setCellFactory(param -> new TableCell<>() {
+            @Override
+            protected void updateItem(Boolean item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    boolean isBlocked = item;
+                    setText(isBlocked ? "Blocked" : "Active");
+                    setAlignment(Pos.CENTER_LEFT);
+                    setStyle(
+                        "-fx-text-fill: white; " +
+                            "-fx-font-weight: bold; " +
+                            "-fx-font-size: 12px;"
+                    );
+                }
+            }
+        });
+    }
+
+    private void styleTableColumn(TableColumn<UserDTO, String> column) {
+        column.setCellFactory(stringTableColumn -> new TableCell<>() {
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
@@ -110,90 +136,172 @@ public class UserController {
                     );
                 }
             }
-        }));
+        });
+    }
 
-        updateCol.setCellFactory(new Callback<>() {
+    private void setupTableView() {
+        userTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
+
+        // Setup update column
+        updateCol.setCellFactory(param -> new TableCell<>() {
             @Override
-            public TableCell<User, String> call(TableColumn<User, String> param) {
-                return new TableCell<>() {
-                    @Override
-                    protected void updateItem(String item, boolean empty) {
-                        super.updateItem(item, empty);
-                        if (empty) {
-                            setGraphic(null);
-                        } else {
-                            Button detailButton = new Button("Update");
-                            detailButton.setStyle(
-                                "-fx-background-color: #74aef6; " +
-                                    "-fx-text-fill: white; " +
-                                    "-fx-border-radius: 20px; " +
-                                    "-fx-background-radius: 20px; " +
-                                    "-fx-font-size: 14px; " +
-                                    "-fx-font-weight: bold; " +
-                                    "-fx-padding: 10 20 10 20; " +
-                                    "-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 5, 0.0, 0, 1);"
-                            );
-                            detailButton.setMaxWidth(Double.MAX_VALUE);
-                            detailButton.setMaxHeight(Double.MAX_VALUE);
-                            detailButton.setOnAction(event -> userDetails(getTableRow().getItem()));
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    Button detailButton = createUpdateButton();
+                    StackPane stackPane = new StackPane(detailButton);
+                    stackPane.setPrefWidth(Double.MAX_VALUE);
+                    stackPane.setPrefHeight(Double.MAX_VALUE);
+                    setGraphic(stackPane);
+                }
+            }
 
-                            StackPane stackPane = new StackPane(detailButton);
-                            stackPane.setPrefWidth(Double.MAX_VALUE);
-                            stackPane.setPrefHeight(Double.MAX_VALUE);
-                            setGraphic(stackPane);
-                        }
-                    }
-                };
+            private Button createUpdateButton() {
+                Button detailButton = new Button("Update");
+                detailButton.setStyle(
+                    "-fx-background-color: #74aef6; " +
+                        "-fx-text-fill: white; " +
+                        "-fx-border-radius: 20px; " +
+                        "-fx-background-radius: 20px; " +
+                        "-fx-font-size: 14px; " +
+                        "-fx-font-weight: bold; " +
+                        "-fx-padding: 10 20 10 20; " +
+                        "-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 5, 0.0, 0, 1);"
+                );
+                detailButton.setMaxWidth(Double.MAX_VALUE);
+                detailButton.setMaxHeight(Double.MAX_VALUE);
+                detailButton.setOnAction(event -> {
+                    UserDTO user = getTableRow().getItem();
+                    if (user != null) userDetails(user);
+                });
+                return detailButton;
             }
         });
 
-        userTable.setItems(userList);
-
+        // Set row factory
         userTable.setRowFactory(param -> {
-            TableRow<User> row = new TableRow<>();
+            TableRow<UserDTO> row = new TableRow<>();
             row.setPrefHeight(50);
-
             row.setOnMouseClicked(event -> {
-                if (event.getClickCount() == 1 && (!row.isEmpty())) {
-                    User user = row.getItem();
+                if (event.getClickCount() == 2 && (!row.isEmpty())) {
+                    UserDTO user = row.getItem();
                     userActivity(user);
                 }
             });
-
             return row;
         });
 
-//        userTable.setOnMouseClicked(event -> {
-//            if (event.getClickCount() == 2 && !userTable.getSelectionModel().isEmpty()) {
-//                User selectedUser = userTable.getSelectionModel().getSelectedItem();
-//                userDetails(selectedUser);
-//            }
-//        });
+        // Set items
+        userTable.setItems(userList);
 
         actionComboBox.getItems().addAll("Block", "Unblock", "Delete");
-//        actionComboBox.getSelectionModel().select("Block");
     }
 
-    private void userDetails(User user) {
-        logger.info("User details: " + user.getId());
-        ViewModel.getInstance().getViewFactory().getSelectedView()
-            .set("User-" + user.getId() + "-" + user.getUsername());
+    private void loadUsersAsync() {
+        Task<List<UserDTO>> task = new Task<>() {
+            @Override
+            protected List<UserDTO> call() {
+                List<UserDTO> databaseUsers = userManagementDAO.getAllUsers();
+                return databaseUsers != null
+                    ? databaseUsers.stream()
+                    .map(UserDTO::new)
+                    .collect(Collectors.toList())
+                    : List.of();
+            }
+        };
+
+        task.setOnSucceeded(event -> {
+            Platform.runLater(() -> {
+                userList.setAll(task.getValue());
+                userTable.refresh();
+                logger.info("Loaded {} users from database", userList.size());
+            });
+        });
+
+        task.setOnFailed(event -> {
+            Platform.runLater(() -> {
+                logger.error("Failed to load users", task.getException());
+            });
+        });
+
+        new Thread(task).start();
     }
 
-    private void userActivity(User user) {
-        logger.info("User activity: " + user.getId());
+    private void userDetails(UserDTO user) {
+        logger.info("User details: " + user.getUserId());
         ViewModel.getInstance().getViewFactory().getSelectedView()
-            .set("UserActivity-" + user.getId() + "-" + user.getUsername());
+            .set("User-" + user.getUserId() + "-" + user.getUsername());
+    }
+
+    private void userActivity(UserDTO user) {
+        logger.info("User activity: " + user.getUserId());
+        ViewModel.getInstance().getViewFactory().getSelectedView()
+            .set("UserActivity-" + user.getUserId() + "-" + user.getUsername());
     }
 
     @FXML
     public void applyFilter(ActionEvent event) {
+        // Implement filtering logic
     }
 
     @FXML
     public void applyAction(ActionEvent event) {
+        String action = actionComboBox.getValue();
+
+        List<UserDTO> selectedUsers = userTable.getSelectionModel().getSelectedItems();
+
+        if (selectedUsers.isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.WARNING, "Please select at least one user to apply the action.");
+            alert.showAndWait();
+            return;
+        }
+
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                switch (action) {
+                    case "Block":
+                        userManagementDAO.blockUsers(selectedUsers);
+                        break;
+                    case "Unblock":
+                        userManagementDAO.unblockUsers(selectedUsers);
+                        break;
+                    case "Delete":
+                        userManagementDAO.deleteUsers(selectedUsers);
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Invalid action selected.");
+                }
+                return null;
+            }
+
+            @Override
+            protected void succeeded() {
+                super.succeeded();
+                Platform.runLater(() -> {
+                    userTable.refresh();
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION, action + " action applied successfully.");
+                    alert.showAndWait();
+                });
+            }
+
+            @Override
+            protected void failed() {
+                super.failed();
+                Platform.runLater(() -> {
+                    logger.error("Action failed: " + action);
+                    Alert alert = new Alert(Alert.AlertType.ERROR, "Failed to apply " + action + " action.");
+                    alert.showAndWait();
+                });
+            }
+        };
+
+        new Thread(task).start();
     }
 
     public void createUser(ActionEvent event) {
+        // Implement user creation logic
     }
 }

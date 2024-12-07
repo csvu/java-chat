@@ -1,0 +1,19 @@
+database:
+  dbms: postgresql
+  server:
+    name: localhost
+    port: 5432
+    dbname: chat
+  connection:
+    url: jdbc:postgresql://localhost:5432/chat?useSSL=false
+    username: postgres
+    password:
+    driver_class: com.postgresql.Driver
+  hbm2ddl_auto: none
+  show_sql: true
+  format_sql: true
+  highlight_sql: true
+  connection_pool_size: 4
+  dialect: org.hibernate.dialect.PostgreSQLDialect
+  current_session_context_class: thread
+  connection_autocommit: false

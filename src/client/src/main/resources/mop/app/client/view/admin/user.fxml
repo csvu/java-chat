@@ -13,8 +13,8 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane prefHeight="700.0" prefWidth="1150.0" styleClass="container" xmlns="http://javafx.com/javafx/23.0.1"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="mop.app.client.controller.admin.UserController">
+<AnchorPane prefHeight="700.0" prefWidth="1150.0" styleClass="container" xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml" fx:controller="mop.app.client.controller.admin.UserController">
     <stylesheets>
         <URL value="@../../css/admin.css"/>
     </stylesheets>
@@ -60,6 +60,7 @@
             <TableColumn fx:id="birthdayCol" prefWidth="120" text="Birthday"/>
             <TableColumn fx:id="genderCol" prefWidth="100" text="Gender"/>
             <TableColumn fx:id="addressCol" prefWidth="300" text="Address"/>
+            <TableColumn fx:id="blockCol" prefWidth="130" text="Block"/>
             <TableColumn fx:id="updateCol" prefWidth="130"/>
         </columns>
     </TableView>
