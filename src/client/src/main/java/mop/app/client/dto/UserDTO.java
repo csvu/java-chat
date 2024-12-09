@@ -9,6 +9,7 @@ import jakarta.persistence.Table;
 import java.io.Serial;
 import java.io.Serializable;
 import java.sql.Date;
+import java.sql.Timestamp;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -49,10 +50,10 @@ public class UserDTO implements Serializable {
     private boolean isBanned;
 
     @Column(name = "role_id")
-    private int roleID;
+    private long roleID;
 
     @Column(name = "created_at")
-    private Date createdAt;
+    private Timestamp createdAt;
 
     public UserDTO(UserDTO userDTO) {
         this.userId = userDTO.userId;

@@ -52,6 +52,12 @@ public class ViewFactory {
                 logger.error("Could not load dashboard view: {}", e.getMessage());
             }
         }
+        try {
+            logger.info("New Dashboard view requested");
+            return ViewHelper.getView(ViewPath.DASHBOARD.getPath());
+        } catch (Exception e) {
+            logger.error("Could not load dashboard view: {}", e.getMessage());
+        }
         return dashboardView;
     }
 
@@ -65,6 +71,7 @@ public class ViewFactory {
             }
         }
         try {
+            logger.info("New User view requested");
             return ViewHelper.getView(ViewPath.USER.getPath());
         } catch (Exception e) {
             logger.error("Could not load user view: {}", e.getMessage());
@@ -80,6 +87,13 @@ public class ViewFactory {
             } catch (Exception e) {
                 logger.error("Could not load group view: {}", e.getMessage());
             }
+        } else {
+            logger.info("New Group view requested");
+            try {
+                return ViewHelper.getView(ViewPath.GROUP.getPath());
+            } catch (Exception e) {
+                logger.error("Could not load group view: {}", e.getMessage());
+            }
         }
         return groupView;
     }
@@ -89,6 +103,13 @@ public class ViewFactory {
         if (statisticView == null) {
             try {
                 statisticView = ViewHelper.getView(ViewPath.STATISTIC.getPath());
+            } catch (Exception e) {
+                logger.error("Could not load statistic view: {}", e.getMessage());
+            }
+        } else {
+            logger.info("New Statistic view requested");
+            try {
+                return ViewHelper.getView(ViewPath.STATISTIC.getPath());
             } catch (Exception e) {
                 logger.error("Could not load statistic view: {}", e.getMessage());
             }
@@ -104,6 +125,11 @@ public class ViewFactory {
             } catch (Exception e) {
                 logger.error("Could not load spam view: {}", e.getMessage());
             }
+        }
+        try {
+            spamView = ViewHelper.getView(ViewPath.SPAM.getPath());
+        } catch (Exception e) {
+            logger.error("Could not load spam view: {}", e.getMessage());
         }
         return spamView;
     }
@@ -141,16 +167,16 @@ public class ViewFactory {
                 userDetailsView = userDetailsLoader.load();
                 logger.info("UserDetailsController initialized for user {}, {}", userId, userName);
                 UserDetailsController controller = userDetailsLoader.getController();
-//                controller.setUserId(userId);
-//                controller.setUserName(userName);
+                controller.setUserId(userId);
+                controller.setUserName(userName);
             } catch (Exception e) {
                 logger.error("Could not load user detail view: {}", e.getMessage());
             }
         } else {
             UserDetailsController controller = userDetailsLoader.getController();
             if (controller != null) {
-//                controller.setUserId(userId);
-//                controller.setUserName(userName);
+                controller.setUserId(userId);
+                controller.setUserName(userName);
                 logger.info("Updated UserDetailsController for user {}, {}", userId, userName);
             } else {
                 logger.error("Could not retrieve UserDetailsController from existing view.");
@@ -171,6 +197,15 @@ public class ViewFactory {
                 controller.setUsername(userName);
             } catch (Exception e) {
                 logger.error("Could not load user activity view: {}", e.getMessage());
+            }
+        } else {
+            UserActivityController controller = userActivityLoader.getController();
+            if (controller != null) {
+                controller.setUserId(userId);
+                controller.setUsername(userName);
+                logger.info("Updated UserActivityController");
+            } else {
+                logger.error("Could not retrieve UserActivityController from existing view.");
             }
         }
         return userActivityView;

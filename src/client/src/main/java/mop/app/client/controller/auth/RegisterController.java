@@ -2,6 +2,7 @@ package mop.app.client.controller.auth;
 
 import java.io.IOException;
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -12,6 +13,7 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.util.StringConverter;
 import mop.app.client.dao.AuthDAO;
+import mop.app.client.dao.RoleDAO;
 import mop.app.client.dto.UserDTO;
 import mop.app.client.util.PasswordUtil;
 import mop.app.client.util.ViewHelper;
@@ -182,6 +184,9 @@ public class RegisterController {
             return;
         }
 
+        RoleDAO roleDAO = new RoleDAO();
+        long roleId = roleDAO.getRoleIdByRoleName("USER");
+
         UserDTO user = UserDTO.builder()
             .email(email)
             .username(username)
@@ -190,7 +195,8 @@ public class RegisterController {
             .displayName(fullName)
             .birthDate(sqlDate)
             .address(address)
-            .roleID(1)
+            .roleID(roleId)
+            .createdAt(new Timestamp(System.currentTimeMillis()))
             .build();
 
         UserDTO registeredUser = authDAO.register(user);

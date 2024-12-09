@@ -12,8 +12,8 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.control.Button?>
 
-<AnchorPane prefHeight="700.0" prefWidth="1000.0" styleClass="container" xmlns="http://javafx.com/javafx/23.0.1"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="mop.app.client.controller.admin.DashboardController">
+<AnchorPane prefHeight="700.0" prefWidth="1000.0" styleClass="container" xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml" fx:controller="mop.app.client.controller.admin.DashboardController">
     <stylesheets>
         <URL value="@../../css/admin.css"/>
     </stylesheets>
@@ -56,7 +56,7 @@
         </HBox>
 
         <!-- Registration Chart Section -->
-        <BarChart fx:id="barChart" prefHeight="400" prefWidth="900">
+        <BarChart fx:id="barChart" prefHeight="500" prefWidth="900">
             <xAxis>
                 <CategoryAxis fx:id="monthAxis" label="Month"/>
             </xAxis>

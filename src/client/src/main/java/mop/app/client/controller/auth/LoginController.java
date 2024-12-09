@@ -1,8 +1,8 @@
 package mop.app.client.controller.auth;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import java.sql.Timestamp;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -14,14 +14,16 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import mop.app.client.Client;
 import mop.app.client.dao.AuthDAO;
+import mop.app.client.dao.LoginTimeDAO;
+import mop.app.client.dao.OpenTimeDAO;
 import mop.app.client.dao.RoleDAO;
 import mop.app.client.dto.Request;
 import mop.app.client.dto.RequestType;
 import mop.app.client.dto.Response;
-import mop.app.client.dto.RoleDTO;
 import mop.app.client.dto.UserDTO;
 import mop.app.client.network.SocketClient;
 import mop.app.client.util.ObjectMapperConfig;
+import mop.app.client.util.PreProcess;
 import mop.app.client.util.ViewFactory;
 import mop.app.client.util.ViewHelper;
 import org.slf4j.Logger;
@@ -35,6 +37,12 @@ public class LoginController {
 
     @FXML
     private PasswordField passwordField;
+
+    private final AuthDAO authDAO;
+
+    public LoginController() {
+        authDAO = new AuthDAO();
+    }
 
     @FXML
     private void handleBack(ActionEvent event) {
@@ -103,12 +111,16 @@ public class LoginController {
 
             if ("ADMIN".equals(roleName)) {
                 // Admin role: Navigate to the admin view
+                authDAO.updateUserStatus(user.getUserId(), true);
+                Client.currentUser = user;
                 Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
                 currentStage.close();
                 ViewFactory viewFactory = new ViewFactory();
                 viewFactory.getAdminView();
             } else {
                 // Regular user role: Navigate to the home view
+                authDAO.updateUserStatus(user.getUserId(), true);
+                Client.currentUser = user;
                 Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
                 currentStage.close();
                 Stage stage = new Stage();
@@ -118,6 +130,22 @@ public class LoginController {
                 stage.setResizable(false);
                 stage.setScene(scene);
                 stage.show();
+            }
+            LoginTimeDAO loginTimeDAO = new LoginTimeDAO();
+            boolean isLoginTime = loginTimeDAO.addLoginTime(user.getUserId());
+            if (!isLoginTime) {
+                logger.error("Failed to add login time for user: {}", user.getUserId());
+            }
+
+            OpenTimeDAO openTimeDAO = new OpenTimeDAO();
+            boolean isOpenTime = openTimeDAO.addOpenTime(user.getUserId());
+            if (!isOpenTime) {
+                logger.error("Failed to add open time for user: {}", user.getUserId());
+            }
+
+            boolean isSave = PreProcess.saveUserInformation(user);
+            if (!isSave) {
+                logger.error("Failed to save user information");
             }
         } else {
             showError("Login Failed", loginResponse.getMessage());

@@ -310,10 +310,10 @@
 
 .axis {
     -fx-tick-label-fill: white;
-    -fx-tick-label-font-size: 16px;
-    -fx-tick-label-gap: 10px;
-    -fx-tick-mark-visible: true;
-    -fx-minor-tick-length: 5;
+    -fx-tick-label-font-size: 12px;
+    /*-fx-tick-label-gap: 10px;*/
+    /*-fx-tick-mark-visible: true;*/
+    /*-fx-minor-tick-length: 5;*/
 }
 
 .chart-vertical-grid-lines {
@@ -332,8 +332,8 @@
 }
 
 .default-color0.chart-bar { -fx-bar-fill: #556BF4; }
-/*.default-color1.chart-bar { -fx-bar-fill: orange; }*/
-/*.default-color2.chart-bar { -fx-bar-fill: #4b77b3; }*/
+.default-color1.chart-bar { -fx-bar-fill: orange; }
+.default-color2.chart-bar { -fx-bar-fill: #4b77b3; }
 
 /*.data0.chart-bar,*/
 /*.data1.chart-bar,*/

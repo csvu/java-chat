@@ -1,8 +1,10 @@
 package mop.app.client.controller.admin;
 
+import java.sql.Timestamp;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -41,9 +43,11 @@ public class UserController {
     @FXML
     private TableColumn<UserDTO, String> genderCol;
     @FXML
-    private TableColumn<UserDTO, String> addressCol;
+    private TableColumn<UserDTO, Timestamp> createdAtCol;
     @FXML
     public TableColumn<UserDTO, Boolean> blockCol;
+    @FXML
+    public TableColumn<UserDTO, String> statusCol;
     @FXML
     private TableColumn<UserDTO, String> updateCol;
     private final ObservableList<UserDTO> userList;
@@ -58,22 +62,44 @@ public class UserController {
     public void initialize() {
         setupTableColumns();
         setupTableView();
-        loadUsersAsync();
+        loadUsers();
     }
 
     private void setupTableColumns() {
         List<TableColumn<UserDTO, String>> strColumns =
-            List.of(userNameCol, emailCol, displayNameCol, genderCol, addressCol);
+            List.of(userNameCol, emailCol, displayNameCol, genderCol, statusCol);
 
         userNameCol.setCellValueFactory(new PropertyValueFactory<>("username"));
         emailCol.setCellValueFactory(new PropertyValueFactory<>("email"));
         displayNameCol.setCellValueFactory(new PropertyValueFactory<>("displayName"));
         birthdayCol.setCellValueFactory(new PropertyValueFactory<>("birthDate"));
         genderCol.setCellValueFactory(new PropertyValueFactory<>("gender"));
-        addressCol.setCellValueFactory(new PropertyValueFactory<>("address"));
+        createdAtCol.setCellValueFactory(new PropertyValueFactory<>("createdAt"));
         blockCol.setCellValueFactory(new PropertyValueFactory<>("isBanned"));
 
         strColumns.forEach(this::styleTableColumn);
+
+        createdAtCol.setCellFactory(param -> new TableCell<>() {
+            @Override
+            protected void updateItem(Timestamp item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+                    String formattedDate = dateFormat.format(item);
+                    setText(formattedDate);
+
+                    setAlignment(Pos.CENTER_LEFT);
+                    setStyle(
+                        "-fx-text-fill: white; " +
+                            "-fx-font-weight: bold; " +
+                            "-fx-font-size: 12px;"
+                    );
+                }
+            }
+        });
 
         birthdayCol.setCellFactory(param -> new TableCell<>() {
             @Override
@@ -83,7 +109,7 @@ public class UserController {
                     setText(null);
                     setStyle("");
                 } else {
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd-yyyy");
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
                     String formattedDate = dateFormat.format(item);
                     setText(formattedDate);
 
@@ -115,6 +141,14 @@ public class UserController {
                     );
                 }
             }
+        });
+
+        statusCol.setCellValueFactory(cellData -> {
+            UserDTO user = cellData.getValue();
+            String status = "Deleted User".equals(user.getDisplayName())
+                ? "Deleted"
+                : "Active";
+            return new SimpleStringProperty(status);
         });
     }
 
@@ -193,13 +227,34 @@ public class UserController {
             return row;
         });
 
-        // Set items
         userTable.setItems(userList);
 
         actionComboBox.getItems().addAll("Block", "Unblock", "Delete");
+
+        filterField.textProperty().addListener((observable, oldValue, newValue) -> {
+            filterUsers(newValue.trim());
+        });
     }
 
-    private void loadUsersAsync() {
+    private void filterUsers(String filterText) {
+        if (filterText.isEmpty()) {
+            userTable.setItems(userList);
+        } else {
+            ObservableList<UserDTO> filteredList = userList.filtered(user -> {
+                String username = user.getUsername() != null ? user.getUsername().toLowerCase() : "";
+                String displayName = user.getDisplayName() != null ? user.getDisplayName().toLowerCase() : "";
+                String lowercaseFilter = filterText.toLowerCase();
+
+                return username.contains(lowercaseFilter) ||
+                    displayName.contains(lowercaseFilter);
+            });
+
+            userTable.setItems(filteredList);
+        }
+        userTable.refresh();
+    }
+
+    private void loadUsers() {
         Task<List<UserDTO>> task = new Task<>() {
             @Override
             protected List<UserDTO> call() {

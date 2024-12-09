@@ -10,7 +10,8 @@
 
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TableColumn?>
-<AnchorPane prefHeight="700.0" prefWidth="1000.0" styleClass="container" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="mop.app.client.controller.admin.GroupDetailsController">
+<AnchorPane prefHeight="700.0" prefWidth="1000.0" styleClass="container" xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml/" fx:controller="mop.app.client.controller.admin.GroupDetailsController">
     <stylesheets>
         <URL value="@../../css/admin.css"/>
     </stylesheets>

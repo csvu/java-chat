@@ -1,6 +1,5 @@
 package mop.app.client.dao;
 
-import mop.app.client.dto.RoleDTO;
 import mop.app.client.dto.UserDTO;
 import mop.app.client.util.EmailSender;
 import mop.app.client.util.HibernateUtil;
@@ -121,7 +120,7 @@ public class AuthDAO {
         }
     }
 
-    public UserDTO getUerById(long userId) {
+    public UserDTO getUserById(long userId) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             return session.get(UserDTO.class, userId);
         } catch (Exception e) {
@@ -148,5 +147,23 @@ public class AuthDAO {
             }
         }
         return false;
+    }
+
+    public UserDTO updateUserStatus(long userId, boolean isActive) {
+        Transaction transaction = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            UserDTO user = session.get(UserDTO.class, userId);
+            user.setIsActive(isActive);
+            session.merge(user);
+            transaction.commit();
+            return user;
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            logger.error("Failed to update user status: {}", e.getMessage());
+        }
+        return null;
     }
 }

@@ -8,8 +8,8 @@
 
 <?import java.net.URL?>
 <?import javafx.geometry.Insets?>
-<AnchorPane prefHeight="700.0" prefWidth="1000.0" styleClass="container" xmlns="http://javafx.com/javafx/23.0.1"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="mop.app.client.controller.admin.NewUserController">
+<AnchorPane prefHeight="700.0" prefWidth="1000.0" styleClass="container" xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml" fx:controller="mop.app.client.controller.admin.NewUserController">
     <stylesheets>
         <URL value="@../../css/admin.css"/>
     </stylesheets>
@@ -24,6 +24,7 @@
 
     <VBox layoutX="20" layoutY="20" spacing="10" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="100.0">
         <HBox spacing="30.0">
+            <TextField prefWidth="250" promptText="Filter by email/display name" styleClass="data-filter" fx:id="emailFilter"/>
             <ComboBox fx:id="filterComboBox" prefWidth="200" promptText="Filter"/>
             <Button onAction="#applyFilter" prefWidth="100" styleClass="apply-button" text="Apply"/>
         </HBox>

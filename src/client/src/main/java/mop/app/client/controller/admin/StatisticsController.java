@@ -1,18 +1,21 @@
 package mop.app.client.controller.admin;
 
-import com.github.javafaker.Faker;
-import java.util.Locale;
+import java.time.Year;
+import javafx.collections.FXCollections;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.ComboBox;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
+import javafx.scene.control.ComboBox;
+import mop.app.client.dao.UserManagementDAO;
 
-import java.time.Year;
+import java.util.List;
 
 public class StatisticsController {
+
     @FXML
     private ComboBox<String> filterComboBox;
 
@@ -28,6 +31,12 @@ public class StatisticsController {
     @FXML
     private NumberAxis userAxis;
 
+    private final UserManagementDAO userManagementDAO;
+
+    public StatisticsController() {
+        userManagementDAO = new UserManagementDAO();
+    }
+
     @FXML
     public void applyFilter(ActionEvent event) {
         String selectedYear = yearComboBox.getValue();
@@ -41,25 +50,71 @@ public class StatisticsController {
             barChart.setTitle("Monthly Registrations");
         }
 
-        int[] data = selectedFilter.equals("Monthly Active Users") ?
-            getMonthlyActiveUsers(selectedYear) :
-            getMonthlyRegistrations(selectedYear);
+        userAxis.setLowerBound(0);
+        userAxis.setUpperBound(10);
+        userAxis.setTickUnit(1);
 
+        Task<int[]> dataTask = new Task<>() {
+            @Override
+            protected int[] call() throws Exception {
+                if (selectedFilter.equals("Monthly Active Users")) {
+                    return loadMonthlyActiveUsers(selectedYear);
+                } else {
+                    return loadMonthlyRegistrations(selectedYear);
+                }
+            }
+        };
+
+        dataTask.setOnSucceeded(event1 -> {
+            int[] data = dataTask.getValue();
+            updateChart(data, selectedFilter);
+        });
+
+        new Thread(dataTask).start();
+    }
+
+    private int[] loadMonthlyRegistrations(String year) {
+        int[] registrations = new int[12];
+
+        List<Object[]> registrationData = userManagementDAO.getNewRegistrationsByMonth(Integer.parseInt(year));
+        for (Object[] entry : registrationData) {
+            Integer month = (Integer) entry[0];
+            Long count = (Long) entry[1];
+            registrations[month - 1] = count.intValue();
+        }
+        return registrations;
+    }
+
+    private int[] loadMonthlyActiveUsers(String year) {
+        int[] activeUsers = new int[12];
+
+        List<Object[]> activeUserData = userManagementDAO.getActiveUsersByMonth(Integer.parseInt(year));
+        for (Object[] entry : activeUserData) {
+            Integer month = (Integer) entry[0];
+            Long count = (Long) entry[1];
+            activeUsers[month - 1] = count.intValue();
+        }
+        return activeUsers;
+    }
+
+    private void updateChart(int[] data, String selectedFilter) {
         barChart.getData().clear();
 
         XYChart.Series<String, Number> series = new XYChart.Series<>();
-
-        if (selectedFilter.equals("Monthly Active Users")) {
-            series.setName("Active Users");
-        } else {
-            series.setName("New Registrations");
-        }
+        series.setName(selectedFilter.equals("Monthly Active Users") ? "Active Users" : "New Registrations");
 
         for (int month = 0; month < data.length; month++) {
             series.getData().add(new XYChart.Data<>(getMonthName(month), data[month]));
         }
 
         barChart.getData().add(series);
+
+        monthAxis.setCategories(FXCollections.observableArrayList(
+            "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+        ));
+
+        barChart.layout();
     }
 
     @FXML
@@ -75,10 +130,6 @@ public class StatisticsController {
         populateYearComboBox(currentYear);
         yearComboBox.setValue(String.valueOf(currentYear));
 
-//        yearComboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-//            applyFilter(null);
-//        });
-
         applyFilter(null);
     }
 
@@ -87,24 +138,6 @@ public class StatisticsController {
         for (int i = 0; i < 10; i++) {
             yearComboBox.getItems().add(String.valueOf(currentYear - i));
         }
-    }
-
-    private int[] getMonthlyRegistrations(String year) {
-        Faker faker = new Faker(Locale.ENGLISH);
-        int[] registrations = new int[12];
-        for (int i = 0; i < registrations.length; i++) {
-            registrations[i] = faker.number().numberBetween(5, 70);
-        }
-        return registrations;
-    }
-
-    private int[] getMonthlyActiveUsers(String year) {
-        Faker faker = new Faker(Locale.ENGLISH);
-        int[] activeUsers = new int[12];
-        for (int i = 0; i < activeUsers.length; i++) {
-            activeUsers[i] = faker.number().numberBetween(50, 200);
-        }
-        return activeUsers;
     }
 
     private String getMonthName(int month) {

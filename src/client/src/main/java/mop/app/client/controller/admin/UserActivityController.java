@@ -35,11 +35,15 @@ public class UserActivityController {
     private TableView<LoginTime> activityTable;
     private TableView<User> friendsTable;
     private TableView<User> friendsOfFriendsTable;
+    private long userId;
+    private String username;
 
     public void setUserId(long userId) {
+        this.userId = userId;
     }
 
     public void setUsername(String userName) {
+        this.username = userName;
         usernameLabel.setText("Username: " + userName);
     }
 

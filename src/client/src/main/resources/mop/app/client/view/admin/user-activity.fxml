@@ -8,7 +8,9 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane prefHeight="700.0" prefWidth="1000.0" styleClass="container" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mop.app.client.controller.admin.UserActivityController">
+<?import javafx.scene.control.TextField?>
+<AnchorPane prefHeight="700.0" prefWidth="1000.0" styleClass="container" xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml/" fx:controller="mop.app.client.controller.admin.UserActivityController">
     <stylesheets>
         <URL value="@../../css/admin.css"/>
     </stylesheets>
