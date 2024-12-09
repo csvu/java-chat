@@ -49,7 +49,7 @@ public class ViewFactory {
             try {
                 dashboardView = ViewHelper.getView(ViewPath.DASHBOARD.getPath());
             } catch (Exception e) {
-                logger.error("Could not load dashboard view.", e);
+                logger.error("Could not load dashboard view: {}", e.getMessage());
             }
         }
         return dashboardView;
@@ -61,8 +61,13 @@ public class ViewFactory {
             try {
                 userView = ViewHelper.getView(ViewPath.USER.getPath());
             } catch (Exception e) {
-                logger.error("Could not load user view.", e);
+                logger.error("Could not load user view: {}", e.getMessage());
             }
+        }
+        try {
+            return ViewHelper.getView(ViewPath.USER.getPath());
+        } catch (Exception e) {
+            logger.error("Could not load user view: {}", e.getMessage());
         }
         return userView;
     }
@@ -73,7 +78,7 @@ public class ViewFactory {
             try {
                 groupView = ViewHelper.getView(ViewPath.GROUP.getPath());
             } catch (Exception e) {
-                logger.error("Could not load group view.", e);
+                logger.error("Could not load group view: {}", e.getMessage());
             }
         }
         return groupView;
@@ -85,7 +90,7 @@ public class ViewFactory {
             try {
                 statisticView = ViewHelper.getView(ViewPath.STATISTIC.getPath());
             } catch (Exception e) {
-                logger.error("Could not load statistic view.", e);
+                logger.error("Could not load statistic view: {}", e.getMessage());
             }
         }
         return statisticView;
@@ -97,7 +102,7 @@ public class ViewFactory {
             try {
                 spamView = ViewHelper.getView(ViewPath.SPAM.getPath());
             } catch (Exception e) {
-                logger.error("Could not load spam view.", e);
+                logger.error("Could not load spam view: {}", e.getMessage());
             }
         }
         return spamView;
@@ -113,7 +118,7 @@ public class ViewFactory {
                 controller.setGroupId(groupId);
                 controller.setGroupName(groupName);
             } catch (Exception e) {
-                logger.error("Could not load group detail view.", e);
+                logger.error("Could not load group detail view: {}", e.getMessage());
             }
         } else {
             GroupDetailsController controller = groupDetailsLoader.getController();
@@ -139,7 +144,7 @@ public class ViewFactory {
 //                controller.setUserId(userId);
 //                controller.setUserName(userName);
             } catch (Exception e) {
-                logger.error("Could not load user detail view.", e);
+                logger.error("Could not load user detail view: {}", e.getMessage());
             }
         } else {
             UserDetailsController controller = userDetailsLoader.getController();
@@ -165,7 +170,7 @@ public class ViewFactory {
                 controller.setUserId(userId);
                 controller.setUsername(userName);
             } catch (Exception e) {
-                logger.error("Could not load user activity view.", e);
+                logger.error("Could not load user activity view: {}", e.getMessage());
             }
         }
         return userActivityView;
@@ -177,7 +182,7 @@ public class ViewFactory {
             try {
                 userLoginView = ViewHelper.getView(ViewPath.USER_LOGIN.getPath());
             } catch (Exception e) {
-                logger.error("Could not load user login view.", e);
+                logger.error("Could not load user login view: {}", e.getMessage());
             }
         }
         return userLoginView;
@@ -189,7 +194,7 @@ public class ViewFactory {
             try {
                 newUserView = ViewHelper.getView(ViewPath.NEW_USER.getPath());
             } catch (Exception e) {
-                logger.error("Could not load new user view.", e);
+                logger.error("Could not load new user view: {}", e.getMessage());
             }
         }
         return newUserView;

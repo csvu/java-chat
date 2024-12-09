@@ -32,7 +32,7 @@ public class ViewHelper {
         try {
             scene = new Scene(loader.load());
         } catch (IOException e) {
-            logger.error("Failed to load scene", e);
+            logger.error("Failed to load scene: {}", e.getMessage());
         }
         Stage stage = new Stage();
 
@@ -40,7 +40,7 @@ public class ViewHelper {
             stage.getIcons().add(new Image(
                 Objects.requireNonNull(Client.class.getResourceAsStream("images/app-icon.png"))));
         } catch (Exception e) {
-            logger.error("Failed to load application icon", e);
+            logger.error("Failed to load application icon: {}", e.getMessage());
         }
 
         stage.setTitle("MOP Application");

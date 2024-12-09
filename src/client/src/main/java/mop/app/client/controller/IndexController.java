@@ -20,7 +20,7 @@ public class IndexController {
         try {
             ViewHelper.getLoginScene(event);
         } catch (IOException e) {
-            logger.error("Could not load login page", e);
+            logger.error("Could not load login page: {}", e.getMessage());
             showError("Navigation Error", "Could not load email login page.");
         }
     }

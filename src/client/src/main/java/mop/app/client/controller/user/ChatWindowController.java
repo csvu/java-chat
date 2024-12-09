@@ -1,7 +1,9 @@
 package mop.app.client.controller.user;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
@@ -18,9 +20,17 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import mop.app.client.Client;
+import mop.app.client.dao.RoleDAO;
 import mop.app.client.dao.user.UserDAO;
+import mop.app.client.dto.Request;
+import mop.app.client.dto.RequestType;
+import mop.app.client.dto.Response;
+import mop.app.client.dto.UserDTO;
 import mop.app.client.model.user.Conversation;
 import mop.app.client.model.user.Message;
+import mop.app.client.network.SocketClient;
+import mop.app.client.util.ObjectMapperConfig;
+import mop.app.client.util.ViewFactory;
 
 import java.io.IOException;
 import java.net.URL;
@@ -323,4 +333,71 @@ public class ChatWindowController extends GridPane {
             onNewMessage.accept(newMsg, curConversation);
         }
     }
+
+    void sendMessageNet() {
+            SocketClient socketClient = Client.socketClient;
+
+            if (!socketClient.isConnectionValid()) {
+                return;
+            }
+
+            UserDTO loginData = UserDTO.builder()
+                    .email(email)
+                    .password(password)
+                    .build();
+
+            ObjectMapper mapper = ObjectMapperConfig.getObjectMapper();
+
+            Request loginRequest = new Request(RequestType.LOGIN, loginData);
+            String jsonLoginRequest = mapper.writeValueAsString(loginRequest);
+            String jsonLoginResponse = socketClient.sendRequest(jsonLoginRequest);
+            Response loginResponse = mapper.readValue(jsonLoginResponse, Response.class);
+
+            if (loginResponse.isSuccess()) {
+                UserDTO user = mapper.convertValue(loginResponse.getData(), UserDTO.class);
+
+                // Check if user is deleted
+                if (user.getDisplayName().equals("Deleted User")) {
+                    showError("Account Deleted", "Your account has been deleted.");
+                    return;
+                }
+
+                // Check if user is banned
+                if (user.getIsBanned()) {
+                    showError("Account Banned", "Your account has been banned.");
+                    return;
+                }
+
+                RoleDAO role = new RoleDAO();
+                String roleName = role.getRoleByUserId(user.getUserId());
+
+                if (roleName == null) {
+                    showError("Role Error", "Could not retrieve user role.");
+                    return;
+                }
+
+                if ("ADMIN".equals(roleName)) {
+                    // Admin role: Navigate to the admin view
+                    Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                    currentStage.close();
+                    ViewFactory viewFactory = new ViewFactory();
+                    viewFactory.getAdminView();
+                } else {
+                    // Regular user role: Navigate to the home view
+                    Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                    currentStage.close();
+                    Stage stage = new Stage();
+                    FXMLLoader fxmlLoader = new FXMLLoader(Client.class.getResource("view/user/home-view.fxml"));
+                    Scene scene = new Scene(fxmlLoader.load());
+                    stage.setTitle("MOP Application");
+                    stage.setResizable(false);
+                    stage.setScene(scene);
+                    stage.show();
+                }
+            } else {
+                showError("Login Failed", loginResponse.getMessage());
+            }
+
+    }
+
 }

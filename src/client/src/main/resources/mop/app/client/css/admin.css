@@ -23,7 +23,7 @@
 .table-view .column-header {
     /* Cell Header Color */
     -fx-background-color: #0e1621;
-
+    /* Top Right Bottom Left */
     -fx-border-color: transparent transparent #3587f3 transparent;
     -fx-font-weight: bold;
 }
