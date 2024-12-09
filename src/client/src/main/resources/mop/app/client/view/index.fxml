@@ -9,8 +9,8 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
-<VBox alignment="CENTER" spacing="20" styleClass="container" xmlns="http://javafx.com/javafx/8"
-      xmlns:fx="http://javafx.com/fxml/1" fx:controller="mop.app.client.controller.IndexController"
+<VBox alignment="CENTER" spacing="20" styleClass="container" xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml" fx:controller="mop.app.client.controller.IndexController"
       prefWidth="920" prefHeight="640" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity">
     <stylesheets>
         <URL value="@../css/style.css"/>

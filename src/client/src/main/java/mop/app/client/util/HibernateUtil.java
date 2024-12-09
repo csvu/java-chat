@@ -2,7 +2,6 @@ package mop.app.client.util;
 
 import java.util.Map;
 import lombok.Getter;
-import mop.app.client.dto.UserDTO;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.slf4j.Logger;
@@ -40,6 +39,13 @@ public class HibernateUtil {
 
             configuration.addAnnotatedClass(mop.app.client.dto.UserDTO.class);
             configuration.addAnnotatedClass(mop.app.client.dto.RoleDTO.class);
+            configuration.addAnnotatedClass(mop.app.client.dto.ConversationDTO.class);
+            configuration.addAnnotatedClass(mop.app.client.dto.ConversationTypeDTO.class);
+            configuration.addAnnotatedClass(mop.app.client.dto.EnrollmentRoleDTO.class);
+            configuration.addAnnotatedClass(mop.app.client.dto.EnrollmentDTO.class);
+            configuration.addAnnotatedClass(mop.app.client.dto.LoginTimeDTO.class);
+            configuration.addAnnotatedClass(mop.app.client.dto.OpenTimeDTO.class);
+            configuration.addAnnotatedClass(mop.app.client.dto.ReportDTO.class);
 
             sessionFactory = configuration.buildSessionFactory();
         } catch (Exception e) {

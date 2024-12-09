@@ -16,8 +16,8 @@
 <?import javafx.collections.FXCollections?>
 <?import java.lang.String?>
 
-<AnchorPane prefHeight="700.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="mop.app.client.controller.auth.RegisterController">
+<AnchorPane prefHeight="700.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml" fx:controller="mop.app.client.controller.auth.RegisterController">
     <stylesheets>
         <URL value="@../../css/style.css"/>
         <URL value="@../../css/register.css"/>

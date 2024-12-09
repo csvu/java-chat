@@ -8,8 +8,8 @@
 
 <?import javafx.geometry.Insets?>
 <?import java.net.URL?>
-<AnchorPane prefHeight="700.0" prefWidth="1000.0" styleClass="container" xmlns="http://javafx.com/javafx/23.0.1"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="mop.app.client.controller.admin.UserLoginController">
+<AnchorPane prefHeight="700.0" prefWidth="1000.0" styleClass="container" xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml/" fx:controller="mop.app.client.controller.admin.UserLoginController">
     <stylesheets>
         <URL value="@../../css/admin.css"/>
     </stylesheets>
@@ -21,13 +21,25 @@
         <Label styleClass="header-text" text="User Login History"/>
     </VBox>
 
+    <VBox layoutX="20" layoutY="20" spacing="10" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0"
+          AnchorPane.topAnchor="100.0">
+        <HBox spacing="30.0">
+            <TextField prefWidth="250" promptText="Filter by username/display name" styleClass="data-filter" fx:id="usernameFilter"/>
+            <DatePicker prefWidth="250" fx:id="dateFilter" promptText="Filter by date (MM/dd/yyyy)"/>
+            <Button prefWidth="100" styleClass="apply-button" text="Apply" onAction="#applyFilter"/>
+            <VBox.margin>
+                <Insets bottom="20.0"/>
+            </VBox.margin>
+        </HBox>
+    </VBox>
+
     <TableView fx:id="userLoginTable" layoutX="14.0" layoutY="100.0" prefHeight="500" prefWidth="1000.0"
                AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="0.0"
-               AnchorPane.topAnchor="100.0">
+               AnchorPane.topAnchor="160.0">
         <columns>
             <TableColumn fx:id="usernameCol" prefWidth="200" text="Username"/>
             <TableColumn fx:id="displayNameCol" prefWidth="200" text="Display Name"/>
-            <TableColumn fx:id="loginDateCol" prefWidth="200" text="Login Date"/>
+            <TableColumn fx:id="loginDateCol" prefWidth="200" text="Login At"/>
         </columns>
     </TableView>
 

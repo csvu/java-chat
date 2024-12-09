@@ -24,7 +24,7 @@ module mop.app.client {
     requires org.hibernate.orm.core;
     requires org.hibernate.orm.hikaricp;
     requires org.slf4j;
-    requires org.yaml.snakeyaml;
+    requires snakeyaml;
 
     requires static lombok;
 

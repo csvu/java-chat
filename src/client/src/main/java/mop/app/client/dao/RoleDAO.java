@@ -29,4 +29,20 @@ public class RoleDAO {
 
         return roleName;
     }
+
+    public long getRoleIdByRoleName(String roleName) {
+        long roleId = 0;
+
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "SELECT r.roleId FROM RoleDTO r WHERE r.roleName = :roleName";
+            Query<Long> query = session.createQuery(hql, Long.class);
+            query.setParameter("roleName", roleName);
+
+            roleId = query.uniqueResult();
+        } catch (Exception e) {
+            logger.error("Failed to get role id by role name: {}", e.getMessage());
+        }
+
+        return roleId;
+    }
 }
