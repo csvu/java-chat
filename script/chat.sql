@@ -47,7 +47,7 @@ SET default_table_access_method = heap;
 --
 
 CREATE TABLE public.conversation (
-    conversation_id integer NOT NULL,
+    conversation_id serial NOT NULL,
     name character varying,
     icon character varying,
     type_id integer
@@ -98,7 +98,7 @@ ALTER TABLE public.enrollment_role OWNER TO postgres;
 --
 
 CREATE TABLE public.login_time (
-    instance integer NOT NULL,
+    instance serial NOT NULL,
     login_at timestamp without time zone,
     user_id integer
 );
@@ -111,7 +111,7 @@ ALTER TABLE public.login_time OWNER TO postgres;
 --
 
 CREATE TABLE public.message (
-    msg_id integer NOT NULL,
+    msg_id serial NOT NULL,
     conversation_id integer,
     user_id integer,
     sent_at timestamp without time zone,
@@ -126,7 +126,7 @@ ALTER TABLE public.message OWNER TO postgres;
 --
 
 CREATE TABLE public.open_time (
-    instance integer NOT NULL,
+    instance serial NOT NULL,
     open_at timestamp without time zone,
     user_id integer
 );
@@ -165,7 +165,7 @@ ALTER TABLE public.relationship_type OWNER TO postgres;
 --
 
 CREATE TABLE public.report (
-    report_id integer NOT NULL,
+    report_id serial NOT NULL,
     user_id1 integer,
     user_id2 integer,
     created_at timestamp without time zone
@@ -179,7 +179,7 @@ ALTER TABLE public.report OWNER TO postgres;
 --
 
 CREATE TABLE public."user" (
-    user_id integer NOT NULL,
+    user_id serial NOT NULL,
     username character varying,
     display_name character varying,
     password character varying,
@@ -211,128 +211,6 @@ ALTER TABLE public.user_role OWNER TO postgres;
 --
 -- Data for Name: conversation; Type: TABLE DATA; Schema: public; Owner: postgres
 --
-
-COPY public.conversation (conversation_id, name, icon, type_id) FROM stdin;
-1	General Chat	icon1.png	1
-2	Private Chat	icon2.png	2
-3	Work Channel	icon3.png	2
-\.
-
-
---
--- Data for Name: conversation_type; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.conversation_type (type_id, type_name) FROM stdin;
-1	Group Chat
-2	Direct Message
-\.
-
-
---
--- Data for Name: enrollment; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.enrollment (user_id, conversation_id, role_id) FROM stdin;
-1	1	1
-2	1	2
-3	2	2
-\.
-
-
---
--- Data for Name: enrollment_role; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.enrollment_role (role_id, role_name) FROM stdin;
-1	Admin
-2	Member
-\.
-
-
---
--- Data for Name: login_time; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.login_time (instance, login_at, user_id) FROM stdin;
-1	2024-11-17 08:00:00	1
-2	2024-11-17 08:15:00	2
-3	2024-11-17 08:30:00	3
-\.
-
-
---
--- Data for Name: message; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.message (msg_id, conversation_id, user_id, sent_at, content) FROM stdin;
-1	1	1	2024-11-17 13:00:00	Hello
-2	1	2	2024-11-17 13:05:00	Hi there
-3	2	3	2024-11-17 13:10:00	Hey
-\.
-
-
---
--- Data for Name: open_time; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.open_time (instance, open_at, user_id) FROM stdin;
-1	2024-11-17 09:00:00	1
-2	2024-11-17 09:30:00	2
-3	2024-11-17 10:00:00	3
-\.
-
-
---
--- Data for Name: relationship; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.relationship (user_id1, user_id2, created_at, status) FROM stdin;
-1	2	2024-11-17 14:00:00	1
-1	3	2024-11-17 14:15:00	2
-2	3	2024-11-17 14:30:00	3
-\.
-
-
---
--- Data for Name: relationship_type; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.relationship_type (type_id, type_name) FROM stdin;
-1	Friend
-2	Blocked
-3	Pending
-\.
-
-
---
--- Data for Name: report; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.report (report_id, user_id1, user_id2, created_at) FROM stdin;
-\.
-
-
---
--- Data for Name: user; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public."user" (user_id, username, display_name, password, email, avatar, birth_date, address, is_active, is_banned, role_id, created_at) FROM stdin;
-1	john_doe	John Doe	password123	john@example.com	avatar1.png	1990-01-01	123 Main St	t	f	1	2024-11-17 10:00:00
-2	jane_doe	Jane Doe	password456	jane@example.com	avatar2.png	1992-05-15	456 Oak St	t	f	2	2024-11-17 11:00:00
-3	sam_smith	Sam Smith	password789	sam@example.com	avatar3.png	1985-08-23	789 Pine St	f	t	3	2024-11-17 12:00:00
-\.
-
-
---
--- Data for Name: user_role; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.user_role (role_id, role_name) FROM stdin;
-1	Admin
-2	User
-3	Moderator
-\.
 
 
 --

@@ -21,6 +21,11 @@ class CustomLabel extends Label {
 
 public class IconLabel extends HBox {
     VBox vbox;
+
+    public Label getTitleLabel() {
+        return titleLabel;
+    }
+
     Label titleLabel;
     HBox hbox;
     Label titleSideLabel;
@@ -60,7 +65,9 @@ public class IconLabel extends HBox {
 
     public void update(URL icon, String title, String titleSide, String content) {
         if (icon != null) {
-            circleImage.update(icon.toString());
+            if (circleImage != null) circleImage.update(icon.toString());
+        } else {
+            if (circleImage != null) circleImage.update(null);
         }
         if (title != null) {
             titleLabel.setText(title);

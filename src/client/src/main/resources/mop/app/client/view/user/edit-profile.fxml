@@ -18,103 +18,90 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
-
-<VBox alignment="CENTER" prefHeight="200.0" prefWidth="850.0" styleClass="right-side"
-      xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="mop.app.client.controller.auth.RegisterController">
+<VBox alignment="CENTER" prefHeight="200.0" prefWidth="850.0" styleClass="right-side" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mop.app.client.controller.auth.RegisterController">
     <children>
-        <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="mop-text" text="Get started with MOP"
-              textAlignment="CENTER">
+        <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="mop-text" text="Get started with MOP" textAlignment="CENTER">
             <VBox.margin>
-                <Insets bottom="60.0"/>
+                <Insets bottom="60.0" />
             </VBox.margin>
         </Text>
 
         <GridPane alignment="CENTER" hgap="20.0" vgap="20.0">
             <columnConstraints>
-                <ColumnConstraints minWidth="100" prefWidth="150"/>
-                <ColumnConstraints minWidth="200" prefWidth="300"/>
+                <ColumnConstraints minWidth="100" prefWidth="150" />
+                <ColumnConstraints minWidth="200" prefWidth="300" />
             </columnConstraints>
             <children>
                 <!-- Email -->
-                <Label styleClass="form-text" text="Email:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-                <TextField fx:id="emailField" promptText="Enter your email" styleClass="input-field"
-                           GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                <Label styleClass="form-text" text="Email:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                <TextField fx:id="emailField" promptText="Enter your email" styleClass="input-field" GridPane.columnIndex="1" GridPane.rowIndex="0" />
 
                 <!-- Username -->
-                <Label styleClass="form-text" text="Username:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-                <TextField fx:id="usernameField" promptText="Choose a username" styleClass="input-field"
-                           GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                <Label styleClass="form-text" text="Username:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                <TextField fx:id="usernameField" promptText="Choose a username" styleClass="input-field" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
                 <!-- Password -->
-                <Label styleClass="form-text" text="Password:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
-                <PasswordField fx:id="passwordField" promptText="Choose a password" styleClass="input-field"
-                               GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                <Label styleClass="form-text" text="Password:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                <PasswordField fx:id="passwordField" promptText="Choose a password" styleClass="input-field" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 
                 <!-- Gender -->
-                <Label styleClass="form-text" text="Gender:" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
-                <ComboBox fx:id="genderComboBox" promptText="Select your gender" styleClass="combo-box"
-                          GridPane.columnIndex="1" GridPane.rowIndex="3">
+                <Label styleClass="form-text" text="Gender:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+                <ComboBox fx:id="genderComboBox" promptText="Select your gender" styleClass="combo-box" GridPane.columnIndex="1" GridPane.rowIndex="4">
                     <items>
                         <FXCollections fx:factory="observableArrayList">
-                            <String fx:value="Male"/>
-                            <String fx:value="Female"/>
-                            <String fx:value="Other"/>
+                            <String fx:value="Male" />
+                            <String fx:value="Female" />
+                            <String fx:value="Other" />
                         </FXCollections>
                     </items>
                 </ComboBox>
 
                 <!-- Full Name -->
-                <Label styleClass="form-text" text="Full Name:" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
-                <TextField fx:id="fullNameField" promptText="Enter your full name" styleClass="input-field"
-                           GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+                <Label styleClass="form-text" text="Full Name:" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+                <TextField fx:id="fullNameField" promptText="Enter your full name" styleClass="input-field" GridPane.columnIndex="1" GridPane.rowIndex="5" />
 
                 <!-- Date of Birth -->
-                <Label styleClass="form-text" text="Date of Birth:" GridPane.columnIndex="0" GridPane.rowIndex="5"/>
-                <DatePicker fx:id="dateOfBirthPicker" promptText="Select your date of birth" styleClass="date-picker"
-                            GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+                <Label styleClass="form-text" text="Date of Birth:" GridPane.columnIndex="0" GridPane.rowIndex="6" />
+                <DatePicker fx:id="dateOfBirthPicker" promptText="Select your date of birth" styleClass="date-picker" GridPane.columnIndex="1" GridPane.rowIndex="6" />
 
                 <!-- Address -->
-                <Label styleClass="form-text" text="Address:" GridPane.columnIndex="0" GridPane.rowIndex="6"
-                       GridPane.valignment="TOP">
+                <Label styleClass="form-text" text="Address:" GridPane.columnIndex="0" GridPane.rowIndex="7" GridPane.valignment="TOP">
                     <padding>
-                        <Insets top="5"/>
+                        <Insets top="5" />
                     </padding>
                 </Label>
-                <TextArea fx:id="addressArea" prefRowCount="3" promptText="Enter your address" styleClass="text-area"
-                          wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
+                <TextArea fx:id="addressArea" prefRowCount="3" promptText="Enter your address" styleClass="text-area" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                <Button fx:id="registerButton" alignment="CENTER" mnemonicParsing="false" prefWidth="480.0" styleClass="continue-button" text="Reset Password" textAlignment="CENTER" GridPane.columnIndex="1" GridPane.rowIndex="3" />
             </children>
             <rowConstraints>
-                <RowConstraints/>
-                <RowConstraints/>
-                <RowConstraints/>
-                <RowConstraints/>
-                <RowConstraints/>
-                <RowConstraints/>
-                <RowConstraints/>
+                <RowConstraints />
+                <RowConstraints />
+                <RowConstraints />
+            <RowConstraints />
+                <RowConstraints />
+                <RowConstraints />
+                <RowConstraints />
+                <RowConstraints />
             </rowConstraints>
         </GridPane>
 
         <!-- Already have an account? -->
-        <HBox alignment="CENTER_LEFT" maxWidth="480.0"/>
-
-        <!-- Register Button -->
-        <VBox alignment="CENTER" maxWidth="480.0">
-            <children>
-                <Button fx:id="registerButton" alignment="CENTER" mnemonicParsing="false" prefWidth="480.0"
-                        styleClass="continue-button" text="Save Changes" textAlignment="CENTER">
-                    <VBox.margin>
-                        <Insets top="30.0"/>
-                    </VBox.margin>
-                </Button>
-            </children>
-        </VBox>
+        <HBox alignment="CENTER_LEFT" maxWidth="480.0" />
+      <VBox alignment="CENTER" layoutX="195.0" layoutY="549.0" maxWidth="480.0">
+         <children>
+            <Button fx:id="registerButton1" alignment="CENTER" mnemonicParsing="false" prefWidth="480.0" styleClass="continue-button" text="Save Changes" textAlignment="CENTER">
+               <VBox.margin>
+                  <Insets top="30.0" />
+               </VBox.margin>
+            </Button>
+         </children>
+      </VBox>
     </children>
     <padding>
-        <Insets bottom="40.0" left="40.0" right="40.0" top="40.0"/>
+        <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
     </padding>
     <stylesheets>
-        <URL value="@../../css/register.css"/>
-        <URL value="@../../css/style.css"/>
+        <URL value="@../../css/register.css" />
+        <URL value="@../../css/style.css" />
     </stylesheets>
 </VBox>

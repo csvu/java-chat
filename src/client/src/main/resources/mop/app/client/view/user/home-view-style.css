@@ -8,8 +8,15 @@
     -fx-background-color: rgba(255, 255, 255, 0.2);
 }
 
+#dmNav:hover {
+ -fx-effect: innershadow( gaussian, rgba( 0, 0, 0, 0.5 ), 20, 0, 0, 0 );
+}
 
 TextField {
+    -fx-background-color: transparent;
+    -fx-text-fill: grey;
+}
+TextField:focused {
     -fx-background-color: transparent;
     -fx-text-fill: white;
 }
@@ -42,11 +49,13 @@ TextField {
     -fx-opacity: 0;
 }
 
-ListView .list-cell {
-    -fx-background-color: transparent;
-}
+
 
 #listViewCol2 .list-cell:selected {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+}
+
+#listFriend .list-cell:selected {
     -fx-background-color: rgba(255, 255, 255, 0.1);
 }
 
@@ -73,19 +82,27 @@ ListView .list-cell {
     -fx-pref-width: 0px;
 }
 
+.list-view .list-cell {
+    -fx-background-color: transparent;
+}
 
-
-ListView .corner {
+.list-view {
     -fx-background-color: transparent
 }
 
-ListView .list-cell:hover {
+.list-view .corner {
+    -fx-background-color: transparent
+}
+
+.list-view .list-cell:hover {
     -fx-background-color: rgba(255, 255, 255, 0.1);
 }
 
-#listF .list-cell:hover {
+.noHoverListView .list-cell:hover {
     -fx-background-color: transparent;
 }
+
+
 
 .increment-button {
     -fx-pref-height: 0;

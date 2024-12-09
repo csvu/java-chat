@@ -23,13 +23,15 @@ class ListCellWithButtons extends ListCell<Conversation> {
         if (empty || item == null) {
             setText(null);
             setGraphic(null);
+            setMouseTransparent(true);
         } else {
             if (itemWrapper == null) {
                 itemWrapper = new IconLabelWrapper(item, iconLabelCallback, rightIcons);
             } else {
-                itemWrapper.update(item.getIcon(), item.getName(), null, "Online");
+                itemWrapper.update(item);
             }
             setGraphic(itemWrapper);
+            setMouseTransparent(false);
         }
     }
 }

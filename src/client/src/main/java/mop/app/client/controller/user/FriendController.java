@@ -9,11 +9,11 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 import javafx.util.Pair;
 import mop.app.client.Client;
+import mop.app.client.dao.user.UserDAO;
 import mop.app.client.model.user.Conversation;
 import mop.app.client.model.user.Message;
 import org.slf4j.Logger;
@@ -21,11 +21,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URL;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
 import java.util.function.Consumer;
 
 public class FriendController extends GridPane {
@@ -39,13 +36,15 @@ public class FriendController extends GridPane {
     @FXML
     private ListView<Conversation> listF;
     @FXML
+    private VBox col0;
+    @FXML
     private VBox col2;
     @FXML
     private HBox friendListAllOnl;
 
-    private ChatWindowController chatWindowController;
+    private final ChatWindowController chatWindowController;
 
-    Conversation curConversation;
+    Conversation curFriend;
     ObservableList<Conversation> friendListObservable = FXCollections.observableArrayList();;
     ObservableList<Conversation> groupChad;
     HashMap<Integer, ObservableList<Message>> convMsg = new HashMap<>();
@@ -59,13 +58,33 @@ public class FriendController extends GridPane {
         fxmlLoader.load();
         URL placeholder = Client.class.getResource("images/place-holder.png");
 
+
+        // Default pressed
+        friendListObservable.addAll(new UserDAO().getFriends());
+        friendList.getStyleClass().clear();
+        friendList.getStyleClass().add("PressedWrapper");
+
+
+        curFriend = friendListObservable == null ? null : !friendListObservable.isEmpty() ? friendListObservable.getFirst() : null;
+
+        chatWindowController = new ChatWindowController(curFriend, () -> {}, (msg, curConv) -> {});
+        //Init GUI
+
+
         Consumer<Conversation> changeToChat = item -> {
-            curConversation = item;
-            chatWindowController.changeCurConv(item);
-            getChildren().remove(1);
-            setConstraints(chatWindowController, 1, 0);
-            getChildren().add(chatWindowController);
+            curFriend = item;
+            if (!getChildren().contains(chatWindowController)) {
+                getChildren().remove(1);
+                setConstraints(chatWindowController, 1, 0);
+                getChildren().add(chatWindowController);
+            }
+            Conversation curConv = new Conversation(item);
+            curConv.setType("PAIR");
+            curConv.setConversationID(new UserDAO().getPairConversationId(item.getConversationID()));
+            chatWindowController.changeCurConv(curConv);
+
         };
+
 
         Callback<ListView<Conversation>, ListCell<Conversation>> friendListFactory = param -> new ListCellWithButtons(
                 changeToChat,
@@ -76,9 +95,16 @@ public class FriendController extends GridPane {
                 )
         );
         Callback<ListView<Conversation>, ListCell<Conversation>> friendRequestsFactory = param -> new ListCellWithButtons(
-                changeToChat,
+                (item)->{},
                 Arrays.asList(new Pair<String, Consumer<Conversation>>(
-                        "view/user/accept-svgrepo-com.png", item -> {}),
+                        "view/user/accept-svgrepo-com.png", item -> {
+                            new UserDAO().acceptFriendRequest(item.getConversationID(), item.getName());
+                            Conversation newItem = new Conversation(item);
+                            newItem.setType("PAIR");
+                            ChatController.dmList.add(newItem);
+                            friendListObservable.add(newItem);
+                            friendRequestsList.remove(item);
+                        }),
                         new Pair<String, Consumer<Conversation>>(
                         "view/user/decline-svgrepo-com.png", item -> {})
                 )
@@ -89,6 +115,8 @@ public class FriendController extends GridPane {
 
         //Handlers
         friendList.setOnMouseClicked((e)->{
+            friendListObservable.clear();
+            friendListObservable.addAll(new UserDAO().getFriends());
             getChildren().remove(1);
             getChildren().add(col2);
             curOption.setText("Friend List");
@@ -101,6 +129,8 @@ public class FriendController extends GridPane {
             listF.setCellFactory(friendListFactory);
         });
         friendRequests.setOnMouseClicked((e)->{
+            friendRequestsList.clear();
+            friendRequestsList.addAll(new UserDAO().getFriendRequests());
             getChildren().remove(1);
             getChildren().add(col2);
             curOption.setText("Friend Requests");
@@ -113,39 +143,7 @@ public class FriendController extends GridPane {
             listF.setCellFactory(friendRequestsFactory);
         });
 
-        // Mock data
-        for (int i = 0; i < 30; i++) {
-            Random rand = new Random();
-            StringBuilder str = new StringBuilder();
-            char x = 20;
-            for (int j = 0; j < 10; j++) {
-                Random r = new Random();
-                char c = (char)(r.nextInt(26) + 'a');
-                str.append(c);
-            }
-            friendListObservable.add(new Conversation(i, "PAIR", placeholder, str.toString(), false));
-            friendRequestsList.add(new Conversation(i + 30, "N/A", placeholder, str.toString(), false));
-            ObservableList<Message> messages = FXCollections.observableArrayList();
-            for (int j = 0; j < 30; j++) {
-                messages.add(new Message(Arrays.asList("kaak", "wgewg").get(rand.nextInt(2)),  Client.class.getResource("images/place-holder.png"), LocalDateTime.of(10, 10, 10, 10, 10), "text"));
-            }
-            convMsg.put(i, messages);
 
-        }
-
-
-        groupChad = FXCollections.observableArrayList();
-        for (int i = 0; i < 30; i++) {
-            groupChad.add(new Conversation(i, "PAIR", placeholder, "hiha", false));
-        }
-        //Init
-        friendList.getStyleClass().clear();
-        friendList.getStyleClass().add("PressedWrapper");
-
-
-        curConversation = friendListObservable == null ? null : friendListObservable.getFirst();
-
-        chatWindowController = new ChatWindowController(curConversation, convMsg);
 
         // Scroll
 

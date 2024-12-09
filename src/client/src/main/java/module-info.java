@@ -26,7 +26,7 @@ module mop.app.client {
     opens mop.app.client.controller.user to javafx.fxml;
     opens mop.app.client.model to javafx.base;
     opens mop.app.client.util to javafx.fxml;
-
+    opens mop.app.client.dao to javafx.fxml;
     exports mop.app.client;
     exports mop.app.client.controller;
     exports mop.app.client.controller.admin;
@@ -34,4 +34,5 @@ module mop.app.client {
     exports mop.app.client.controller.user;
     exports mop.app.client.model;
     exports mop.app.client.util;
+    exports mop.app.client.dao;
 }

@@ -45,11 +45,11 @@
                </children>
             </HBox>
             <ListView fx:id="msgWindow" focusTraversable="false" prefHeight="566.0" prefWidth="883.0" style="-fx-background-color: #0E1621;" VBox.vgrow="ALWAYS" />
-            <HBox alignment="CENTER" fillHeight="false" maxHeight="600.0" prefHeight="40.0" prefWidth="883.0" spacing="20.0" style="-fx-background-color: #17212B;" VBox.vgrow="NEVER">
+            <HBox fx:id="writeMsg" alignment="CENTER" fillHeight="false" maxHeight="600.0" prefHeight="40.0" prefWidth="883.0" spacing="20.0" style="-fx-background-color: #17212B;" VBox.vgrow="NEVER">
                <children>
                   <TextArea fx:id="chatArea" maxHeight="600.0" prefHeight="40.0" prefWidth="200.0" promptText="Write a message" wrapText="true" HBox.hgrow="ALWAYS" />
                   <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" />
-                  <Button mnemonicParsing="false" styleClass="HoverWrapper">
+                  <Button fx:id="sendButton" mnemonicParsing="false" styleClass="HoverWrapper">
                      <graphic>
                         <FontAwesomeIconView fill="WHITE" glyphName="SEND" selectionEnd="0" selectionStart="0" size="20" />
                      </graphic>
@@ -77,22 +77,27 @@
             </HBox>
             <VBox fx:id="chatInfo" alignment="TOP_CENTER" spacing="4.0" style="-fx-background-color: #17212B;" VBox.vgrow="ALWAYS">
                <children>
-                  <VBox alignment="CENTER" prefHeight="100.0" spacing="10.0" style="-fx-background-color: #17212B;">
+                  <VBox fx:id="topVBox" alignment="CENTER" prefHeight="100.0" spacing="10.0" style="-fx-background-color: #17212B;">
                      <children>
-                        <ImageView fitHeight="54.0" fitWidth="54.0" pickOnBounds="true">
-                           <image>
-                              <Image url="@../../images/place-holder.png" />
-                           </image>
-                        </ImageView>
-                        <Label alignment="CENTER" style="-fx-font-weight: bold;" text="YOUR NAME" textAlignment="CENTER" textFill="WHITE" />
-                        <ImageView fitHeight="18.0" fitWidth="18.0" layoutX="103.0" layoutY="30.0" pickOnBounds="true">
-                           <image>
-                              <Image url="@edit-3-svgrepo-com.png" />
-                           </image>
-                        </ImageView>
-                        <HBox alignment="CENTER" prefHeight="100.0">
+                        <Label fx:id="chatWindowName" alignment="CENTER" style="-fx-font-weight: bold;" text="YOUR NAME" textAlignment="CENTER" textFill="WHITE">
+                           <font>
+                              <Font size="16.0" />
+                           </font></Label>
+                        <HBox fx:id="editName" alignment="CENTER" fillHeight="false" maxHeight="30.0" maxWidth="30.0" prefHeight="60.0" prefWidth="0.0" styleClass="HoverWrapper">
                            <children>
-                              <HBox alignment="CENTER" fillHeight="false" maxHeight="30.0" maxWidth="30.0" prefHeight="60.0" prefWidth="0.0" styleClass="HoverWrapper">
+                              <ImageView fitHeight="18.0" fitWidth="18.0" pickOnBounds="true">
+                                 <image>
+                                    <Image url="@edit-3-svgrepo-com.png" />
+                                 </image>
+                              </ImageView>
+                           </children>
+                           <padding>
+                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                           </padding>
+                        </HBox>
+                        <HBox fx:id="chatInfoHBox" alignment="CENTER" prefHeight="100.0">
+                           <children>
+                              <HBox fx:id="searchInInfo" alignment="CENTER" fillHeight="false" maxHeight="30.0" maxWidth="30.0" prefHeight="60.0" prefWidth="0.0" styleClass="HoverWrapper">
                                  <children>
                                     <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true">
                                        <image>
@@ -116,7 +121,7 @@
                                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                  </padding>
                               </HBox>
-                              <HBox alignment="CENTER" fillHeight="false" layoutX="130.0" layoutY="10.0" maxHeight="30.0" maxWidth="30.0" prefHeight="60.0" prefWidth="0.0" styleClass="HoverWrapper">
+                              <HBox fx:id="groupAdd" alignment="CENTER" fillHeight="false" layoutX="130.0" layoutY="10.0" maxHeight="30.0" maxWidth="30.0" prefHeight="60.0" prefWidth="0.0" styleClass="HoverWrapper">
                                  <children>
                                     <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true">
                                        <image>
@@ -138,7 +143,7 @@
                   <VBox prefHeight="200.0" prefWidth="100.0" VBox.vgrow="ALWAYS" />
                   <VBox fx:id="chatOptions" alignment="CENTER" layoutX="10.0" layoutY="10.0" style="-fx-background-color: #17212B;">
                      <children>
-                        <HBox alignment="CENTER_LEFT" fillHeight="false" spacing="10.0" styleClass="HoverWrapper">
+                        <HBox fx:id="block" alignment="CENTER_LEFT" fillHeight="false" spacing="10.0" styleClass="HoverWrapper">
                            <children>
                               <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true">
                                  <image>
@@ -151,7 +156,7 @@
                               <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
                            </padding>
                         </HBox>
-                        <HBox alignment="CENTER_LEFT" fillHeight="false" layoutX="10.0" layoutY="20.0" spacing="10.0" styleClass="HoverWrapper">
+                        <HBox fx:id="report" alignment="CENTER_LEFT" fillHeight="false" layoutX="10.0" layoutY="20.0" spacing="10.0" styleClass="HoverWrapper">
                            <children>
                               <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true">
                                  <image>
@@ -164,7 +169,7 @@
                               <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
                            </padding>
                         </HBox>
-                        <HBox alignment="CENTER_LEFT" fillHeight="false" spacing="10.0" styleClass="HoverWrapper">
+                        <HBox fx:id="deleteChat" alignment="CENTER_LEFT" fillHeight="false" spacing="10.0" styleClass="HoverWrapper">
                            <children>
                               <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true">
                                  <image>
@@ -177,7 +182,7 @@
                               <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
                            </padding>
                         </HBox>
-                        <HBox alignment="CENTER_LEFT" fillHeight="false" layoutX="10.0" layoutY="43.0" spacing="10.0" styleClass="HoverWrapper">
+                        <HBox fx:id="leaveChat" alignment="CENTER_LEFT" fillHeight="false" layoutX="10.0" layoutY="43.0" spacing="10.0" styleClass="HoverWrapper">
                            <children>
                               <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true">
                                  <image>

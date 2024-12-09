@@ -14,10 +14,11 @@ import org.slf4j.LoggerFactory;
 
 public class Client extends Application {
     private static final Logger logger = LoggerFactory.getLogger(Client.class);
-
+    public static int currentUserId = 3;
     @Override
     public void start(Stage stage) throws IOException {
         logger.info("Starting JavaFX Application");
+        System.out.println(Client.class.getResource("images/place-holder.png"));
 //        ViewFactory viewFactory = new ViewFactory();
 //        viewFactory.getAdminView();
         FXMLLoader fxmlLoader = new FXMLLoader(Client.class.getResource("view/user/home-view.fxml"));

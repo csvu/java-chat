@@ -18,6 +18,6 @@ public class CircleImage extends ImageView {
     }
 
     public void update(String image) {
-        setImage(new Image(image));
+        setImage(image == null ? null : new Image(image));
     }
 }

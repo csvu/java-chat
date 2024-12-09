@@ -25,68 +25,51 @@
     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
   </rowConstraints>
    <children>
-      <VBox style="-fx-background-color: #17212B;">
+      <VBox fx:id="col0" style="-fx-background-color: #17212B;">
          <children>
-            <HBox alignment="CENTER_LEFT" prefHeight="65.0" spacing="10.0">
+            <HBox fx:id="friendList" alignment="CENTER_LEFT" maxHeight="74.0" minHeight="74.0" prefHeight="74.0" prefWidth="896.0" spacing="10.0" styleClass="HoverWrapper">
                <children>
-                  <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@search-alt-2-svgrepo-com.png" />
-                     </image>
-                  </ImageView>
-                  <TextField promptText="Search" />
+                  <Button mnemonicParsing="false" style="-fx-background-color: transparent;" textFill="WHITE">
+                     <graphic>
+                        <FontAwesomeIconView fill="WHITE" glyphName="USERS" size="20" />
+                     </graphic>
+                  </Button>
+                  <Label text="Friend List" textFill="WHITE">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                     <HBox.margin>
+                        <Insets />
+                     </HBox.margin>
+                  </Label>
                </children>
                <padding>
-                  <Insets bottom="10.0" left="20.0" right="10.0" top="10.0" />
+                  <Insets left="20.0" right="20.0" />
                </padding>
             </HBox>
-            <VBox prefHeight="200.0" prefWidth="100.0" VBox.vgrow="ALWAYS">
+            <HBox fx:id="friendRequests" alignment="CENTER_LEFT" maxHeight="74.0" minHeight="74.0" prefHeight="74.0" prefWidth="896.0" spacing="10.0" styleClass="HoverWrapper">
                <children>
-                  <HBox fx:id="friendList" alignment="CENTER_LEFT" maxHeight="74.0" minHeight="74.0" prefHeight="74.0" prefWidth="896.0" spacing="10.0" styleClass="HoverWrapper">
-                     <children>
-                        <Button mnemonicParsing="false" style="-fx-background-color: transparent;" textFill="WHITE">
-                           <graphic>
-                              <FontAwesomeIconView fill="WHITE" glyphName="USERS" size="20" />
-                           </graphic>
-                        </Button>
-                        <Label text="Friend List" textFill="WHITE">
-                           <font>
-                              <Font size="16.0" />
-                           </font>
-                           <HBox.margin>
-                              <Insets />
-                           </HBox.margin>
-                        </Label>
-                     </children>
-                     <padding>
-                        <Insets left="20.0" right="20.0" />
-                     </padding>
-                  </HBox>
-                  <HBox fx:id="friendRequests" alignment="CENTER_LEFT" layoutX="10.0" layoutY="10.0" maxHeight="74.0" minHeight="74.0" prefHeight="74.0" prefWidth="896.0" spacing="10.0" styleClass="HoverWrapper">
-                     <children>
-                        <Button mnemonicParsing="false" style="-fx-background-color: transparent;" textFill="WHITE">
-                           <graphic>
-                              <FontAwesomeIconView fill="WHITE" glyphName="BELL" size="20" />
-                           </graphic>
-                        </Button>
-                        <Label fx:id="friendList1" text="Friend Requests" textFill="WHITE">
-                           <font>
-                              <Font size="16.0" />
-                           </font>
-                           <HBox.margin>
-                              <Insets />
-                           </HBox.margin>
-                        </Label>
-                     </children>
-                     <padding>
-                        <Insets left="20.0" right="20.0" />
-                     </padding>
-                  </HBox>
+                  <Button mnemonicParsing="false" style="-fx-background-color: transparent;" textFill="WHITE">
+                     <graphic>
+                        <FontAwesomeIconView fill="WHITE" glyphName="BELL" size="20" />
+                     </graphic>
+                  </Button>
+                  <Label fx:id="friendList1" text="Friend Requests" textFill="WHITE">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                     <HBox.margin>
+                        <Insets />
+                     </HBox.margin>
+                  </Label>
                </children>
-            </VBox>
+               <padding>
+                  <Insets left="20.0" right="20.0" />
+               </padding>
+            </HBox>
          </children>
       </VBox>
-      <VBox fx:id="col2" spacing="2.0" GridPane.columnIndex="1">
+      <VBox fx:id="col2" spacing="2.0" style="-fx-background-color: #0E1621;" GridPane.columnIndex="1">
          <children>
             <HBox fx:id="topBarCol3" alignment="CENTER_LEFT" maxHeight="74.0" minHeight="74.0" prefHeight="74.0" prefWidth="896.0" style="-fx-background-color: #17212B;" VBox.vgrow="NEVER">
                <children>
@@ -133,7 +116,7 @@
                   <Insets left="20.0" right="20.0" />
                </padding>
             </HBox>
-            <HBox alignment="CENTER_LEFT" prefHeight="65.0" spacing="10.0" style="-fx-background-color: #0E1621;">
+            <HBox alignment="CENTER_LEFT" prefHeight="65.0" spacing="10.0" style="-fx-background-color: transparent;">
                <children>
                   <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
                      <image>
@@ -146,7 +129,7 @@
                   <Insets bottom="10.0" left="20.0" right="10.0" top="10.0" />
                </padding>
             </HBox>
-            <ListView fx:id="listF" focusTraversable="false" prefHeight="566.0" prefWidth="883.0" style="-fx-background-color: #0E1621;" VBox.vgrow="ALWAYS" />
+            <ListView fx:id="listF" focusTraversable="false" prefHeight="566.0" prefWidth="883.0" style="-fx-background-color: transparent;" styleClass="noHoverListView" VBox.vgrow="ALWAYS" />
          </children>
       </VBox>
    </children>
