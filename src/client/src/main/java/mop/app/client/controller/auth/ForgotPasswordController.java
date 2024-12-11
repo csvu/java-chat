@@ -14,6 +14,7 @@ import mop.app.client.dto.RequestType;
 import mop.app.client.dto.Response;
 import mop.app.client.dto.UserDTO;
 import mop.app.client.network.SocketClient;
+import mop.app.client.util.AlertDialog;
 import mop.app.client.util.EmailSender;
 import mop.app.client.util.ObjectMapperConfig;
 import mop.app.client.util.ViewHelper;
@@ -32,24 +33,13 @@ public class ForgotPasswordController {
             ViewHelper.getLoginScene(event);
         } catch (IOException e) {
             logger.error("Could not navigate to the previous page: {}", e.getMessage());
-            showError("Navigation Error", "Could not navigate to the previous page.");
+            AlertDialog.showAlertDialog(
+                Alert.AlertType.ERROR,
+                "Navigation Error",
+                "Could not navigate to the previous page.",
+                e.getMessage()
+            );
         }
-    }
-
-    private void showInfo(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
-    }
-
-    private void showError(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
     }
 
     @FXML
@@ -57,14 +47,25 @@ public class ForgotPasswordController {
         String email = emailField.getText();
 
         if (email.isEmpty()) {
-            showError("Error", "Please enter your email address.");
+            AlertDialog.showAlertDialog(
+                Alert.AlertType.ERROR,
+                "Error",
+                "Please enter your email address.",
+                ""
+            );
         } else {
             AuthDAO authDAO = new AuthDAO();
 
             UserDTO user = authDAO.getUserByEmail(email);
 
             if (user == null) {
-                showError("Error", "Could not send email. Please check your email address");
+                AlertDialog.showAlertDialog(
+                    Alert.AlertType.ERROR,
+                    "Error",
+                    "Could not send email. Please check your email address",
+                    ""
+                );
+                return;
             }
 
             authDAO.sendResetPasswordEmail(email);

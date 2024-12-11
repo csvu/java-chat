@@ -22,6 +22,7 @@ import mop.app.client.dto.RequestType;
 import mop.app.client.dto.Response;
 import mop.app.client.dto.UserDTO;
 import mop.app.client.network.SocketClient;
+import mop.app.client.util.AlertDialog;
 import mop.app.client.util.ObjectMapperConfig;
 import mop.app.client.util.PreProcess;
 import mop.app.client.util.ViewFactory;
@@ -50,7 +51,12 @@ public class LoginController {
             ViewHelper.getIndexScene(event);
         } catch (IOException e) {
             logger.error("Could not navigate to the previous page: {}", e.getMessage());
-            showError("Navigation Error", "Could not navigate to the previous page.");
+            AlertDialog.showAlertDialog(
+                Alert.AlertType.ERROR,
+                "Navigation Error",
+                "Could not navigate to the previous page.",
+                e.getMessage()
+            );
         }
     }
 
@@ -60,7 +66,12 @@ public class LoginController {
         String password = passwordField.getText();
 
         if (email.isEmpty() || password.isEmpty()) {
-            showError("Validation Error", "Please fill in all fields.");
+            AlertDialog.showAlertDialog(
+                Alert.AlertType.ERROR,
+                "Validation Error",
+                "Please fill in all fields.",
+                ""
+            );
             return;
         }
 
@@ -70,7 +81,12 @@ public class LoginController {
         SocketClient socketClient = Client.socketClient;
 
         if (!socketClient.isConnectionValid()) {
-            showError("Connection Error", "Could not connect to the server.");
+            AlertDialog.showAlertDialog(
+                Alert.AlertType.ERROR,
+                "Connection Error",
+                "Could not connect to the server.",
+                ""
+            );
             return;
         }
 
@@ -91,13 +107,23 @@ public class LoginController {
 
             // Check if user is deleted
             if (user.getDisplayName().equals("Deleted User")) {
-                showError("Account Deleted", "Your account has been deleted.");
+                AlertDialog.showAlertDialog(
+                    Alert.AlertType.ERROR,
+                    "Account Deleted",
+                    "Your account has been deleted.",
+                    ""
+                );
                 return;
             }
 
             // Check if user is banned
             if (user.getIsBanned()) {
-                showError("Account Banned", "Your account has been banned.");
+                AlertDialog.showAlertDialog(
+                    Alert.AlertType.ERROR,
+                    "Account Banned",
+                    "Your account has been banned.",
+                    ""
+                );
                 return;
             }
 
@@ -105,7 +131,12 @@ public class LoginController {
             String roleName = role.getRoleByUserId(user.getUserId());
 
             if (roleName == null) {
-                showError("Role Error", "Could not retrieve user role.");
+                AlertDialog.showAlertDialog(
+                    Alert.AlertType.ERROR,
+                    "Role Error",
+                    "Could not retrieve user role.",
+                    ""
+                );
                 return;
             }
 
@@ -149,7 +180,12 @@ public class LoginController {
             }
             Client.registerActivity();
         } else {
-            showError("Login Failed", loginResponse.getMessage());
+            AlertDialog.showAlertDialog(
+                Alert.AlertType.ERROR,
+                "Login Failed",
+                loginResponse.getMessage(),
+                ""
+            );
         }
     }
 
@@ -159,7 +195,12 @@ public class LoginController {
             ViewHelper.getForgotPasswordScene(event);
         } catch (IOException e) {
             logger.error("Could not navigate to the forgot password page: {}", e.getMessage());
-            showError("Navigation Error", "Could not navigate to the forgot password page.");
+            AlertDialog.showAlertDialog(
+                Alert.AlertType.ERROR,
+                "Navigation Error",
+                "Could not navigate to the forgot password page.",
+                e.getMessage()
+            );
         }
     }
 
@@ -169,7 +210,12 @@ public class LoginController {
             ViewHelper.getResetPasswordScene(event);
         } catch (IOException e) {
             logger.error("Could not navigate to the reset password page: {}", e.getMessage());
-            showError("Navigation Error", "Could not navigate to the reset password page.");
+            AlertDialog.showAlertDialog(
+                Alert.AlertType.ERROR,
+                "Navigation Error",
+                "Could not navigate to the reset password page.",
+                e.getMessage()
+            );
         }
     }
 
@@ -179,23 +225,12 @@ public class LoginController {
             ViewHelper.getRegisterScene(event);
         } catch (IOException e) {
             logger.error("Could not navigate to the register page: {}", e.getMessage());
-            showError("Navigation Error", "Could not navigate to the register page.");
+            AlertDialog.showAlertDialog(
+                Alert.AlertType.ERROR,
+                "Navigation Error",
+                "Could not navigate to the register page.",
+                e.getMessage()
+            );
         }
-    }
-
-    private void showError(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
-    }
-
-    private void showInfo(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
     }
 }

@@ -17,7 +17,7 @@
 
 <?import javafx.scene.control.PasswordField?>
 <AnchorPane prefHeight="700.0" prefWidth="1000.0" styleClass="container" xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml/" fx:controller="mop.app.client.controller.admin.UserDetailsController">
+            xmlns:fx="http://javafx.com/fxml/" fx:controller="mop.app.client.controller.admin.CreateUserController">
     <stylesheets>
         <URL value="@../../css/admin.css"/>
         <URL value="@../../css/register.css"/>
@@ -28,11 +28,6 @@
     </padding>
     <VBox layoutX="20" layoutY="20" spacing="10" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
           AnchorPane.topAnchor="20.0">
-
-        <!-- Existing username label -->
-        <!--        <Label fx:id="userNameLabel" styleClass="header-text" text="Username: " />-->
-        <!--      <Line endX="291.29290771484375" endY="0.6213218569755554" startX="-100.0" styleClass="line" />-->
-
         <!-- Identity Section -->
         <Label styleClass="header-text" text="Identity">
             <padding>
@@ -56,21 +51,25 @@
                 <TextField fx:id="displayNameField" styleClass="input-field"/>
             </VBox>
 
+            <!-- Email -->
             <VBox spacing="5" GridPane.columnIndex="0" GridPane.rowIndex="1">
                 <Label styleClass="field-label" text="Email *"/>
                 <TextField fx:id="emailField" styleClass="input-field"/>
             </VBox>
 
+            <!-- Gender -->
             <VBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="1">
                 <Label styleClass="field-label" text="Gender *"/>
                 <ComboBox fx:id="genderComboBox" prefWidth="500"/>
             </VBox>
 
+            <!-- Birthday -->
             <VBox spacing="5" GridPane.columnIndex="0" GridPane.rowIndex="2">
                 <Label styleClass="field-label" text="Birthday"/>
                 <DatePicker fx:id="birthdayPicker" prefWidth="500" styleClass="date-picker"/>
             </VBox>
 
+            <!-- Role -->
             <VBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="2">
                 <Label styleClass="field-label" text="Role *"/>
                 <ComboBox fx:id="roleComboBox" prefWidth="500"/>
@@ -82,6 +81,7 @@
             </rowConstraints>
         </GridPane>
 
+        <!-- Address Section -->
         <Label styleClass="header-text" text="Address">
             <padding>
                 <Insets bottom="5"/>
@@ -93,6 +93,7 @@
             <TextArea fx:id="addressArea" styleClass="text-area"/>
         </VBox>
 
+        <!-- Change Password Section -->
         <Label styleClass="header-text" text="Change Password">
             <padding>
                 <Insets bottom="5"/>
@@ -104,11 +105,13 @@
                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="400" minWidth="200"/>
             </columnConstraints>
 
+            <!-- Password -->
             <VBox spacing="5" GridPane.columnIndex="0" GridPane.rowIndex="0">
                 <Label styleClass="field-label" text="Password *"/>
                 <PasswordField fx:id="passwordField" styleClass="input-field"/>
             </VBox>
 
+            <!-- Confirm Password -->
             <VBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="0">
                 <Label styleClass="field-label" text="Confirm Password *"/>
                 <PasswordField fx:id="confirmPasswordField" styleClass="input-field"/>
@@ -121,9 +124,9 @@
             <padding>
                 <Insets top="10"/>
             </padding>
-            <Button fx:id="saveButton" onAction="#handleSave" styleClass="save-button" text="SAVE"/>
+            <Button fx:id="backButton" onAction="#handleBack" styleClass="delete-button" text="BACK"/>
             <!--            <Region HBox.hgrow="ALWAYS" />-->
-            <Button fx:id="deleteButton" onAction="#handleDelete" styleClass="delete-button" text="DELETE">
+            <Button fx:id="createButton" onAction="#createSave" styleClass="save-button" text="CREATE">
                 <HBox.margin>
                     <Insets left="695.0"/>
                 </HBox.margin>

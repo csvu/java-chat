@@ -21,7 +21,8 @@ public class MessageController {
             .data(message)
             .build();
 
-        ArrayList<Integer> usersInConversation = new MessageDAO().getUsersInConversation(message.getConversationId(), message.getSenderId());
+        ArrayList<Integer> usersInConversation =
+            new MessageDAO().getUsersInConversation(message.getConversationId(), message.getSenderId());
 
         Server.clients.forEach(clientHandler -> {
             Client client = clientHandler.getClient();
@@ -44,6 +45,5 @@ public class MessageController {
                 }
             }
         });
-
     }
 }

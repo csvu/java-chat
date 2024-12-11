@@ -24,6 +24,7 @@ import mop.app.client.dao.ReportDAO;
 import mop.app.client.dao.UserManagementDAO;
 import mop.app.client.dto.ReportDTO;
 import mop.app.client.dto.UserDTO;
+import mop.app.client.util.AlertDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,9 +87,12 @@ public class SpamController {
                     return LocalDate.parse(string, formatter);
                 } catch (DateTimeParseException e) {
                     Platform.runLater(() -> {
-                        showError("Invalid Date Format",
-                            "Please enter the date in MM/dd/yyyy format exactly. " +
-                                "For example: 01/01/2001");
+                        AlertDialog.showAlertDialog(
+                            Alert.AlertType.ERROR,
+                            "Invalid Date Format",
+                            "Please enter the date in MM/dd/yyyy format exactly.",
+                            "For example: 01/01/2001"
+                        );
 
                         dateFilter.setValue(null);
                     });
@@ -112,7 +116,12 @@ public class SpamController {
             LocalDate currentDate = LocalDate.now();
 
             if (selectedDate.isAfter(currentDate)) {
-                showError("Invalid Date", "Birth date cannot be in the future.");
+                AlertDialog.showAlertDialog(
+                    Alert.AlertType.ERROR,
+                    "Invalid Date",
+                    "Date cannot be in the future.",
+                    "Please enter a valid date."
+                );
                 dateFilter.setValue(null);
             }
         }
@@ -175,7 +184,12 @@ public class SpamController {
         task.setOnFailed(event -> {
             Platform.runLater(() -> {
                 logger.error("Failed to load reports", task.getException());
-                showAlert(Alert.AlertType.ERROR, "Failed to load reports");
+                AlertDialog.showAlertDialog(
+                    Alert.AlertType.ERROR,
+                    "Failed to load reports",
+                    "Failed to load reports.",
+                    "Please try again."
+                );
             });
         });
 
@@ -323,7 +337,12 @@ public class SpamController {
                 Platform.runLater(() -> {
                     spamReportsTable.refresh();
                     logger.info("Users blocked successfully.");
-                    showAlert(Alert.AlertType.INFORMATION, "Users blocked successfully.");
+                    AlertDialog.showAlertDialog(
+                        Alert.AlertType.INFORMATION,
+                        "Users blocked successfully",
+                        "Users blocked successfully.",
+                        "The selected users have been blocked."
+                    );
                 });
             }
 
@@ -331,7 +350,12 @@ public class SpamController {
             protected void failed() {
                 Platform.runLater(() -> {
                     logger.error("Failed to block users.");
-                    showAlert(Alert.AlertType.ERROR, "Failed to block users.");
+                    AlertDialog.showAlertDialog(
+                        Alert.AlertType.ERROR,
+                        "Failed to block users",
+                        "Failed to block users.",
+                        "Please try again."
+                    );
                 });
             }
         };
@@ -351,7 +375,12 @@ public class SpamController {
                 Platform.runLater(() -> {
                     spamReportsTable.refresh();
                     logger.info("Users unblocked successfully.");
-                    showAlert(Alert.AlertType.INFORMATION, "Users unblocked successfully.");
+                    AlertDialog.showAlertDialog(
+                        Alert.AlertType.INFORMATION,
+                        "Users unblocked successfully",
+                        "Users unblocked successfully.",
+                        "The selected users have been unblocked."
+                    );
                 });
             }
 
@@ -359,24 +388,16 @@ public class SpamController {
             protected void failed() {
                 Platform.runLater(() -> {
                     logger.error("Failed to unblock users.");
-                    showAlert(Alert.AlertType.ERROR, "Failed to unblock users.");
+                    AlertDialog.showAlertDialog(
+                        Alert.AlertType.ERROR,
+                        "Failed to unblock users",
+                        "Failed to unblock users.",
+                        "Please try again."
+                    );
                 });
             }
         };
         new Thread(task).start();
-    }
-
-    private void showAlert(Alert.AlertType type, String message) {
-        Alert alert = new Alert(type, message);
-        alert.showAndWait();
-    }
-
-    private void showError(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
     }
 
     @FXML
@@ -385,7 +406,12 @@ public class SpamController {
         String currentUsername = usernameFilter.getText().trim();
 
         if (selectedDate == null) {
-            showError("Validation Error", "Please enter a valid date.");
+            AlertDialog.showAlertDialog(
+                Alert.AlertType.ERROR,
+                "Validation Error",
+                "Please enter a valid date.",
+                "You must select a date to apply the filter."
+            );
             return;
         }
 
@@ -433,7 +459,12 @@ public class SpamController {
         spamReportsTable.refresh();
 
         if (filteredSpamReports.isEmpty()) {
-            showAlert(Alert.AlertType.INFORMATION, "No reports found matching the selected criteria.");
+            AlertDialog.showAlertDialog(
+                Alert.AlertType.INFORMATION,
+                "No reports found",
+                "No reports found matching the selected criteria.",
+                "Please try again with different criteria."
+            );
         }
     }
 }

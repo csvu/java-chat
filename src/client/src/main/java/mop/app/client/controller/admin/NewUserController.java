@@ -19,6 +19,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import mop.app.client.dao.UserManagementDAO;
 import mop.app.client.dto.UserDTO;
+import mop.app.client.util.TableStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,51 +57,19 @@ public class NewUserController {
         filterComboBox.getItems().addAll("Today", "1 day ago", "1 week ago", "1 month ago", "1 year ago", "All time");
         filterComboBox.getSelectionModel().select("All time");
 
-        logger.info("Initializing NewUserController");
-
-        newUserTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
-
-        // Set up table columns
         usernameCol.setCellValueFactory(new PropertyValueFactory<>("username"));
         emailCol.setCellValueFactory(new PropertyValueFactory<>("email"));
         displayNameCol.setCellValueFactory(new PropertyValueFactory<>("displayName"));
         createdCol.setCellValueFactory(new PropertyValueFactory<>("createdAt"));
 
-        // Style table columns
-        List<TableColumn<UserDTO, String>> columns = List.of(usernameCol, emailCol, displayNameCol);
-        columns.forEach(column -> column.setCellFactory(stringTableColumn -> new TableCell<>() {
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                    setStyle("");
-                } else {
-                    setText(item);
-                    setAlignment(Pos.CENTER_LEFT);
-                    setStyle("-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;");
-                }
-            }
-        }));
-
-        createdCol.setCellFactory(stringTableColumn -> new TableCell<>() {
-            @Override
-            protected void updateItem(Timestamp item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                    setStyle("");
-                } else {
-                    setText(item.toString());
-                    setAlignment(Pos.CENTER_LEFT);
-                    setStyle("-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;");
-                }
-            }
-        });
+        TableStyle.styleTable(newUserTable,
+            List.of(Pos.CENTER_LEFT, Pos.CENTER_LEFT, Pos.CENTER_LEFT, Pos.CENTER_LEFT),
+            "14px"
+        );
 
         newUserTable.setItems(userList);
 
-        newUserTable.setRowFactory(param -> {
+        newUserTable.setRowFactory(tv -> {
             TableRow<UserDTO> row = new TableRow<>();
             row.setPrefHeight(50);
             return row;

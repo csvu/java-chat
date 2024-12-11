@@ -37,7 +37,8 @@
             <TableColumn fx:id="usernameCol" prefWidth="200" text="Username"/>
             <TableColumn fx:id="emailCol" prefWidth="200" text="Email"/>
             <TableColumn fx:id="displayNameCol" prefWidth="200" text="Display Name"/>
-            <TableColumn fx:id="birthdayCol" prefWidth="300" text="Birthday"/>
+            <TableColumn fx:id="birthdayCol" prefWidth="200" text="Birthday"/>
+            <TableColumn fx:id="genderCol" prefWidth="200" text="Gender"/>
         </columns>
     </TableView>
 </AnchorPane>

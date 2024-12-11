@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import java.io.Serial;
 import java.io.Serializable;
 import java.sql.Date;
@@ -71,6 +72,12 @@ public class UserDTO implements Serializable {
         this.createdAt = userDTO.createdAt;
     }
 
+    public UserDTO(String username, String email, String displayName) {
+        this.username = username;
+        this.email = email;
+        this.displayName = displayName;
+    }
+
     public boolean getIsBanned() {
         return isBanned;
     }
@@ -85,5 +92,15 @@ public class UserDTO implements Serializable {
 
     public void setIsBanned(boolean isBanned) {
         this.isBanned = isBanned;
+    }
+
+    @Transient
+    private String status;
+
+    public String getStatus() {
+        if (status != null) return status;
+        return "Deleted User".equals(getDisplayName())
+            ? "Deleted"
+            : "Active";
     }
 }

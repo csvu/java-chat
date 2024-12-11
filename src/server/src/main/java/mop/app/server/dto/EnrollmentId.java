@@ -8,7 +8,8 @@ public class EnrollmentId implements Serializable {
     private int conversationId;
 
     // Default constructor
-    public EnrollmentId() {}
+    public EnrollmentId() {
+    }
 
     public EnrollmentId(int userId, int conversationId) {
         this.userId = userId;
@@ -17,8 +18,12 @@ public class EnrollmentId implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         EnrollmentId that = (EnrollmentId) o;
         return userId == that.userId && conversationId == that.conversationId;
     }

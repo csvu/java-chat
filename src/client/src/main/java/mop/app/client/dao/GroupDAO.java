@@ -19,7 +19,8 @@ public class GroupDAO {
             String hql = "SELECT c " +
                 "FROM ConversationDTO c " +
                 "JOIN ConversationTypeDTO ct ON c.typeId = ct.typeId " +
-                "WHERE ct.typeName = 'GROUP'";
+                "WHERE ct.typeName = 'GROUP'" +
+                "ORDER BY c.createdAt DESC";
 
             Query<ConversationDTO> query = session.createQuery(hql, ConversationDTO.class);
             return query.list();
@@ -151,28 +152,28 @@ public class GroupDAO {
         }
     }
 
-    public static void main(String[] args) {
-        GroupDAO groupDAO = new GroupDAO();
-
-        logger.info("All members:");
-        logger.info("Total members: " + groupDAO.countAllMembers(2));
-        List<UserDTO> allMembers = groupDAO.getAllMembers(2);
-        if (allMembers != null) {
-            allMembers.forEach(user -> logger.info(user.toString()));
-        }
-
-        logger.info("Group members:");
-        logger.info("Total members: " + groupDAO.countMembers(2));
-        List<UserDTO> groupMembers = groupDAO.getGroupMembers(2);
-        if (groupMembers != null) {
-            groupMembers.forEach(user -> logger.info(user.toString()));
-        }
-
-        logger.info("Group admins:");
-        logger.info("Total admins: " + groupDAO.countAdmins(2));
-        List<UserDTO> groupAdmins = groupDAO.getGroupAdmins(2);
-        if (groupAdmins != null) {
-            groupAdmins.forEach(user -> logger.info(user.toString()));
-        }
-    }
+//    public static void main(String[] args) {
+//        GroupDAO groupDAO = new GroupDAO();
+//
+//        logger.info("All members:");
+//        logger.info("Total members: " + groupDAO.countAllMembers(2));
+//        List<UserDTO> allMembers = groupDAO.getAllMembers(2);
+//        if (allMembers != null) {
+//            allMembers.forEach(user -> logger.info(user.toString()));
+//        }
+//
+//        logger.info("Group members:");
+//        logger.info("Total members: " + groupDAO.countMembers(2));
+//        List<UserDTO> groupMembers = groupDAO.getGroupMembers(2);
+//        if (groupMembers != null) {
+//            groupMembers.forEach(user -> logger.info(user.toString()));
+//        }
+//
+//        logger.info("Group admins:");
+//        logger.info("Total admins: " + groupDAO.countAdmins(2));
+//        List<UserDTO> groupAdmins = groupDAO.getGroupAdmins(2);
+//        if (groupAdmins != null) {
+//            groupAdmins.forEach(user -> logger.info(user.toString()));
+//        }
+//    }
 }

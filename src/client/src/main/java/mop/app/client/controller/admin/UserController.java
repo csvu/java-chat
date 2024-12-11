@@ -76,6 +76,7 @@ public class UserController {
         genderCol.setCellValueFactory(new PropertyValueFactory<>("gender"));
         createdAtCol.setCellValueFactory(new PropertyValueFactory<>("createdAt"));
         blockCol.setCellValueFactory(new PropertyValueFactory<>("isBanned"));
+        statusCol.setCellValueFactory(new PropertyValueFactory<>("status"));
 
         strColumns.forEach(this::styleTableColumn);
 
@@ -145,7 +146,7 @@ public class UserController {
 
         statusCol.setCellValueFactory(cellData -> {
             UserDTO user = cellData.getValue();
-            String status = "Deleted User".equals(user.getDisplayName())
+            String status = (user != null && "Deleted User".equals(user.getDisplayName()))
                 ? "Deleted"
                 : "Active";
             return new SimpleStringProperty(status);
@@ -214,7 +215,6 @@ public class UserController {
             }
         });
 
-        // Set row factory
         userTable.setRowFactory(param -> {
             TableRow<UserDTO> row = new TableRow<>();
             row.setPrefHeight(50);
@@ -261,6 +261,11 @@ public class UserController {
                 List<UserDTO> databaseUsers = userManagementDAO.getAllUsers();
                 return databaseUsers != null
                     ? databaseUsers.stream()
+                    .peek(user -> {
+                        if ("Deleted User".equals(user.getDisplayName())) {
+                            user.setStatus("Deleted");
+                        }
+                    })
                     .map(UserDTO::new)
                     .collect(Collectors.toList())
                     : List.of();
@@ -294,11 +299,6 @@ public class UserController {
         logger.info("User activity: " + user.getUserId());
         ViewModel.getInstance().getViewFactory().getSelectedView()
             .set("UserActivity-" + user.getUserId() + "-" + user.getUsername());
-    }
-
-    @FXML
-    public void applyFilter(ActionEvent event) {
-        // Implement filtering logic
     }
 
     @FXML
@@ -356,7 +356,8 @@ public class UserController {
         new Thread(task).start();
     }
 
+    @FXML
     public void createUser(ActionEvent event) {
-        // Implement user creation logic
+        ViewModel.getInstance().getViewFactory().getSelectedView().set("CreateUser");
     }
 }
