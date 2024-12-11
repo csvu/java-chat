@@ -40,6 +40,8 @@ public class HibernateUtil {
             configuration.setProperty("hibernate.connection.autocommit", String.valueOf(config.get("autocommit")));
 
             configuration.addAnnotatedClass(mop.app.server.dto.UserDTO.class);
+            configuration.addAnnotatedClass(mop.app.server.dto.EnrollmentDTO.class);
+
 
             sessionFactory = configuration.buildSessionFactory();
         } catch (Exception e) {

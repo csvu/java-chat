@@ -25,4 +25,5 @@ public class AuthController {
 
         return new Response(true, user);
     }
+
 }

@@ -11,17 +11,16 @@ module mop.app.server {
     requires eu.hansolo.tilesfx;
 
     requires bcrypt;
-    requires com.fasterxml.jackson.databind;
-    requires com.fasterxml.jackson.core;
     requires com.zaxxer.hikari;
     requires jakarta.persistence;
-    requires java.sql;
     requires org.hibernate.orm.core;
     requires org.hibernate.orm.hikaricp;
     requires org.slf4j;
     requires org.yaml.snakeyaml;
 
     requires static lombok;
+    requires com.fasterxml.jackson.datatype.jsr310;
+    requires com.fasterxml.jackson.databind;
 
     opens mop.app.server to javafx.fxml;
     opens mop.app.server.controller to javafx.fxml;

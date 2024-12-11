@@ -14,6 +14,7 @@ public class Client {
     private static final Logger logger = LoggerFactory.getLogger(Client.class);
     private Socket clientSocket;
     private int port;
+    private int userId;
     private ObjectInputStream in;
     private ObjectOutputStream out;
 

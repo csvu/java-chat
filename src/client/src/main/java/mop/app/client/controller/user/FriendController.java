@@ -101,7 +101,7 @@ public class FriendController extends GridPane {
                             new UserDAO().acceptFriendRequest(item.getConversationID(), item.getName());
                             Conversation newItem = new Conversation(item);
                             newItem.setType("PAIR");
-                            ChatController.dmList.add(newItem);
+                            ChatController.getDmList().add(newItem);
                             friendListObservable.add(newItem);
                             friendRequestsList.remove(item);
                         }),

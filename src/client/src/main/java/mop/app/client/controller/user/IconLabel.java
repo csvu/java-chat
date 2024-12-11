@@ -9,6 +9,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import lombok.Getter;
 
 import java.net.URL;
 
@@ -20,17 +21,14 @@ class CustomLabel extends Label {
 }
 
 public class IconLabel extends HBox {
-    VBox vbox;
+    private VBox vbox;
 
-    public Label getTitleLabel() {
-        return titleLabel;
-    }
-
-    Label titleLabel;
-    HBox hbox;
-    Label titleSideLabel;
-    Label contentLabel;
-    CircleImage circleImage;
+    @Getter
+    private Label titleLabel;
+    private HBox hbox;
+    private Label titleSideLabel;
+    private Label contentLabel;
+    private CircleImage circleImage;
 
     public IconLabel(URL icon, String title, String titleSide, String content) {
         setPadding(new Insets(10, 10, 10, 10));

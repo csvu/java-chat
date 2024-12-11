@@ -1,23 +1,19 @@
-package mop.app.client.model.user;
+package mop.app.server.dto;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import lombok.*;
+import lombok.Data;
 
-import java.io.Serializable;
 import java.net.URL;
 import java.time.LocalDateTime;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class Message implements Serializable {
+public class MessageDTO {
     private String sender;
     private URL senderIcon;
     private LocalDateTime sentAt;
     private String content;
     private int conversationId;
     private int senderId;
+
 
 }
 

@@ -1,6 +1,8 @@
 package mop.app.client;
 
 import java.util.Objects;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -11,9 +13,13 @@ import java.io.IOException;
 import mop.app.client.dao.AuthDAO;
 import mop.app.client.dao.OpenTimeDAO;
 import mop.app.client.dao.RoleDAO;
+import mop.app.client.dto.Request;
+import mop.app.client.dto.RequestType;
+import mop.app.client.dto.Response;
 import mop.app.client.dto.UserDTO;
 import mop.app.client.network.SocketClient;
 import mop.app.client.util.HibernateUtil;
+import mop.app.client.util.ObjectMapperConfig;
 import mop.app.client.util.PreProcess;
 import mop.app.client.util.ViewFactory;
 import org.hibernate.Session;
@@ -22,7 +28,6 @@ import org.slf4j.LoggerFactory;
 
 public class Client extends Application {
     private static final Logger logger = LoggerFactory.getLogger(Client.class);
-    public static int currentUserId = 3;
     public static SocketClient socketClient;
 
     public static UserDTO currentUser;
@@ -51,6 +56,8 @@ public class Client extends Application {
             AuthDAO authDAO = new AuthDAO();
             authDAO.updateUserStatus(currentUser.getUserId(), true);
 
+            //
+
             if ("ADMIN".equals(roleName)) {
                 // Admin role: Navigate to the admin view
                 ViewFactory viewFactory = new ViewFactory();
@@ -63,6 +70,7 @@ public class Client extends Application {
                 stage.setResizable(false);
                 stage.setScene(scene);
                 stage.show();
+                socketClient.start();
             } else {
                 logger.error("Could not retrieve user role");
                 throw new RuntimeException("Could not retrieve user role");
@@ -93,6 +101,21 @@ public class Client extends Application {
             stage.setScene(scene);
             stage.show();
         }
+    }
+
+    public static void registerActivity() throws IOException {
+        UserDTO data = UserDTO.builder()
+                .userId(Client.currentUser.getUserId())
+                .build();
+
+        ObjectMapper mapper = ObjectMapperConfig.getObjectMapper();
+
+        Request req = new Request(RequestType.CHAT_ACTIVITY, data);
+        String jsonReq = mapper.writeValueAsString(req);
+        socketClient.sendAsyncRequest(jsonReq);
+
+//        String jsonRes =
+//        Response res = mapper.readValue(jsonRes, Response.class);
     }
 
     public static void main(String[] args) {

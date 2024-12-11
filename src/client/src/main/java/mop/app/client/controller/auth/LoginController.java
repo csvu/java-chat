@@ -147,6 +147,7 @@ public class LoginController {
             if (!isSave) {
                 logger.error("Failed to save user information");
             }
+            Client.registerActivity();
         } else {
             showError("Login Failed", loginResponse.getMessage());
         }

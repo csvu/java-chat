@@ -1,5 +1,6 @@
 package mop.app.client.controller.user;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -10,15 +11,16 @@ import javafx.scene.layout.VBox;
 import mop.app.client.Client;
 import mop.app.client.dao.user.UserDAO;
 import mop.app.client.model.user.Conversation;
+import mop.app.client.model.user.Message;
 
 import java.io.IOException;
 import java.net.URL;
 
 
 public class ChatController extends GridPane {
-    public static ObservableList<Conversation> dmList = FXCollections.observableArrayList();;
+    private static ObservableList<Conversation> dmList = FXCollections.observableArrayList();;
 
-    private final ChatWindowController chatWindowController;
+    private static ChatWindowController chatWindowController;
     URL placeholder = Client.class.getResource("images/place-holder.png");
 
 //    HashMap<Integer, ObservableList<Message>> convMsg = new HashMap<>();
@@ -37,7 +39,7 @@ public class ChatController extends GridPane {
         fxmlLoader.setController(this);
         fxmlLoader.load();
         // Mock data
-
+        dmList.clear();
         dmList.addAll(new UserDAO().getConv());
         //Init
 
@@ -105,6 +107,25 @@ public class ChatController extends GridPane {
         if (!dmList.isEmpty()) {
             chatWindowController.changeCurConv(listViewCol2.getSelectionModel().getSelectedItem());
         }
+    }
+
+    static ObservableList<Conversation> getDmList() {
+        return dmList;
+    }
+
+    public synchronized static void handleNewMessage(Message msg) {
+        for (Conversation conv : dmList) {
+            if (conv.getConversationID() == msg.getConversationId()) {
+                conv.setContent(msg.getContent());
+                conv.setLastContentDateTime(msg.getSentAt());
+                dmList.remove(conv);
+                dmList.add(0, conv);
+                break;
+            }
+        }
+
+        chatWindowController.handleNewMessage(msg);
+
     }
 
 

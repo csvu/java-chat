@@ -58,6 +58,7 @@ public class Server {
 
                 Future<String> future = threadPool.submit(() -> {
                     ClientHandler clientHandler = new ClientHandler(clientSocket);
+                    clients.add(clientHandler);
                     threadPool.execute(clientHandler);
                 }, "Client connected: " + clientSocket.getInetAddress());
 

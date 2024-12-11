@@ -1,5 +1,6 @@
 package mop.app.client.controller.user;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -86,32 +87,32 @@ public class ChatWindowController extends GridPane {
     @FXML
     private Button sendButton;
 
-    private IconLabel addFriend;
+    private final IconLabel addFriend;
 
     private final Text sizeHelper = new Text();;
     private double oldHeight = 0;
 
-
-    URL placeholder = Client.class.getResource("images/place-holder.png");
-
-    Conversation curConversation;
-    ObservableList<Message> convMsg = FXCollections.observableArrayList();
-    BiConsumer<Message, Conversation> onNewMessage;
+    private Conversation curConversation;
+    private final ObservableList<Message> convMsg = FXCollections.observableArrayList();
+    private final BiConsumer<Message, Conversation> onNewMessage;
 
     public ChatWindowController(Conversation inpConversation, Runnable onUpdate, BiConsumer<Message, Conversation> onNewMessage) throws IOException {
         this.curConversation = inpConversation;
-
+        this.onNewMessage = onNewMessage;
         FXMLLoader fxmlLoader = new FXMLLoader(Client.class.getResource("view/user/chat-window-view.fxml"));
         fxmlLoader.setRoot(this);
         fxmlLoader.setController(this);
         fxmlLoader.load();
+        System.out.println(col2.getChildren().size());
 
         if (this.curConversation == null) {
-            addFriend = new IconLabel(null, null, null, null);
+            addFriend = new IconLabel(null, "null", null, null);
         } else {
+
             addFriend = new IconLabel(!this.curConversation.getType().equals("PENDING") ? null : Client.class.getResource("view/user/add-friend-basic-outline-svgrepo-com.png"), !this.curConversation.getType().equals("PENDING") ? "Add Friend" : "Cancel Friend Request", null, null);
 
         }
+
         addFriend.setAlignment(Pos.CENTER);
         addFriend.getStyleClass().add("HoverWrapper");
         addFriend.setOnMouseClicked(e -> {
@@ -151,7 +152,11 @@ public class ChatWindowController extends GridPane {
                     chatArea.appendText("\n");
                 } else {
                     //sendd
-                    sendMessage();
+                    try {
+                        sendMessage();
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
                 event.consume();
             }
@@ -207,7 +212,11 @@ public class ChatWindowController extends GridPane {
         });
 
         sendButton.setOnAction(e->{
-            sendMessage();
+            try {
+                sendMessage();
+            } catch (JsonProcessingException ex) {
+                throw new RuntimeException(ex);
+            }
         });
 
         msgWindow.setCellFactory(params -> new ListCell<>(){
@@ -277,9 +286,11 @@ public class ChatWindowController extends GridPane {
 
     void updateTopBarIfNotFriend() {
         if (curConversation == null) {
-            col2.getChildren().clear();
+            col2.setVisible(false);
             return;
         }
+        col2.setVisible(true);
+        System.out.println(curConversation.getType());
         if (Objects.equals(curConversation.getType(), "N/A") || Objects.equals(curConversation.getType(), "PENDING")) {
             if (!col2.getChildren().contains(addFriend)) {
                 col2.getChildren().add(1, addFriend);
@@ -288,7 +299,7 @@ public class ChatWindowController extends GridPane {
             if (this.curConversation.getType().equals("PENDING")) {
                 addFriend.update(null, "Cancel Friend Request", null, null);
             } else {
-                addFriend.update(Client.class.getResource("view/user/add-friend-basic-outline-svgrepo-com.png"), "Add Friend", null, null);
+                addFriend.update(null, "Add Friend", null, null);
             }
 
         } else {
@@ -307,8 +318,9 @@ public class ChatWindowController extends GridPane {
         //Update activity status too
         //Update blocked
         //Messages
+
         convMsg.clear();
-        if (item != null) convMsg.addAll(new UserDAO().getMessages(item.getConversationID()));
+        if (item != null && (item.getType().equals("PAIR") || item.getType().equals("GROUP"))) convMsg.addAll(new UserDAO().getMessages(item.getConversationID()));
         
 
         topBarCol3.getChildren().clear();
@@ -316,17 +328,14 @@ public class ChatWindowController extends GridPane {
 
         msgWindow.setItems(convMsg);
 
-        if (convMsg != null) msgWindow.scrollTo(convMsg.size());
+        msgWindow.scrollTo(convMsg.size());
     }
 
-    Conversation getCurConv() {
-        return curConversation;
-    }
-
-    void sendMessage() {
+    void sendMessage() throws JsonProcessingException {
         if (!chatArea.getText().trim().isEmpty()) {
             new UserDAO().sendMessage(curConversation.getConversationID(), chatArea.getText());
-            Message newMsg = new Message("You", null, LocalDateTime.now(),chatArea.getText());
+            sendMessageNet(new Message(Client.currentUser.getDisplayName(), null, LocalDateTime.now(), chatArea.getText(), curConversation.getConversationID(), (int)Client.currentUser.getUserId()));
+            Message newMsg = new Message("You", null, LocalDateTime.now(),chatArea.getText(), curConversation.getConversationID(), (int)Client.currentUser.getUserId());
             convMsg.add(newMsg);
             chatArea.clear();
             msgWindow.scrollTo(convMsg.size());
@@ -334,70 +343,26 @@ public class ChatWindowController extends GridPane {
         }
     }
 
-    void sendMessageNet() {
+    void sendMessageNet(Message msg) throws JsonProcessingException {
             SocketClient socketClient = Client.socketClient;
 
             if (!socketClient.isConnectionValid()) {
                 return;
             }
 
-            UserDTO loginData = UserDTO.builder()
-                    .email(email)
-                    .password(password)
-                    .build();
 
             ObjectMapper mapper = ObjectMapperConfig.getObjectMapper();
 
-            Request loginRequest = new Request(RequestType.LOGIN, loginData);
-            String jsonLoginRequest = mapper.writeValueAsString(loginRequest);
-            String jsonLoginResponse = socketClient.sendRequest(jsonLoginRequest);
-            Response loginResponse = mapper.readValue(jsonLoginResponse, Response.class);
+            Request req = new Request(RequestType.SEND_MESSAGE, msg);
+            String rawReq = mapper.writeValueAsString(req);
+            socketClient.sendAsyncRequest(rawReq);
+    }
 
-            if (loginResponse.isSuccess()) {
-                UserDTO user = mapper.convertValue(loginResponse.getData(), UserDTO.class);
 
-                // Check if user is deleted
-                if (user.getDisplayName().equals("Deleted User")) {
-                    showError("Account Deleted", "Your account has been deleted.");
-                    return;
-                }
-
-                // Check if user is banned
-                if (user.getIsBanned()) {
-                    showError("Account Banned", "Your account has been banned.");
-                    return;
-                }
-
-                RoleDAO role = new RoleDAO();
-                String roleName = role.getRoleByUserId(user.getUserId());
-
-                if (roleName == null) {
-                    showError("Role Error", "Could not retrieve user role.");
-                    return;
-                }
-
-                if ("ADMIN".equals(roleName)) {
-                    // Admin role: Navigate to the admin view
-                    Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-                    currentStage.close();
-                    ViewFactory viewFactory = new ViewFactory();
-                    viewFactory.getAdminView();
-                } else {
-                    // Regular user role: Navigate to the home view
-                    Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-                    currentStage.close();
-                    Stage stage = new Stage();
-                    FXMLLoader fxmlLoader = new FXMLLoader(Client.class.getResource("view/user/home-view.fxml"));
-                    Scene scene = new Scene(fxmlLoader.load());
-                    stage.setTitle("MOP Application");
-                    stage.setResizable(false);
-                    stage.setScene(scene);
-                    stage.show();
-                }
-            } else {
-                showError("Login Failed", loginResponse.getMessage());
-            }
-
+    public void handleNewMessage(Message msg) {
+        if (curConversation.getConversationID() == msg.getConversationId()) {
+            convMsg.add(msg);
+        }
     }
 
 }

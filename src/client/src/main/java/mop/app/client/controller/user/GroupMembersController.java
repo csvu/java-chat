@@ -55,7 +55,7 @@ public class GroupMembersController extends VBox {
         });
         List<Pair<String, Consumer<Conversation>>> rightIcons = new ArrayList<>();
 
-        if (adminList.stream().anyMatch(item -> item.getConversationID() == Client.currentUserId)) {
+        if (adminList.stream().anyMatch(item -> item.getConversationID() == (int) Client.currentUser.getUserId())) {
             rightIcons.add(new Pair<>("view/user/remove-ellipse-svgrepo-com.png", (item) -> {
 //                new UserDAO().removeMember(cur.getConversationID(), item.getConversationID());
                 memberList.remove(item);

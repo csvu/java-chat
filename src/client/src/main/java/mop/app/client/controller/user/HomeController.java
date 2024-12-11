@@ -13,6 +13,8 @@ import javafx.scene.shape.Circle;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import mop.app.client.Client;
+import mop.app.client.network.SocketClient;
+import mop.app.client.util.PreProcess;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -30,6 +32,9 @@ public class HomeController {
     private ImageView dmNav;
     @FXML
     private VBox col2;
+    @FXML
+    private HBox logOut;
+
     private static final Logger logger = org.slf4j.LoggerFactory.getLogger(HomeController.class);
 
     public HomeController() throws IOException {
@@ -60,19 +65,35 @@ public class HomeController {
             chatController.update();
             col2.getChildren().add(chatController);
         });
+        logOut.setOnMouseClicked(e->{
+            PreProcess.deleteUserInformation();
+            Stage stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
+            stage.close();
+            Client.socketClient.close();
+            Client.socketClient = new SocketClient();
+            Client.currentUser = null;
+            try {
+                FXMLLoader fxmlLoader = new FXMLLoader(Client.class.getResource("view/index.fxml"));
+                Scene scene = new Scene(fxmlLoader.load());
+                stage.setScene(scene);
+                stage.setResizable(false);
+                stage.show();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
         dmNav.setOnMouseClicked(e -> {
             Stage stage = new Stage();
-            FXMLLoader fxmlLoader = new FXMLLoader(Client.class.getResource("view/user/edit-profile.fxml"));
 
             try {
-                Scene scene = new Scene(fxmlLoader.load());
+                Scene scene = new Scene(new EditProfileControl());
                 stage.setScene(scene);
                 stage.setResizable(false);
                 stage.initModality(Modality.WINDOW_MODAL);
                 stage.initOwner(((Node)e.getSource()).getScene().getWindow() );
                 try {
                     stage.getIcons().add(new Image(
-                            Objects.requireNonNull(getClass().getResourceAsStream("images/app-icon.png"))));
+                            Objects.requireNonNull(Client.class.getResourceAsStream("images/app-icon.png"))));
                 } catch (Exception ex) {
                     logger.error("Failed to load application icon", ex);
                 }

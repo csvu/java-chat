@@ -52,8 +52,8 @@ public class UserDAO {
                         "\tOR R3.TYPE_NAME IS NULL\n")) {
             preparedStatement.setString(1, "%" + query + "%");
             preparedStatement.setString(2, "%" + query + "%");
-            preparedStatement.setInt(3, Client.currentUserId);
-            preparedStatement.setInt(4, Client.currentUserId);
+            preparedStatement.setInt(3, (int) Client.currentUser.getUserId());
+            preparedStatement.setInt(4, (int) Client.currentUser.getUserId());
 
 
             System.out.println("SHI");
@@ -114,8 +114,8 @@ public class UserDAO {
                         "\tEN.USER_ID = ?\n" +
                         "\tAND ME.CONTENT ILIKE ?")) {
 
-            preparedStatement.setInt(1, Client.currentUserId);
-            preparedStatement.setInt(2, Client.currentUserId);
+            preparedStatement.setInt(1, (int) Client.currentUser.getUserId());
+            preparedStatement.setInt(2, (int) Client.currentUser.getUserId());
             preparedStatement.setString(3, "%" + query + "%");
 
 
@@ -150,11 +150,10 @@ public class UserDAO {
 
         try (PreparedStatement preparedStatement = conn.prepareStatement(query)) {
 
-            preparedStatement.setInt(1, Client.currentUserId);
-            preparedStatement.setInt(2, Client.currentUserId);
-            preparedStatement.setInt(3, Client.currentUserId);
-            preparedStatement.setInt(4, Client.currentUserId);
-
+            preparedStatement.setInt(1, (int) Client.currentUser.getUserId());
+            preparedStatement.setInt(2, (int) Client.currentUser.getUserId());
+            preparedStatement.setInt(3, (int) Client.currentUser.getUserId());
+            preparedStatement.setInt(4, (int) Client.currentUser.getUserId());
 
             System.out.println("SHI");
             ResultSet rs = preparedStatement.executeQuery();
@@ -176,6 +175,7 @@ public class UserDAO {
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
+
         return list;
     }
 
@@ -191,9 +191,9 @@ public class UserDAO {
                 "insert into public.relationship\n" +
                         "values (?, ?, NOW(), 3)")) {
 
-            preparedStatement.setInt(1, Client.currentUserId);
+            preparedStatement.setInt(1, (int) Client.currentUser.getUserId());
             preparedStatement.setInt(2, userId);
-            preparedStatement.executeQuery();
+            preparedStatement.executeUpdate();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
@@ -226,7 +226,7 @@ public class UserDAO {
                         "\t) AS R1\n" +
                         "\tJOIN PUBLIC.\"user\" AS R2 ON R1.USER_ID1 = R2.USER_ID" )) {
 
-            preparedStatement.setInt(1, Client.currentUserId);
+            preparedStatement.setInt(1, (int) Client.currentUser.getUserId());
 
 
             System.out.println("SHI");
@@ -261,7 +261,7 @@ public class UserDAO {
                         "from public.relationship\n" +
                         "where user_id1 = ? and user_id2 = ?" )) {
 
-            preparedStatement.setInt(1, Client.currentUserId);
+            preparedStatement.setInt(1, (int) Client.currentUser.getUserId());
             preparedStatement.setInt(2, userId);
 
             preparedStatement.executeUpdate();
@@ -297,9 +297,9 @@ public class UserDAO {
         ) {
             conn.setAutoCommit(false);
             relationshipStatement1.setInt(1, userId);
-            relationshipStatement1.setInt(2, Client.currentUserId);
+            relationshipStatement1.setInt(2, (int) Client.currentUser.getUserId());
             relationshipStatement1.executeUpdate();
-            relationshipStatement2.setInt(1, Client.currentUserId);
+            relationshipStatement2.setInt(1, (int) Client.currentUser.getUserId());
             relationshipStatement2.setInt(2, userId);
             relationshipStatement2.executeUpdate();
 
@@ -311,7 +311,7 @@ public class UserDAO {
             int conversationId = rs.getInt(1);
             relationshipStatement4.setInt(1, userId);
             relationshipStatement4.setInt(2, conversationId);
-            relationshipStatement4.setInt(3, Client.currentUserId);
+            relationshipStatement4.setInt(3, (int) Client.currentUser.getUserId());
             relationshipStatement4.setInt(4, conversationId);
             relationshipStatement4.executeUpdate();
 
@@ -342,7 +342,7 @@ public class UserDAO {
                         "\twhere conversation_id = ?\n" +
                         ")\n" )) {
 
-            preparedStatement.setInt(1, Client.currentUserId);
+            preparedStatement.setInt(1, (int) Client.currentUser.getUserId());
             preparedStatement.setInt(2, conversationId);
 
             System.out.println("SHI");
@@ -416,7 +416,7 @@ public class UserDAO {
                 "SELECT user_id2 as \"id\", display_name, avatar, 'FRIEND' as \"type\", is_active FROM public.relationship join public.relationship_type on status = type_id join public.\"user\" on user_id2 = user_id\n" +
                         "where user_id1 = ? and type_name = 'FRIEND'" )) {
 
-            preparedStatement.setInt(1, Client.currentUserId);
+            preparedStatement.setInt(1, (int) Client.currentUser.getUserId());
 
             System.out.println("SHI");
             ResultSet rs = preparedStatement.executeQuery();
@@ -453,7 +453,7 @@ public class UserDAO {
                         "group by co.conversation_id\n" +
                         "having count(en.user_id) = 2 and SUM(CASE WHEN en.user_id = ? or en.user_id = ? THEN 1 ELSE 0 END) = 2" )) {
 
-            preparedStatement.setInt(1, Client.currentUserId);
+            preparedStatement.setInt(1, (int) Client.currentUser.getUserId());
             preparedStatement.setInt(2, friendId);
 
 
@@ -497,7 +497,7 @@ public class UserDAO {
                 rs.next();
                 conversationId = rs.getInt(1);
                 relationshipStatement2.setInt(1, conversationId);
-                relationshipStatement2.setInt(2, Client.currentUserId);
+                relationshipStatement2.setInt(2, (int) Client.currentUser.getUserId());
                 relationshipStatement2.setInt(3, convId);
                 relationshipStatement2.executeUpdate();
             } else {
@@ -539,7 +539,7 @@ public class UserDAO {
 
         ) {
             relationshipStatement.setInt(1, convId);
-            relationshipStatement.setInt(2, Client.currentUserId);
+            relationshipStatement.setInt(2, (int) Client.currentUser.getUserId());
             relationshipStatement.setString(3, content);
             relationshipStatement.executeUpdate();
 
@@ -574,12 +574,12 @@ public class UserDAO {
             while (rs.next()) {
                 String sender = rs.getString("sender");
                 int userId = rs.getInt("user_id");
-                if (userId == Client.currentUserId) {
+                if (userId == (int) Client.currentUser.getUserId()) {
                     sender = "You";
                 }
                 String content = rs.getString("content");
                 Timestamp ts = rs.getTimestamp("sent_at");
-                Message msg = new Message(sender, null, ts.toLocalDateTime(), content);
+                Message msg = new Message(sender, null, ts.toLocalDateTime(), content, conversationId, userId);
                 list.add(msg);
             }
         } catch (SQLException e) {

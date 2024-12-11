@@ -54,7 +54,7 @@
                   <Insets bottom="20.0" top="20.0" />
                </padding>
             </HBox>
-            <HBox fx:id="friendsHBox2" alignment="CENTER" layoutX="10.0" layoutY="189.0" styleClass="HoverWrapper">
+            <HBox fx:id="logOut" alignment="CENTER" layoutX="10.0" layoutY="189.0" styleClass="HoverWrapper">
                <children>
                   <FontAwesomeIconView fill="WHITE" glyphName="ARROW_LEFT" size="24" />
                </children>
