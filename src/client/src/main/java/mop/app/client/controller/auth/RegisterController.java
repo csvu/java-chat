@@ -15,6 +15,7 @@ import javafx.util.StringConverter;
 import mop.app.client.dao.AuthDAO;
 import mop.app.client.dao.RoleDAO;
 import mop.app.client.dto.UserDTO;
+import mop.app.client.util.AlertDialog;
 import mop.app.client.util.PasswordUtil;
 import mop.app.client.util.ViewHelper;
 import org.slf4j.Logger;
@@ -93,9 +94,12 @@ public class RegisterController {
                     return LocalDate.parse(string, formatter);
                 } catch (DateTimeParseException e) {
                     Platform.runLater(() -> {
-                        showError("Invalid Date Format",
-                            "Please enter the date in MM/dd/yyyy format exactly. " +
-                                "For example: 01/01/2001");
+                        AlertDialog.showAlertDialog(
+                            Alert.AlertType.ERROR,
+                            "Invalid Date Format",
+                            "Please enter the date in MM/dd/yyyy format exactly.",
+                            "For example: 05/16/2004"
+                        );
 
                         // Clear the invalid input
                         dateOfBirthPicker.setValue(null);
@@ -122,14 +126,24 @@ public class RegisterController {
 
             // Validate age (at least 13 years old)
             if (selectedDate.isAfter(currentDate.minusYears(13))) {
-                showError("Age Restriction", "You must be at least 13 years old.");
+                AlertDialog.showAlertDialog(
+                    Alert.AlertType.ERROR,
+                    "Invalid Birth Date",
+                    "You must be at least 13 years old to register.",
+                    "Please enter a valid birth date."
+                );
                 dateOfBirthPicker.setValue(null);
                 return;
             }
 
             // Ensure date is not in the future
             if (selectedDate.isAfter(currentDate)) {
-                showError("Invalid Date", "Birth date cannot be in the future.");
+                AlertDialog.showAlertDialog(
+                    Alert.AlertType.ERROR,
+                    "Invalid Date",
+                    "Birth date cannot be in the future.",
+                    "Please enter a valid date."
+                );
                 dateOfBirthPicker.setValue(null);
             }
         }
@@ -149,38 +163,74 @@ public class RegisterController {
 
         if (email.isEmpty() || username.isEmpty() || password.isEmpty() || fullName.isEmpty() || address.isEmpty() ||
             gender == null) {
-            showError("Validation Error", "All fields must be filled.");
+            AlertDialog.showAlertDialog(
+                Alert.AlertType.ERROR,
+                "Validation Error",
+                "Please fill in all fields.",
+                ""
+            );
             return;
         }
 
         LocalDate birthDate = dateOfBirthPicker.getValue();
         if (birthDate == null) {
-            showError("Validation Error", "Please enter a valid birth date.");
+            AlertDialog.showAlertDialog(
+                Alert.AlertType.ERROR,
+                "Validation Error",
+                "Please enter a valid birth date.",
+                ""
+            );
             return;
         }
         Date sqlDate = Date.valueOf(birthDate);
 
         // Check if the email is unique
         if (!authDAO.isEmailExists(email)) {
-            showError("Validation Error", "Email is already taken.");
+            AlertDialog.showAlertDialog(
+                Alert.AlertType.ERROR,
+                "Validation Error",
+                "Email is already taken.",
+                ""
+            );
             return;
         }
 
         // Check if the username is unique
         if (!authDAO.isUsernameExists(username)) {
-            showError("Validation Error", "Username is already taken.");
+            AlertDialog.showAlertDialog(
+                Alert.AlertType.ERROR,
+                "Validation Error",
+                "Username is already taken.",
+                ""
+            );
             return;
         }
 
         // Check password strength
         if (!PasswordUtil.isStrongPassword(password)) {
             logger.info("Password is not strong enough: " + password);
-            showError("Validation Error", "Password must be at least 8 characters long, contain at least 1 uppercase letter, 1 lowercase letter, 1 digit, and 1 special character.");
+            AlertDialog.showAlertDialog(
+                Alert.AlertType.ERROR,
+                "Error",
+                "Invalid password",
+                """
+                Password must be at least 8 characters long and contain:
+                - At least one uppercase letter
+                - At least one lowercase letter
+                - At least one number
+                - At least one special character (@$!%*?&_-)
+                """
+            );
             return;
         }
 
         if (fullName.equals("Deleted User")) {
-            showError("Validation Error", "Display name cannot be 'Deleted User'.");
+            AlertDialog.showAlertDialog(
+                Alert.AlertType.ERROR,
+                "Validation Error",
+                "Display name cannot be 'Deleted User'.",
+                ""
+            );
             return;
         }
 
@@ -202,7 +252,12 @@ public class RegisterController {
         UserDTO registeredUser = authDAO.register(user);
 
         if (registeredUser != null) {
-            showInfo("Registration Successful!");
+            AlertDialog.showAlertDialog(
+                Alert.AlertType.INFORMATION,
+                "Registration Successful",
+                "You have successfully registered.",
+                "You can now login with your email and password."
+            );
 
             // Clear all fields
             emailField.clear();
@@ -215,31 +270,13 @@ public class RegisterController {
             dateOfBirthPicker.setPromptText("Select your date of birth (MM/dd/yyyy)");
             addressArea.clear();
         } else {
-            showError("Registration Error", "An error occurred during registration. Please try again.");
+            AlertDialog.showAlertDialog(
+                Alert.AlertType.ERROR,
+                "Registration Error",
+                "An error occurred during registration. Please try again.",
+                ""
+            );
         }
-    }
-
-    private void showInfo(String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Registration Success");
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-
-    private void showError(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-
-        Label label = new Label(content);
-        label.setWrapText(true);
-        label.setMaxWidth(Double.MAX_VALUE);
-
-        alert.getDialogPane().setContent(label);
-        alert.getDialogPane().setPrefWidth(450);
-        alert.showAndWait();
     }
 
     @FXML
@@ -248,7 +285,12 @@ public class RegisterController {
             ViewHelper.getLoginScene(event);
         } catch (IOException e) {
             logger.error("Could not load login page: {}", e.getMessage());
-            showError("Navigation Error", "Could not load email login page.");
+            AlertDialog.showAlertDialog(
+                Alert.AlertType.ERROR,
+                "Navigation Error",
+                "Could not load email login page.",
+                e.getMessage()
+            );
         }
     }
 }

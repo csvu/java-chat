@@ -8,6 +8,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import mop.app.client.dao.AuthDAO;
+import mop.app.client.util.AlertDialog;
 import mop.app.client.util.PasswordUtil;
 import mop.app.client.util.ViewHelper;
 import org.slf4j.Logger;
@@ -27,31 +28,13 @@ public class ResetPasswordController {
             ViewHelper.getLoginScene(event);
         } catch (IOException e) {
             logger.error("Could not navigate to the previous page: {}", e.getMessage());
-            showError("Navigation Error", "Could not navigate to the previous page.");
+            AlertDialog.showAlertDialog(
+                Alert.AlertType.ERROR,
+                "Navigation Error",
+                "Could not navigate to the previous page.",
+                e.getMessage()
+            );
         }
-    }
-
-    private void showInfo(String success, String s) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(success);
-        alert.setHeaderText(null);
-        alert.setContentText(s);
-        alert.showAndWait();
-    }
-
-    private void showError(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-
-        Label label = new Label(content);
-        label.setWrapText(true);
-        label.setMaxWidth(Double.MAX_VALUE);
-
-        alert.getDialogPane().setContent(label);
-        alert.getDialogPane().setPrefWidth(450);
-        alert.showAndWait();
     }
 
     @FXML
@@ -62,17 +45,38 @@ public class ResetPasswordController {
         String confirmPassword = confirmPasswordField.getText();
 
         if (email.isEmpty() || currentPassword.isEmpty() || newPassword.isEmpty() || confirmPassword.isEmpty()) {
-            showError("Error", "Please fill in all fields.");
+            AlertDialog.showAlertDialog(
+                Alert.AlertType.ERROR,
+                "Error",
+                "Please fill in all fields.",
+                ""
+            );
             return;
         }
 
         if (!newPassword.equals(confirmPassword)) {
-            showError("Error", "New password and confirm password do not match.");
+            AlertDialog.showAlertDialog(
+                Alert.AlertType.ERROR,
+                "Error",
+                "New password and confirm password do not match.",
+                ""
+            );
             return;
         }
 
         if (!PasswordUtil.isStrongPassword(newPassword)) {
-            showError("Error", "Password must contain at least 8 characters, 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character.");
+            AlertDialog.showAlertDialog(
+                Alert.AlertType.ERROR,
+                "Error",
+                "Invalid password",
+                """
+                Password must be at least 8 characters long and contain:
+                - At least one uppercase letter
+                - At least one lowercase letter
+                - At least one number
+                - At least one special character (@$!%*?&_-)
+                """
+            );
             return;
         }
 
@@ -80,9 +84,19 @@ public class ResetPasswordController {
         boolean isPasswordChanged = authDAO.changePassword(email, currentPassword, newPassword);
 
         if (isPasswordChanged) {
-            showInfo("Success", "Password has been changed successfully.");
+            AlertDialog.showAlertDialog(
+                Alert.AlertType.INFORMATION,
+                "Success",
+                "Password has been changed successfully.",
+                ""
+            );
         } else {
-            showError("Error", "Failed to change password. Please check your email and password.");
+            AlertDialog.showAlertDialog(
+                Alert.AlertType.ERROR,
+                "Error",
+                "Failed to change password.",
+                "Please check your email and password."
+            );
         }
     }
 }

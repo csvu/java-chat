@@ -46,6 +46,8 @@ public class HibernateUtil {
             configuration.addAnnotatedClass(mop.app.client.dto.LoginTimeDTO.class);
             configuration.addAnnotatedClass(mop.app.client.dto.OpenTimeDTO.class);
             configuration.addAnnotatedClass(mop.app.client.dto.ReportDTO.class);
+            configuration.addAnnotatedClass(mop.app.client.dto.RelationshipDTO.class);
+            configuration.addAnnotatedClass(mop.app.client.dto.RelationshipTypeDTO.class);
 
             sessionFactory = configuration.buildSessionFactory();
         } catch (Exception e) {

@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 @ToString
 public class ClientHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(ClientHandler.class);
+
     @Getter
     private Client client;
     private AuthController authController;
@@ -42,24 +43,24 @@ public class ClientHandler implements Runnable {
     public void run() {
         try {
             while (true) {
-                    String jsonRequest = client.getIn().readObject().toString();
-                    if (jsonRequest == null) {
-                        logger.error("Client request is null");
-                    }
-                    logger.info("Request: {}", jsonRequest);
+                String jsonRequest = client.getIn().readObject().toString();
+                if (jsonRequest == null) {
+                    logger.error("Client request is null");
+                }
+                logger.info("Request: {}", jsonRequest);
 
-                    ObjectMapper objectMapper = ObjectMapperConfig.getObjectMapper();
+                ObjectMapper objectMapper = ObjectMapperConfig.getObjectMapper();
 
-                    Request request = objectMapper.readValue(jsonRequest, Request.class);
+                Request request = objectMapper.readValue(jsonRequest, Request.class);
 
-                    Response response = processRequest(request);
-                    String jsonResponse = objectMapper.writeValueAsString(response);
+                Response response = processRequest(request);
+                String jsonResponse = objectMapper.writeValueAsString(response);
 
-                    synchronized (client.getOut()) {
-                        client.getOut().writeObject(jsonResponse);
-                        client.getOut().flush();
-                    }
-                    logger.info("Response: {}", response);
+                synchronized (client.getOut()) {
+                    client.getOut().writeObject(jsonResponse);
+                    client.getOut().flush();
+                }
+                logger.info("Response: {}", response);
             }
         } catch (IOException | ClassNotFoundException e) {
             logger.error("Client has disconnected: {}", e.getMessage());
@@ -78,7 +79,8 @@ public class ClientHandler implements Runnable {
                 client.setUserId((int) data.getUserId());
                 return new Response(true, "Chat activity registered");
             case SEND_MESSAGE:
-                new MessageController().sendMessage(ObjectMapperConfig.getObjectMapper().convertValue(request.getData(), MessageDTO.class));
+                new MessageController().sendMessage(
+                        ObjectMapperConfig.getObjectMapper().convertValue(request.getData(), MessageDTO.class));
                 return new Response(true, "Message sent");
 
             default:

@@ -2,17 +2,20 @@ package mop.app.client.controller.admin;
 
 import com.github.javafaker.Faker;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.sql.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import mop.app.client.model.User;
+import mop.app.client.dao.GroupDAO;
+import mop.app.client.dto.UserDTO;
+import mop.app.client.util.TableStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,38 +27,28 @@ public class GroupDetailsController {
     @FXML
     private ComboBox<String> filterComboBox;
     @FXML
-    private TableView<User> groupUserTable;
+    private TableView<UserDTO> groupUserTable;
     @FXML
-    private TableColumn<User, String> usernameCol;
+    private TableColumn<UserDTO, String> usernameCol;
     @FXML
-    private TableColumn<User, String> emailCol;
+    private TableColumn<UserDTO, String> emailCol;
     @FXML
-    private TableColumn<User, String> displayNameCol;
+    private TableColumn<UserDTO, String> displayNameCol;
     @FXML
-    private TableColumn<User, String> birthdayCol;
-
-    private ObservableList<User> userList;
+    private TableColumn<UserDTO, Date> birthdayCol;
+    @FXML
+    public TableColumn<UserDTO, String> genderCol;
+    private ObservableList<UserDTO> userList;
+    private final GroupDAO groupDAO;
+    private long groupId;
 
     public GroupDetailsController() {
         userList = FXCollections.observableArrayList();
-
-        Faker faker = new Faker(Locale.ENGLISH);
-        for (int i = 0; i < 10; i++) {
-            String username = faker.name().username();
-            String email = faker.internet().emailAddress();
-            String displayName = faker.name().fullName();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-            Date randomDate = faker.date().past(30, TimeUnit.DAYS);
-            String birthday = dateFormat.format(randomDate);
-            boolean isAdmin = faker.bool().bool();
-            userList.add(new User(username, email, displayName, birthday, isAdmin));
-        }
-
-        logger.info("GroupDetailController initialized");
+        groupDAO = new GroupDAO();
     }
 
     public void setGroupId(long groupId) {
-//        groupNameLabel.setText("Group: " + groupId);
+        this.groupId = groupId;
         logger.info("GroupDetailController initialized for group {}", groupId);
     }
 
@@ -65,59 +58,69 @@ public class GroupDetailsController {
 
     @FXML
     public void initialize() {
-        groupUserTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
-
         usernameCol.setCellValueFactory(new PropertyValueFactory<>("username"));
         emailCol.setCellValueFactory(new PropertyValueFactory<>("email"));
         displayNameCol.setCellValueFactory(new PropertyValueFactory<>("displayName"));
-        birthdayCol.setCellValueFactory(new PropertyValueFactory<>("birthday"));
+        birthdayCol.setCellValueFactory(new PropertyValueFactory<>("birthDate"));
+        genderCol.setCellValueFactory(new PropertyValueFactory<>("gender"));
 
-        List<TableColumn<User, String>> columns = List.of(usernameCol, emailCol, displayNameCol, birthdayCol);
+        TableStyle.styleTable(
+            groupUserTable,
+            List.of(Pos.CENTER_LEFT, Pos.CENTER_LEFT, Pos.CENTER_LEFT, Pos.CENTER_LEFT, Pos.CENTER_LEFT),
+            "14px"
+        );
 
-        columns.forEach(column -> column.setCellFactory(stringTableColumn -> new TableCell<>() {
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                    setStyle("");
-                } else {
-                    setText(item);
-                    setAlignment(Pos.CENTER_LEFT);
-                    setStyle(
-                        "-fx-text-fill: white; " +
-                            "-fx-font-weight: bold; " +
-                            "-fx-font-size: 14px;"
-                    );
-                }
-            }
-        }));
-
-        groupUserTable.setItems(userList);
-
-        groupUserTable.setRowFactory(param -> {
-            TableRow<User> row = new TableRow<>();
+        groupUserTable.setRowFactory(tv -> {
+            TableRow<UserDTO> row = new TableRow<>();
             row.setPrefHeight(50);
             return row;
         });
 
+        groupUserTable.setItems(userList);
+
         filterComboBox.getItems().addAll("All", "Admin", "User");
         filterComboBox.getSelectionModel().select("All");
+        applyFilter();
     }
 
     @FXML
     private void applyFilter() {
         String selectedRole = filterComboBox.getValue();
-        ObservableList<User> filteredList = FXCollections.observableArrayList();
+        Task<List<UserDTO>> filterTask = new Task<>() {
+            @Override
+            protected List<UserDTO> call() throws Exception {
+                List<UserDTO> filteredList = null;
 
-        for (User user : userList) {
-            if ("All".equals(selectedRole) ||
-                ("Admin".equals(selectedRole) && user.isAdmin()) ||
-                ("User".equals(selectedRole) && !user.isAdmin())) {
-                filteredList.add(user);
+                switch (selectedRole) {
+                    case "Admin":
+                        filteredList = groupDAO.getGroupAdmins(groupId);
+                        break;
+                    case "User":
+                        filteredList = groupDAO.getGroupMembers(groupId);
+                        break;
+                    case "All":
+                        filteredList = groupDAO.getAllMembers(groupId);
+                        break;
+                }
+                return filteredList;
             }
-        }
+        };
 
-        groupUserTable.setItems(filteredList);
+        filterTask.setOnSucceeded(event -> {
+            List<UserDTO> filteredList = filterTask.getValue();
+            if (filteredList != null) {
+                ObservableList<UserDTO> observableList = FXCollections.observableArrayList(filteredList);
+                groupUserTable.setItems(observableList);
+            }
+        });
+
+        filterTask.setOnFailed(event -> {
+            logger.error("Error occurred while filtering users: ", filterTask.getException());
+            groupUserTable.setItems(FXCollections.observableArrayList());
+        });
+
+        groupUserTable.refresh();
+
+        new Thread(filterTask).start();
     }
 }

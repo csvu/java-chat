@@ -1,24 +1,29 @@
 package mop.app.client.controller.admin;
 
-import com.github.javafaker.Faker;
+import java.sql.Date;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
-import mop.app.client.model.LoginTime;
-import mop.app.client.model.User;
+import mop.app.client.dto.FriendDTO;
+import mop.app.client.dto.FriendsOfFriendsDTO;
+import mop.app.client.dto.LoginTimeDTO;
+import mop.app.client.dto.RelationshipDTO;
+import mop.app.client.dto.UserDTO;
+import mop.app.client.dao.UserManagementDAO;
+import mop.app.client.dto.UserLoginDTO;
+import mop.app.client.util.TableStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class UserActivityController {
     private static final Logger logger = LoggerFactory.getLogger(UserActivityController.class);
@@ -32,11 +37,12 @@ public class UserActivityController {
     @FXML
     private AnchorPane contentPane;
 
-    private TableView<LoginTime> activityTable;
-    private TableView<User> friendsTable;
-    private TableView<User> friendsOfFriendsTable;
+    private TableView<UserLoginDTO> activityTable;
+    private TableView<FriendDTO> friendsTable;
+    private TableView<FriendsOfFriendsDTO> friendsOfFriendsTable;
     private long userId;
     private String username;
+    private UserManagementDAO userManagementDAO;
 
     public void setUserId(long userId) {
         this.userId = userId;
@@ -58,6 +64,7 @@ public class UserActivityController {
         initializeFriendsTable();
         initializeFriendsOfFriendsTable();
 
+        userManagementDAO = new UserManagementDAO();
         applyFilter(null);
     }
 
@@ -65,105 +72,121 @@ public class UserActivityController {
         activityTable = new TableView<>();
         activityTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
 
-        TableColumn<LoginTime, String> usernameCol = new TableColumn<>("Username");
+        TableColumn<UserLoginDTO, String> usernameCol = new TableColumn<>("Username");
         usernameCol.setCellValueFactory(new PropertyValueFactory<>("username"));
         usernameCol.setPrefWidth(300);
 
-        TableColumn<LoginTime, String> emailCol = new TableColumn<>("Email");
+        TableColumn<UserLoginDTO, String> emailCol = new TableColumn<>("Email");
         emailCol.setCellValueFactory(new PropertyValueFactory<>("email"));
         emailCol.setPrefWidth(300);
 
-        TableColumn<LoginTime, String> loginDateCol = new TableColumn<>("Login Date");
-        loginDateCol.setCellValueFactory(new PropertyValueFactory<>("loginDate"));
+        TableColumn<UserLoginDTO, String> displayNameCol = new TableColumn<>("Display Name");
+        displayNameCol.setCellValueFactory(new PropertyValueFactory<>("displayName"));
+        displayNameCol.setPrefWidth(200);
+
+        TableColumn<UserLoginDTO, Timestamp> loginDateCol = new TableColumn<>("Login At");
+        loginDateCol.setCellValueFactory(new PropertyValueFactory<>("loginAt"));
         loginDateCol.setPrefWidth(300);
 
-        activityTable.getColumns().addAll(usernameCol, emailCol, loginDateCol);
-        styleTable(activityTable);
+        AnchorPane.setTopAnchor(activityTable, 0.0);
+        AnchorPane.setLeftAnchor(activityTable, 0.0);
+        AnchorPane.setRightAnchor(activityTable, 0.0);
+        AnchorPane.setBottomAnchor(activityTable, 0.0);
+
+        activityTable.getColumns().addAll(usernameCol, emailCol, displayNameCol, loginDateCol);
+        TableStyle.styleTable(
+            activityTable,
+            List.of(Pos.CENTER_LEFT, Pos.CENTER_LEFT, Pos.CENTER_LEFT, Pos.CENTER_LEFT),
+            "14px"
+        );
+
+        activityTable.setRowFactory(param -> {
+            TableRow<UserLoginDTO> row = new TableRow<>();
+            row.setPrefHeight(50);
+            return row;
+        });
     }
 
     private void initializeFriendsTable() {
         friendsTable = new TableView<>();
-        friendsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
 
-        TableColumn<User, String> usernameCol = new TableColumn<>("Username");
+        TableColumn<FriendDTO, String> usernameCol = new TableColumn<>("Username");
         usernameCol.setCellValueFactory(new PropertyValueFactory<>("username"));
-        usernameCol.setPrefWidth(300);
+        usernameCol.setPrefWidth(200);
 
-        TableColumn<User, String> emailCol = new TableColumn<>("Email");
+        TableColumn<FriendDTO, String> emailCol = new TableColumn<>("Email");
         emailCol.setCellValueFactory(new PropertyValueFactory<>("email"));
         emailCol.setPrefWidth(300);
 
-        TableColumn<User, String> displayNameCol = new TableColumn<>("Display Name");
+        TableColumn<FriendDTO, String> displayNameCol = new TableColumn<>("Display Name");
         displayNameCol.setCellValueFactory(new PropertyValueFactory<>("displayName"));
-        displayNameCol.setPrefWidth(300);
+        displayNameCol.setPrefWidth(200);
 
-        friendsTable.getColumns().addAll(usernameCol, emailCol, displayNameCol);
-        styleTable(friendsTable);
+        TableColumn<FriendDTO, Timestamp> createdAtCol = new TableColumn<>("Created At");
+        createdAtCol.setCellValueFactory(new PropertyValueFactory<>("createdAt"));
+        createdAtCol.setPrefWidth(300);
+
+        AnchorPane.setTopAnchor(friendsTable, 0.0);
+        AnchorPane.setLeftAnchor(friendsTable, 0.0);
+        AnchorPane.setRightAnchor(friendsTable, 0.0);
+        AnchorPane.setBottomAnchor(friendsTable, 0.0);
+
+        friendsTable.getColumns().addAll(usernameCol, emailCol, displayNameCol, createdAtCol);
+        TableStyle.styleTable(
+            friendsTable,
+            List.of(Pos.CENTER_LEFT, Pos.CENTER_LEFT, Pos.CENTER_LEFT, Pos.CENTER_LEFT),
+            "14px"
+        );
+
+        friendsTable.setRowFactory(param -> {
+            TableRow<FriendDTO> row = new TableRow<>();
+            row.setPrefHeight(50);
+            return row;
+        });
     }
 
     private void initializeFriendsOfFriendsTable() {
         friendsOfFriendsTable = new TableView<>();
         friendsOfFriendsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
 
-        TableColumn<User, String> usernameCol = new TableColumn<>("Username");
+        TableColumn<FriendsOfFriendsDTO, String> usernameCol = new TableColumn<>("Username");
         usernameCol.setCellValueFactory(new PropertyValueFactory<>("username"));
-        usernameCol.setPrefWidth(300);
+        usernameCol.setPrefWidth(200);
 
-        TableColumn<User, String> emailCol = new TableColumn<>("Email");
+        TableColumn<FriendsOfFriendsDTO, String> emailCol = new TableColumn<>("Email");
         emailCol.setCellValueFactory(new PropertyValueFactory<>("email"));
         emailCol.setPrefWidth(300);
 
-        TableColumn<User, String> displayNameCol = new TableColumn<>("Display Name");
+        TableColumn<FriendsOfFriendsDTO, String> displayNameCol = new TableColumn<>("Display Name");
         displayNameCol.setCellValueFactory(new PropertyValueFactory<>("displayName"));
-        displayNameCol.setPrefWidth(300);
+        displayNameCol.setPrefWidth(200);
 
-        friendsOfFriendsTable.getColumns().addAll(usernameCol, emailCol, displayNameCol);
-        styleTable(friendsOfFriendsTable);
-    }
+        TableColumn<FriendsOfFriendsDTO, String> directFriendCol = new TableColumn<>("Direct Friend");
+        directFriendCol.setCellValueFactory(new PropertyValueFactory<>("directFriend"));
+        directFriendCol.setPrefWidth(200);
 
-    private <T> void styleTable(TableView<T> tableView) {
-        AnchorPane.setTopAnchor(tableView, 0.0);
-        AnchorPane.setLeftAnchor(tableView, 0.0);
-        AnchorPane.setRightAnchor(tableView, 0.0);
-        AnchorPane.setBottomAnchor(tableView, 0.0);
+        TableColumn<FriendsOfFriendsDTO, Timestamp> createdAtCol = new TableColumn<>("Created At");
+        createdAtCol.setCellValueFactory(new PropertyValueFactory<>("createdAt"));
+        createdAtCol.setPrefWidth(300);
 
-        for (TableColumn<T, ?> column : tableView.getColumns()) {
-            @SuppressWarnings("unchecked")
-            TableColumn<T, String> typedColumn = (TableColumn<T, String>) column;
-            typedColumn.setCellFactory(col -> new TableCell<T, String>() {
-                @Override
-                protected void updateItem(String item, boolean empty) {
-                    super.updateItem(item, empty);
-                    if (empty || item == null) {
-                        setText(null);
-                        setStyle("");
-                    } else {
-                        setText(item);
-                        setAlignment(Pos.CENTER_LEFT);
-                        setStyle(
-                            "-fx-text-fill: white; " +
-                                "-fx-font-weight: bold; " +
-                                "-fx-font-size: 14px;"
-                        );
-                    }
-                }
-            });
-        }
+        AnchorPane.setTopAnchor(friendsOfFriendsTable, 0.0);
+        AnchorPane.setLeftAnchor(friendsOfFriendsTable, 0.0);
+        AnchorPane.setRightAnchor(friendsOfFriendsTable, 0.0);
+        AnchorPane.setBottomAnchor(friendsOfFriendsTable, 0.0);
 
-        tableView.setRowFactory(param -> {
-            TableRow<T> row = new TableRow<>();
+        friendsOfFriendsTable.getColumns().addAll(usernameCol, emailCol, displayNameCol, directFriendCol, createdAtCol);
+        TableStyle.styleTable(
+            friendsOfFriendsTable,
+            List.of(Pos.CENTER_LEFT, Pos.CENTER_LEFT, Pos.CENTER_LEFT, Pos.CENTER_LEFT, Pos.CENTER_LEFT),
+            "14px"
+        );
+
+        friendsOfFriendsTable.setRowFactory(param -> {
+            TableRow<FriendsOfFriendsDTO> row = new TableRow<>();
             row.setPrefHeight(50);
             return row;
         });
-
-        tableView.setStyle(
-            "-fx-background-color: transparent; " +
-                "-fx-control-inner-background: transparent; " +
-                "-fx-background-insets: 0; " +
-                "-fx-padding: 0;"
-        );
     }
-
 
     @FXML
     public void applyFilter(ActionEvent event) {
@@ -201,54 +224,84 @@ public class UserActivityController {
     }
 
     private void loadActivities() {
-        Faker faker = new Faker(Locale.ENGLISH);
+        Task<List<Object[]>> task = new Task<>() {
+            @Override
+            protected List<Object[]> call() throws Exception {
+                return userManagementDAO.getLoginTimeByUserId(userId);
+            }
+        };
 
-        List<LoginTime> activities = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy - HH:mm:ss");
-            Date randomDate = faker.date().past(30, TimeUnit.DAYS);
-            String date = dateFormat.format(randomDate);
-            activities.add(new LoginTime(
-                faker.name().username(),
-                faker.internet().emailAddress(),
-                faker.name().fullName(),
-                date
-            ));
-        }
+        task.setOnSucceeded(e -> {
+            List<Object[]> loginTimeDTOs = task.getValue();
+            List<UserLoginDTO> activities = loginTimeDTOs.stream()
+                .map(data -> {
+                    UserDTO userDTO = (UserDTO) data[0];
+                    LoginTimeDTO loginTimeDTO = (LoginTimeDTO) data[1];
+                    return new UserLoginDTO(userDTO.getUsername(), userDTO.getEmail(), userDTO.getDisplayName(),
+                        loginTimeDTO.getLoginAt());
+                })
+                .collect(Collectors.toList());
 
-        ObservableList<LoginTime> observableList = FXCollections.observableArrayList(activities);
-        activityTable.setItems(observableList);
+            activityTable.setItems(FXCollections.observableArrayList(activities));
+        });
+
+        task.setOnFailed(e -> logger.error("Failed to load activities"));
+
+        new Thread(task).start();
     }
 
     private void loadFriends() {
-        Faker faker = new Faker(Locale.ENGLISH);
-        List<User> friends = new ArrayList<>();
+        Task<List<Object[]>> task = new Task<>() {
+            @Override
+            protected List<Object[]> call() throws Exception {
+                return userManagementDAO.getFriendByUserId(userId);
+            }
+        };
 
-        for (int i = 0; i < 20; i++) {
-            friends.add(new User(
-                faker.name().username(),
-                faker.internet().emailAddress(),
-                faker.name().fullName()
-            ));
-        }
+        task.setOnSucceeded(e -> {
+            List<Object[]> friendsData = task.getValue();
+            List<FriendDTO> friends = friendsData.stream()
+                .map(data -> {
+                    UserDTO userDTO = (UserDTO) data[0];
+                    RelationshipDTO relationshipDTO = (RelationshipDTO) data[1];
+                    return new FriendDTO(userDTO.getUsername(), userDTO.getEmail(), userDTO.getDisplayName(),
+                        relationshipDTO.getCreatedAt());
+                })
+                .collect(Collectors.toList());
 
-        ObservableList<User> observableList = FXCollections.observableArrayList(friends);
-        friendsTable.setItems(observableList);
+            friendsTable.setItems(FXCollections.observableArrayList(friends));
+        });
+
+        task.setOnFailed(e -> logger.error("Failed to load friends"));
+
+        new Thread(task).start();
     }
 
     private void loadFriendsOfFriends() {
-        Faker faker = new Faker(Locale.ENGLISH);
-        List<User> friendsOfFriends = new ArrayList<>();
+        Task<List<Object[]>> task = new Task<>() {
+            @Override
+            protected List<Object[]> call() throws Exception {
+                return userManagementDAO.getFriendsOfFriendsByUserId(userId);
+            }
+        };
 
-        for (int i = 0; i < 40; i++) {
-            friendsOfFriends.add(new User(
-                faker.name().username(),
-                faker.internet().emailAddress(),
-                faker.name().fullName()
-            ));
-        }
+        task.setOnSucceeded(e -> {
+            List<Object[]> friendsOfFriendsData = task.getValue();
+            List<FriendsOfFriendsDTO> friendsOfFriends = friendsOfFriendsData.stream()
+                .map(data -> {
+                    UserDTO userDTO = (UserDTO) data[0];
+                    UserDTO directFriendDTO = (UserDTO) data[1];
+                    RelationshipDTO relationshipDTO = (RelationshipDTO) data[2];
+                    return new FriendsOfFriendsDTO(userDTO.getUsername(), userDTO.getEmail(), userDTO.getDisplayName(),
+                        directFriendDTO.getUsername(), relationshipDTO.getCreatedAt());
+                })
+                .collect(Collectors.toList());
 
-        ObservableList<User> observableList = FXCollections.observableArrayList(friendsOfFriends);
-        friendsOfFriendsTable.setItems(observableList);
+            friendsOfFriendsTable.setItems(FXCollections.observableArrayList(friendsOfFriends));
+        });
+
+        task.setOnFailed(e -> logger.error("Failed to load friends of friends"));
+
+        new Thread(task).start();
     }
 }

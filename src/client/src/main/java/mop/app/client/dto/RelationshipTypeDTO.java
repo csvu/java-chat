@@ -6,35 +6,23 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import java.io.Serial;
-import java.io.Serializable;
-import java.sql.Timestamp;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "\"conversation\"", schema = "public")
+@Table(name = "\"relationship_type\"", schema = "public")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ConversationDTO implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
-
+public class RelationshipTypeDTO {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "conversation_id")
-    private long conversationId;
-
-    private String name;
-    private String icon;
-
     @Column(name = "type_id")
     private long typeId;
 
-    @Column(name = "created_at")
-    private Timestamp createdAt;
+    @Column(name = "type_name")
+    private String typeName;
 }

@@ -20,6 +20,7 @@ import mop.app.client.dao.AuthDAO;
 import mop.app.client.dao.RoleDAO;
 import mop.app.client.dao.UserManagementDAO;
 import mop.app.client.dto.UserDTO;
+import mop.app.client.util.AlertDialog;
 import mop.app.client.util.PasswordUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,8 +83,12 @@ public class UserDetailsController {
                     return LocalDate.parse(string, formatter);
                 } catch (DateTimeParseException e) {
                     Platform.runLater(() -> {
-                        showAlert(Alert.AlertType.ERROR, "Please enter the date in MM/dd/yyyy format exactly. " +
-                                "For example: 01/01/2001");
+                        AlertDialog.showAlertDialog(
+                            Alert.AlertType.ERROR,
+                            "Invalid Date Format",
+                            "Please enter the date in MM/dd/yyyy format exactly.",
+                            "For example: 01/01/2001"
+                        );
 
                         birthdayPicker.setValue(null);
                     });
@@ -109,13 +114,24 @@ public class UserDetailsController {
 
             // Validate age (at least 13 years old)
             if (selectedDate.isAfter(currentDate.minusYears(13))) {
-                showAlert(Alert.AlertType.ERROR, "You must be at least 13 years old.");
+                AlertDialog.showAlertDialog(
+                    Alert.AlertType.ERROR,
+                    "Invalid Birth Date",
+                    "You must be at least 13 years old to register.",
+                    ""
+                );
+
                 birthdayPicker.setValue(null);
                 return;
             }
 
             if (selectedDate.isAfter(currentDate)) {
-                showAlert(Alert.AlertType.ERROR, "Birth date cannot be in the future.");
+                AlertDialog.showAlertDialog(
+                    Alert.AlertType.ERROR,
+                    "Invalid Birth Date",
+                    "Birth date cannot be in the future.",
+                    ""
+                );
                 birthdayPicker.setValue(null);
             }
         }
@@ -155,7 +171,12 @@ public class UserDetailsController {
 
                     logger.info("User details loaded successfully for user ID: {}", userId);
                 } else {
-                    showAlert(Alert.AlertType.ERROR, "Failed to load user details");
+                    AlertDialog.showAlertDialog(
+                        Alert.AlertType.ERROR,
+                        "Error",
+                        "Failed to load user details",
+                        ""
+                    );
                 }
             });
         });
@@ -163,7 +184,12 @@ public class UserDetailsController {
         task.setOnFailed(event -> {
             Platform.runLater(() -> {
                 logger.error("Failed to load user details", task.getException());
-                showAlert(Alert.AlertType.ERROR, "Failed to load user details");
+                AlertDialog.showAlertDialog(
+                    Alert.AlertType.ERROR,
+                    "Error",
+                    "Failed to load user details",
+                    ""
+                );
             });
         });
 
@@ -203,7 +229,12 @@ public class UserDetailsController {
         validationTask.setOnSucceeded(validationEvent -> {
             Platform.runLater(() -> {
                 if (!validationTask.getValue()) {
-                    showAlert(Alert.AlertType.ERROR, "Username or email already exists");
+                    AlertDialog.showAlertDialog(
+                        Alert.AlertType.ERROR,
+                        "Error",
+                        "Username or email already exists",
+                        ""
+                    );
                     return;
                 }
 
@@ -223,7 +254,12 @@ public class UserDetailsController {
                     Platform.runLater(() -> {
                         UserDTO currentUser = retrieveTask.getValue();
                         if (currentUser == null) {
-                            showAlert(Alert.AlertType.ERROR, "Failed to retrieve current user details");
+                            AlertDialog.showAlertDialog(
+                                Alert.AlertType.ERROR,
+                                "Error",
+                                "Failed to retrieve current user details",
+                                ""
+                            );
                             return;
                         }
 
@@ -245,13 +281,18 @@ public class UserDetailsController {
                         String newPassword = passwordField.getText();
                         if (!newPassword.isEmpty()) {
                             if (!PasswordUtil.isStrongPassword(newPassword)) {
-                                showAlert(Alert.AlertType.ERROR,
+                                AlertDialog.showAlertDialog(
+                                    Alert.AlertType.ERROR,
+                                    "Error",
+                                    "Invalid password",
                                     """
-                                        Password must be at least 8 characters long and contain:
-                                        - At least one uppercase letter
-                                        - At least one lowercase letter
-                                        - At least one number
-                                        - At least one special character (@$!%*?&_-)""");
+                                    Password must be at least 8 characters long and contain:
+                                    - At least one uppercase letter
+                                    - At least one lowercase letter
+                                    - At least one number
+                                    - At least one special character (@$!%*?&_-)
+                                    """
+                                );
                                 return;
                             }
 
@@ -270,14 +311,24 @@ public class UserDetailsController {
 
                         updateTask.setOnSucceeded(e -> {
                             Platform.runLater(() -> {
-                                showAlert(Alert.AlertType.INFORMATION, "User details updated successfully");
+                                AlertDialog.showAlertDialog(
+                                    Alert.AlertType.INFORMATION,
+                                    "User details updated",
+                                    "User details updated successfully",
+                                    ""
+                                );
                                 logger.info("User details updated for user ID: {}", userId);
                             });
                         });
 
                         updateTask.setOnFailed(e -> {
                             Platform.runLater(() -> {
-                                showAlert(Alert.AlertType.ERROR, "Failed to update user details");
+                                AlertDialog.showAlertDialog(
+                                    Alert.AlertType.ERROR,
+                                    "Error",
+                                    "Failed to update user details",
+                                    ""
+                                );
                                 logger.error("Failed to update user details", updateTask.getException());
                             });
                         });
@@ -288,7 +339,12 @@ public class UserDetailsController {
 
                 retrieveTask.setOnFailed(retrieveEvent -> {
                     Platform.runLater(() -> {
-                        showAlert(Alert.AlertType.ERROR, "Failed to retrieve current user details");
+                        AlertDialog.showAlertDialog(
+                            Alert.AlertType.ERROR,
+                            "Error",
+                            "Failed to retrieve user details",
+                            ""
+                        );
                         logger.error("Failed to retrieve user details", retrieveTask.getException());
                     });
                 });
@@ -299,7 +355,12 @@ public class UserDetailsController {
 
         validationTask.setOnFailed(validationEvent -> {
             Platform.runLater(() -> {
-                showAlert(Alert.AlertType.ERROR, "Failed to validate user details");
+                AlertDialog.showAlertDialog(
+                    Alert.AlertType.ERROR,
+                    "Error",
+                    "Failed to validate user details",
+                    ""
+                );
                 logger.error("Failed to validate user details", validationTask.getException());
             });
         });
@@ -309,19 +370,34 @@ public class UserDetailsController {
 
     private boolean validateInput() {
         if (usernameField.getText().trim().isEmpty()) {
-            showAlert(Alert.AlertType.ERROR, "Username cannot be empty");
+            AlertDialog.showAlertDialog(
+                Alert.AlertType.ERROR,
+                "Error",
+                "Username cannot be empty",
+                ""
+            );
             return false;
         }
 
         if (emailField.getText().trim().isEmpty()) {
-            showAlert(Alert.AlertType.ERROR, "Email cannot be empty");
+            AlertDialog.showAlertDialog(
+                Alert.AlertType.ERROR,
+                "Error",
+                "Email cannot be empty",
+                ""
+            );
             return false;
         }
 
         // Only check password match if a new password is entered
         if (!passwordField.getText().isEmpty() &&
             !passwordField.getText().equals(confirmPasswordField.getText())) {
-            showAlert(Alert.AlertType.ERROR, "Passwords do not match");
+            AlertDialog.showAlertDialog(
+                Alert.AlertType.ERROR,
+                "Error",
+                "Passwords do not match",
+                ""
+            );
             return false;
         }
 
@@ -348,7 +424,12 @@ public class UserDetailsController {
                 task.setOnSucceeded(e -> {
                     Platform.runLater(() -> {
                         displayNameField.setText("Deleted User");
-                        showAlert(Alert.AlertType.INFORMATION, "User deleted successfully");
+                        AlertDialog.showAlertDialog(
+                            Alert.AlertType.INFORMATION,
+                            "User deleted",
+                            "User deleted successfully",
+                            ""
+                        );
                         logger.info("User deleted: {}", userId);
                     });
                 });
@@ -360,11 +441,6 @@ public class UserDetailsController {
                 new Thread(task).start();
             }
         });
-    }
-
-    private void showAlert(Alert.AlertType type, String message) {
-        Alert alert = new Alert(type, message);
-        alert.showAndWait();
     }
 
     public void setUserId(long userId) {

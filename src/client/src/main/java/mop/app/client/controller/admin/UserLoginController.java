@@ -18,6 +18,8 @@ import javafx.util.StringConverter;
 import mop.app.client.dao.LoginTimeDAO;
 import mop.app.client.dto.UserDTO;
 import mop.app.client.dto.UserLoginDTO;
+import mop.app.client.util.AlertDialog;
+import mop.app.client.util.TableStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,9 +79,12 @@ public class UserLoginController {
                     return LocalDate.parse(string, formatter);
                 } catch (DateTimeParseException e) {
                     Platform.runLater(() -> {
-                        showAlert(Alert.AlertType.ERROR, "Invalid Date Format",
-                            "Please enter the date in MM/dd/yyyy format exactly. " +
-                                "For example: 01/01/2001");
+                        AlertDialog.showAlertDialog(
+                            Alert.AlertType.ERROR,
+                            "Invalid Date Format",
+                            "Please enter the date in MM/dd/yyyy format exactly.",
+                            "For example: 01/01/2001"
+                        );
 
                         dateFilter.setValue(null);
                     });
@@ -103,18 +108,15 @@ public class UserLoginController {
             LocalDate currentDate = LocalDate.now();
 
             if (selectedDate.isAfter(currentDate)) {
-                showAlert(Alert.AlertType.ERROR, "Invalid Date", "Date cannot be in the future");
+                AlertDialog.showAlertDialog(
+                    Alert.AlertType.ERROR,
+                    "Invalid Date",
+                    "Date cannot be in the future",
+                    "Please enter a valid date."
+                );
                 dateFilter.setValue(null);
             }
         }
-    }
-
-    private void showAlert(Alert.AlertType alertType, String title, String message) {
-        Alert alert = new Alert(alertType);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
     }
 
     private void setupUsernameFilter() {
@@ -124,54 +126,15 @@ public class UserLoginController {
     }
 
     private void setupTableColumns() {
-        userLoginTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
-
         usernameCol.setCellValueFactory(new PropertyValueFactory<>("username"));
         displayNameCol.setCellValueFactory(new PropertyValueFactory<>("displayName"));
         loginDateCol.setCellValueFactory(new PropertyValueFactory<>("loginAt"));
 
-        List<TableColumn<UserLoginDTO, String>> columns = List.of(usernameCol, displayNameCol);
-        columns.forEach(column -> {
-            column.setCellFactory(stringTableColumn -> new TableCell<>() {
-                @Override
-                protected void updateItem(String item, boolean empty) {
-                    super.updateItem(item, empty);
-                    if (empty || item == null) {
-                        setText(null);
-                        setStyle("");
-                    } else {
-                        setText(item);
-                        setAlignment(Pos.CENTER_LEFT);
-                        setStyle(
-                            "-fx-text-fill: white; " +
-                                "-fx-font-weight: bold; " +
-                                "-fx-font-size: 14px;"
-                        );
-                    }
-                }
-            });
-        });
-
-        loginDateCol.setCellFactory(param -> new TableCell<>() {
-            @Override
-            protected void updateItem(Timestamp item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                    setStyle("");
-                } else {
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-                    String formattedDate = dateFormat.format(item);
-                    setText(formattedDate);
-                    setAlignment(Pos.CENTER_LEFT);
-                    setStyle(
-                        "-fx-text-fill: white; " +
-                            "-fx-font-weight: bold; " +
-                            "-fx-font-size: 14px;"
-                    );
-                }
-            }
-        });
+        TableStyle.styleTable(
+            userLoginTable,
+            List.of(Pos.CENTER_LEFT, Pos.CENTER_LEFT, Pos.CENTER_LEFT),
+            "14px"
+        );
 
         userLoginTable.setRowFactory(param -> {
             TableRow<UserLoginDTO> row = new TableRow<>();
@@ -237,7 +200,12 @@ public class UserLoginController {
         String currentUsername = usernameFilter.getText().trim();
 
         if (selectedDate == null) {
-            showAlert(Alert.AlertType.ERROR, "Validation Error", "Please enter a valid date.");
+            AlertDialog.showAlertDialog(
+                Alert.AlertType.ERROR,
+                "Validation Error",
+                "Please enter a valid date.",
+                ""
+            );
             return;
         }
 
@@ -282,7 +250,12 @@ public class UserLoginController {
         userLoginTable.refresh();
 
         if (filteredLoginTimeList.isEmpty()) {
-            showAlert(Alert.AlertType.INFORMATION, "No Results", "No results found for the given filters.");
+            AlertDialog.showAlertDialog(
+                Alert.AlertType.INFORMATION,
+                "No Results",
+                "No results found for the given filters.",
+                ""
+            );
         }
     }
 }

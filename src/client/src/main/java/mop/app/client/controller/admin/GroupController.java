@@ -1,28 +1,23 @@
 package mop.app.client.controller.admin;
 
-import com.github.javafaker.Faker;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableRow;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.StackPane;
-import javafx.util.Callback;
-import mop.app.client.model.Group;
-import mop.app.client.model.Spam;
+import mop.app.client.dao.GroupDAO;
+import mop.app.client.dto.ConversationDTO;
+import mop.app.client.util.AlertDialog;
+import mop.app.client.util.TableStyle;
 import mop.app.client.util.ViewModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,136 +28,167 @@ public class GroupController {
     @FXML
     private TextField filterField;
     @FXML
-    private TableView<Group> groupTable;
+    private TableView<ConversationDTO> groupTable;
     @FXML
-    private TableColumn<Group, String> groupNameCol;
+    private TableColumn<ConversationDTO, String> groupNameCol;
     @FXML
-    private TableColumn<Group, String> creationDateCol;
+    private TableColumn<ConversationDTO, Timestamp> createdAtCol;
     @FXML
-    private TableColumn<Group, Integer> membersCol;
+    private TableColumn<ConversationDTO, Long> membersCol;
     @FXML
-    private TableColumn<Group, Integer> adminCol;
+    private TableColumn<ConversationDTO, Long> adminCol;
     @FXML
-    private TableColumn<Group, String> detailsCol;
-
-    private ObservableList<Group> groups;
+    private TableColumn<ConversationDTO, String> detailsCol;
+    private ObservableList<ConversationDTO> groups;
+    private ObservableList<ConversationDTO> filteredGroups;
+    private final GroupDAO groupDAO;
 
     public GroupController() {
         groups = FXCollections.observableArrayList();
-
-        Faker faker = new Faker(Locale.ENGLISH);
-        for (int i = 0; i < 50; i++) {
-            String name = faker.team().name();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy - HH:mm:ss");
-            Date randomDate = faker.date().past(30, TimeUnit.DAYS);
-            String date = dateFormat.format(randomDate);
-            int members = faker.number().numberBetween(1, 100);
-            int admins = members / 8;
-            groups.add(new Group(i, name, date, members, admins));
-        }
-
-        logger.info("Generated 50 groups");
+        filteredGroups = FXCollections.observableArrayList();
+        groupDAO = new GroupDAO();
     }
 
     @FXML
     public void initialize() {
-        groupTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
+        setupTableColumns();
+        setupFilterField();
+        loadGroups();
+    }
 
-        List<TableColumn<Group, String>> strColumns = List.of(groupNameCol, creationDateCol);
-        List<TableColumn<Group, Integer>> intColumns = List.of(membersCol, adminCol);
+    private void setupTableColumns() {
         groupNameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
-        creationDateCol.setCellValueFactory(new PropertyValueFactory<>("creationDate"));
-        membersCol.setCellValueFactory(new PropertyValueFactory<>("memberCount"));
-        adminCol.setCellValueFactory(new PropertyValueFactory<>("adminCount"));
+        createdAtCol.setCellValueFactory(new PropertyValueFactory<>("createdAt"));
+        membersCol.setCellValueFactory(cellData ->
+            Bindings.createObjectBinding(() ->
+                groupDAO.countMembers(cellData.getValue().getConversationId())
+            )
+        );
+        adminCol.setCellValueFactory(cellData ->
+            Bindings.createObjectBinding(() ->
+                groupDAO.countAdmins(cellData.getValue().getConversationId())
+            )
+        );
+        TableStyle.styleTable(
+            groupTable,
+            List.of(Pos.CENTER_LEFT, Pos.CENTER_LEFT, Pos.CENTER, Pos.CENTER, Pos.CENTER),
+            "14px"
+        );
+        setupDetailsColumn();
 
-        strColumns.forEach(column -> column.setCellFactory(stringTableColumn -> new TableCell<>() {
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                    setStyle("");
-                } else {
-                    setText(item);
-                    setAlignment(Pos.CENTER_LEFT);
-                    setStyle(
-                        "-fx-text-fill: white; " +
-                            "-fx-font-weight: bold; " +
-                            "-fx-font-size: 14px;"
-                    );
-                }
-            }
-        }));
-
-        intColumns.forEach(column -> column.setCellFactory(intTableColumn -> new TableCell<>() {
-            @Override
-            protected void updateItem(Integer item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                    setStyle("");
-                } else {
-                    setText(String.valueOf(item));
-                    setAlignment(Pos.CENTER);
-                    setStyle(
-                        "-fx-text-fill: white; " +
-                            "-fx-font-weight: bold; " +
-                            "-fx-font-size: 14px;"
-                    );
-                }
-            }
-        }));
-
-        detailsCol.setCellFactory(new Callback<>() {
-            @Override
-            public TableCell<Group, String> call(TableColumn<Group, String> param) {
-                return new TableCell<>() {
-                    @Override
-                    protected void updateItem(String item, boolean empty) {
-                        super.updateItem(item, empty);
-                        if (empty) {
-                            setGraphic(null);
-                        } else {
-                            Button detailButton = new Button("Details");
-                            detailButton.setStyle(
-                                "-fx-background-color: #0084ff; " +
-                                    "-fx-text-fill: white; " +
-                                    "-fx-border-radius: 20px; " +
-                                    "-fx-background-radius: 20px; " +
-                                    "-fx-font-size: 14px; " +
-                                    "-fx-font-weight: bold; " +
-                                    "-fx-padding: 10 20 10 20; " +
-                                    "-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 5, 0.0, 0, 1);"
-                            );
-                            detailButton.setMaxWidth(Double.MAX_VALUE);
-                            detailButton.setMaxHeight(Double.MAX_VALUE);
-                            detailButton.setOnAction(event -> groupDetails(getTableRow().getItem()));
-
-                            StackPane stackPane = new StackPane(detailButton);
-                            stackPane.setPrefWidth(Double.MAX_VALUE);
-                            stackPane.setPrefHeight(Double.MAX_VALUE);
-                            setGraphic(stackPane);
-                        }
-                    }
-                };
-            }
-        });
-
-        groupTable.setItems(groups);
-
-        groupTable.setRowFactory(param -> {
-            TableRow<Group> row = new TableRow<>();
+        groupTable.setRowFactory(tv -> {
+            TableRow<ConversationDTO> row = new TableRow<>();
             row.setPrefHeight(50);
             return row;
         });
+
+        groupTable.setItems(groups);
     }
 
-    private void groupDetails(Group group) {
+    private void setupDetailsColumn() {
+        detailsCol.setCellFactory(param -> new TableCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    Button detailButton = createDetailsButton();
+                    StackPane stackPane = new StackPane(detailButton);
+                    stackPane.setPrefWidth(Double.MAX_VALUE);
+                    stackPane.setPrefHeight(Double.MAX_VALUE);
+                    setGraphic(stackPane);
+                }
+            }
+
+            private Button createDetailsButton() {
+                ConversationDTO group = getTableRow().getItem();
+                Button detailButton = new Button("Details");
+                detailButton.setStyle(
+                    "-fx-background-color: #0084ff; " +
+                        "-fx-text-fill: white; " +
+                        "-fx-border-radius: 20px; " +
+                        "-fx-background-radius: 20px; " +
+                        "-fx-font-size: 14px; " +
+                        "-fx-font-weight: bold; " +
+                        "-fx-padding: 10 20 10 20; " +
+                        "-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 5, 0.0, 0, 1);"
+                );
+                detailButton.setMaxWidth(Double.MAX_VALUE);
+                detailButton.setMaxHeight(Double.MAX_VALUE);
+                detailButton.setOnAction(event -> groupDetails(group));
+                return detailButton;
+            }
+        });
+    }
+
+    private void setupFilterField() {
+        filterField.textProperty().addListener((observable, oldValue, newValue) -> {
+            filterGroups(newValue.trim());
+        });
+    }
+
+    private void filterGroups(String groupName) {
+        if (groupName.isEmpty()) {
+            groupTable.setItems(groups);
+        } else {
+            filteredGroups.clear();
+            filteredGroups.addAll(
+                groups.stream()
+                    .filter(group -> group.getName().toLowerCase().contains(groupName.toLowerCase()))
+                    .toList()
+            );
+            groupTable.setItems(filteredGroups);
+        }
+        groupTable.refresh();
+    }
+
+    private void loadGroups() {
+        Task<List<ConversationDTO>> task = new Task<>() {
+            @Override
+            protected List<ConversationDTO> call() {
+                return groupDAO.getAllGroups();
+            }
+        };
+
+        task.setOnSucceeded(event -> {
+            Platform.runLater(() -> {
+                List<ConversationDTO> loadedGroups = task.getValue();
+                if (loadedGroups != null) {
+                    groups.setAll(loadedGroups);
+                    groupTable.setItems(groups);
+                    groupTable.refresh();
+                    logger.info("Loaded {} groups from database", groups.size());
+                } else {
+                    logger.error("Failed to load groups");
+                    AlertDialog.showAlertDialog(
+                        Alert.AlertType.ERROR,
+                        "Failed to load groups",
+                        "Failed to load groups",
+                        task.getMessage()
+                    );
+                }
+            });
+        });
+
+        task.setOnFailed(event -> {
+            Platform.runLater(() -> {
+                logger.error("Failed to load groups", task.getException());
+                AlertDialog.showAlertDialog(
+                    Alert.AlertType.ERROR,
+                    "Failed to load groups",
+                    "Failed to load groups",
+                    task.getMessage()
+                );
+            });
+        });
+
+        new Thread(task).start();
+    }
+
+    private void groupDetails(ConversationDTO group) {
         logger.info("Group details: " + group.getName());
         ViewModel.getInstance().getViewFactory().getSelectedView()
-            .set("Group-" + group.getId() + "-" + group.getName());
-    }
-
-    public void applyFilter(ActionEvent event) {
+            .set("Group-" + group.getConversationId() + "-" + group.getName());
     }
 }

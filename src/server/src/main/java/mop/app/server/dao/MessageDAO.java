@@ -16,7 +16,7 @@ public class MessageDAO {
     public ArrayList<Integer> getUsersInConversation(int conversationId, int userId) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             var users = session.createQuery(
-                "FROM EnrollmentDTO WHERE conversationId = :conversationId", EnrollmentDTO.class)
+                    "FROM EnrollmentDTO WHERE conversationId = :conversationId", EnrollmentDTO.class)
                 .setParameter("conversationId", conversationId)
                 .list();
             ArrayList<Integer> usersInConversation = new ArrayList<>();
@@ -33,5 +33,4 @@ public class MessageDAO {
         }
         return null;
     }
-
 }
