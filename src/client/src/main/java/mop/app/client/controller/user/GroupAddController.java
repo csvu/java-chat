@@ -8,7 +8,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import mop.app.client.Client;
-import mop.app.client.dao.user.UserDAO;
+import mop.app.client.dao.user.ConversationDAO;
 import mop.app.client.model.user.Conversation;
 
 
@@ -34,7 +34,7 @@ public class GroupAddController extends VBox {
         fxmlLoader.setController(this);
         fxmlLoader.load();
         groupName.setText(cur.getName());
-        friendListObservable.addAll(new UserDAO().getFriendsNotInConversation(cur.getConversationID()));
+        friendListObservable.addAll(new ConversationDAO().getFriendsNotInConversation(cur.getConversationID()));
         if (friendListObservable.isEmpty()) {
             groupName.setDisable(true);
             addButton.setDisable(true);
@@ -64,7 +64,7 @@ public class GroupAddController extends VBox {
 
         addButton.setOnAction(e -> {
             List<Integer> selected = Arrays.asList(listFriend.getSelectionModel().getSelectedItems().stream().map(Conversation::getConversationID).toArray(Integer[]::new));
-            new UserDAO().addGroup(cur.getConversationID(), groupName.getText(), cur.getType(), selected);
+            new ConversationDAO().addGroup(cur.getConversationID(), groupName.getText(), cur.getType(), selected);
             onClose.run();
         });
 

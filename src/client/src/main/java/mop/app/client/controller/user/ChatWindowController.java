@@ -2,9 +2,9 @@ package mop.app.client.controller.user;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
@@ -21,26 +21,22 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import mop.app.client.Client;
-import mop.app.client.dao.RoleDAO;
-import mop.app.client.dao.user.UserDAO;
+import mop.app.client.dao.user.MessageDAO;
+import mop.app.client.dao.user.ConversationDAO;
 import mop.app.client.dto.Request;
 import mop.app.client.dto.RequestType;
-import mop.app.client.dto.Response;
-import mop.app.client.dto.UserDTO;
 import mop.app.client.model.user.Conversation;
 import mop.app.client.model.user.Message;
+import mop.app.client.model.user.Relationship;
 import mop.app.client.network.SocketClient;
 import mop.app.client.util.ObjectMapperConfig;
-import mop.app.client.util.ViewFactory;
 
 import java.io.IOException;
-import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Objects;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 
 public class ChatWindowController extends GridPane {
@@ -93,36 +89,39 @@ public class ChatWindowController extends GridPane {
     private double oldHeight = 0;
 
     private Conversation curConversation;
+    private Relationship curRelationship;
     private final ObservableList<Message> convMsg = FXCollections.observableArrayList();
+    private final int maxCursor = 1000000000;
+    private int cursorMsgId = maxCursor;
     private final BiConsumer<Message, Conversation> onNewMessage;
 
-    public ChatWindowController(Conversation inpConversation, Runnable onUpdate, BiConsumer<Message, Conversation> onNewMessage) throws IOException {
+    public ChatWindowController(Conversation inpConversation, Relationship inpRelationship, Runnable onUpdate, BiConsumer<Message, Conversation> onNewMessage) throws IOException {
         this.curConversation = inpConversation;
         this.onNewMessage = onNewMessage;
+        this.curRelationship = inpRelationship;
         FXMLLoader fxmlLoader = new FXMLLoader(Client.class.getResource("view/user/chat-window-view.fxml"));
         fxmlLoader.setRoot(this);
         fxmlLoader.setController(this);
         fxmlLoader.load();
         System.out.println(col2.getChildren().size());
 
-        if (this.curConversation == null) {
+        if (this.curRelationship == null) {
             addFriend = new IconLabel(null, "null", null, null);
         } else {
-
-            addFriend = new IconLabel(!this.curConversation.getType().equals("PENDING") ? null : Client.class.getResource("view/user/add-friend-basic-outline-svgrepo-com.png"), !this.curConversation.getType().equals("PENDING") ? "Add Friend" : "Cancel Friend Request", null, null);
-
+            addFriend = new IconLabel(!this.curRelationship.getStatus().equals("PENDING") ? null : Client.class.getResource("view/user/add-friend-basic-outline-svgrepo-com.png"), !this.curRelationship.getStatus().equals("PENDING") ? "Add Friend" : "Cancel Friend Request", null, null);
         }
 
         addFriend.setAlignment(Pos.CENTER);
         addFriend.getStyleClass().add("HoverWrapper");
         addFriend.setOnMouseClicked(e -> {
-            if (this.curConversation.getType().equals("N/A")) {
-                new UserDAO().makeFriendRequest(this.curConversation.getConversationID());
-                this.curConversation.setType("PENDING");
+            if (curRelationship == null) return;
+            if (curRelationship.getStatus().equals("N/A")) {
+                new ConversationDAO().makeFriendRequest(curRelationship.getId());
+                this.curRelationship.setStatus("PENDING");
                 addFriend.update(null, "Cancel Friend Request", null, null);
             } else {
-                new UserDAO().cancelFriendRequest(this.curConversation.getConversationID());
-                this.curConversation.setType("N/A");
+                new ConversationDAO().cancelFriendRequest(this.curRelationship.getId());
+                this.curRelationship.setStatus("N/A");
                 addFriend.update(Client.class.getResource("view/user/add-friend-basic-outline-svgrepo-com.png"), "Add Friend", null, null);
             }
         });
@@ -244,6 +243,25 @@ public class ChatWindowController extends GridPane {
 
 
         msgWindow.setItems(convMsg);
+        Platform.runLater(() -> {
+            try {
+                ScrollBar bar = (ScrollBar) msgWindow.lookup(".scroll-bar");
+                System.out.println("???" + bar);
+                bar.valueProperty().addListener((src, ov, nv) -> {
+                    if (nv.doubleValue() == 1.) {
+                        System.out.print("Scrolled to bottom");
+                    } else if (nv.doubleValue() == 0.) {
+                        System.out.print("Scrolled to top");
+                        convMsg.addAll(0, MessageDAO.getMessages(curConversation.getConversationID(), cursorMsgId));
+                        if (convMsg.size() > 0) {
+                            cursorMsgId = convMsg.get(0).getMsgId();
+                        }
+                    }
+                });
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        });
         if (convMsg != null) msgWindow.scrollTo(convMsg.size());
     }
 
@@ -278,6 +296,7 @@ public class ChatWindowController extends GridPane {
         } else {
             chatOptions.getChildren().add(block);
             chatOptions.getChildren().add(report);
+            chatInfoHBox.getChildren().add(searchInInfo);
             topVBox.getChildren().remove(editName);
 
         }
@@ -290,29 +309,36 @@ public class ChatWindowController extends GridPane {
             return;
         }
         col2.setVisible(true);
-        System.out.println(curConversation.getType());
-        if (Objects.equals(curConversation.getType(), "N/A") || Objects.equals(curConversation.getType(), "PENDING")) {
+
+        if (this.curRelationship == null || (!this.curRelationship.getStatus().equals("N/A") && !this.curRelationship.getStatus().equals("PENDING"))) {
+            col2.getChildren().remove(addFriend);
+            if (!col2.getChildren().contains(writeMsg)) {
+                col2.getChildren().add(writeMsg);
+            }
+        } else {
             if (!col2.getChildren().contains(addFriend)) {
                 col2.getChildren().add(1, addFriend);
             }
-            col2.getChildren().remove(writeMsg);
-            if (this.curConversation.getType().equals("PENDING")) {
+
+            if (this.curRelationship.getStatus().equals("PENDING")) {
                 addFriend.update(null, "Cancel Friend Request", null, null);
             } else {
                 addFriend.update(null, "Add Friend", null, null);
             }
 
-        } else {
-            col2.getChildren().remove(addFriend);
-            if (!col2.getChildren().contains(writeMsg)) {
-                col2.getChildren().add(writeMsg);
-            }
         }
     }
 
-    void changeCurConv(Conversation item) {
+    public Conversation getConversation() {
+        return curConversation;
+    }
+
+
+    void changeCurConv(Conversation item, Relationship relationship) {
         curConversation = item;
+        curRelationship = relationship;
         chatWindowName.setText(item == null ? null : item.getName());
+        cursorMsgId = maxCursor;
         updateChatInfo();
         updateTopBarIfNotFriend();
         //Update activity status too
@@ -320,11 +346,16 @@ public class ChatWindowController extends GridPane {
         //Messages
 
         convMsg.clear();
-        if (item != null && (item.getType().equals("PAIR") || item.getType().equals("GROUP"))) convMsg.addAll(new UserDAO().getMessages(item.getConversationID()));
+        if (item != null && (item.getType().equals("PAIR") || item.getType().equals("GROUP"))) {
+            convMsg.addAll(MessageDAO.getMessages(item.getConversationID(), cursorMsgId));
+            if (convMsg.size() > 0) {
+                cursorMsgId = convMsg.get(0).getMsgId();
+            }
+        }
         
 
         topBarCol3.getChildren().clear();
-        if (item != null) topBarCol3.getChildren().add(new IconLabel(item.getIcon(), item.getName(), null, "call"));
+        if (item != null) topBarCol3.getChildren().add(new IconLabel(item.getIcon(), item.getName(), null, null));
 
         msgWindow.setItems(convMsg);
 
@@ -333,9 +364,9 @@ public class ChatWindowController extends GridPane {
 
     void sendMessage() throws JsonProcessingException {
         if (!chatArea.getText().trim().isEmpty()) {
-            new UserDAO().sendMessage(curConversation.getConversationID(), chatArea.getText());
-            sendMessageNet(new Message(Client.currentUser.getDisplayName(), null, LocalDateTime.now(), chatArea.getText(), curConversation.getConversationID(), (int)Client.currentUser.getUserId()));
-            Message newMsg = new Message("You", null, LocalDateTime.now(),chatArea.getText(), curConversation.getConversationID(), (int)Client.currentUser.getUserId());
+            int msgId = MessageDAO.sendMessage(curConversation, curRelationship, chatArea.getText());
+            sendMessageNet(new Message(Client.currentUser.getDisplayName(), null, LocalDateTime.now(), chatArea.getText(), curConversation.getConversationID(), (int)Client.currentUser.getUserId(), msgId));
+            Message newMsg = new Message("You", null, LocalDateTime.now(),chatArea.getText(), curConversation.getConversationID(), (int)Client.currentUser.getUserId(), msgId);
             convMsg.add(newMsg);
             chatArea.clear();
             msgWindow.scrollTo(convMsg.size());
@@ -360,9 +391,16 @@ public class ChatWindowController extends GridPane {
 
 
     public void handleNewMessage(Message msg) {
-        if (curConversation.getConversationID() == msg.getConversationId()) {
+        if (curConversation != null && curConversation.getConversationID() == msg.getConversationId()) {
             convMsg.add(msg);
         }
     }
 
+    public void setConvMsg(int msgId) {
+        convMsg.clear();
+        convMsg.addAll(MessageDAO.getMessages(curConversation.getConversationID(), msgId + 1));
+        if (convMsg.size() > 0) {
+            cursorMsgId = convMsg.get(0).getMsgId();
+        }
+    }
 }

@@ -6,15 +6,13 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
 import javafx.util.Pair;
 import mop.app.client.Client;
-import mop.app.client.dao.user.UserDAO;
+import mop.app.client.dao.user.ConversationDAO;
 import mop.app.client.model.user.Conversation;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -35,7 +33,7 @@ public class GroupMembersController extends VBox {
         fxmlLoader.setController(this);
         fxmlLoader.load();
 
-        ArrayList<ArrayList<Conversation>> l = new UserDAO().getMembers(cur.getConversationID());
+        ArrayList<ArrayList<Conversation>> l = new ConversationDAO().getMembers(cur.getConversationID());
         adminList.addAll(l.get(0));
         memberList.addAll(l.get(1));
         admin.setCellFactory(param -> new ListCell<Conversation>() {

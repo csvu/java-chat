@@ -1,6 +1,5 @@
 package mop.app.client.controller.user;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -9,9 +8,13 @@ import javafx.scene.control.ListView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import mop.app.client.Client;
+import mop.app.client.dao.user.ConversationDAO;
+import mop.app.client.dao.user.MessageDAO;
 import mop.app.client.dao.user.UserDAO;
 import mop.app.client.model.user.Conversation;
 import mop.app.client.model.user.Message;
+import mop.app.client.model.user.MessageInConversation;
+import mop.app.client.model.user.Relationship;
 
 import java.io.IOException;
 import java.net.URL;
@@ -40,15 +43,16 @@ public class ChatController extends GridPane {
         fxmlLoader.load();
         // Mock data
         dmList.clear();
-        dmList.addAll(new UserDAO().getConv());
+        dmList.addAll(new ConversationDAO().getConv());
         //Init
 
         Conversation firstConversation = dmList == null || dmList.isEmpty() ? null : dmList.getFirst();
         chatWindowController = new ChatWindowController(
                 firstConversation,
+                (firstConversation == null) ? null :new ConversationDAO().getRelationShipInAPairConversation(firstConversation.getConversationID()),
                 () -> {
                     dmList.clear();
-                    dmList.addAll(new UserDAO().getConv());
+                    dmList.addAll(new ConversationDAO().getConv());
                 },
                 (msg, curConv) -> {
                     dmList.remove(curConv);
@@ -59,8 +63,22 @@ public class ChatController extends GridPane {
                 });
 
         listSearch = new ListSearch(chatWindowController);
-        listSearch.strangers.setOnMouseClicked(mouseEvent -> chatWindowController.changeCurConv(listSearch.strangers.getSelectionModel().getSelectedItem()));
-        listSearch.searchMessages.setOnMouseClicked(mouseEvent -> chatWindowController.changeCurConv(listSearch.searchMessages.getSelectionModel().getSelectedItem()));
+        listSearch.strangers.setOnMouseClicked(mouseEvent -> {
+            Relationship selected = listSearch.strangers.getSelectionModel().getSelectedItem();
+            int conversationID = new ConversationDAO().getPairConversationId(selected.getId());
+            Conversation conv;
+            if (conversationID != -1) {
+                conv = new Conversation(conversationID, "PAIR", null, selected.getUserDisplayName(), false, null, null);
+            } else {
+                conv = new Conversation(-1, "PAIR", null, selected.getUserDisplayName(), false, null, null);
+            }
+            chatWindowController.changeCurConv(conv, selected);
+        });
+        listSearch.searchMessages.setOnMouseClicked(mouseEvent -> {
+            MessageInConversation msg = listSearch.searchMessages.getSelectionModel().getSelectedItem();
+            chatWindowController.changeCurConv(msg, null);
+            chatWindowController.setConvMsg(msg.getMsgId());
+        });
 
         //Handlers
         searchUsersController = new SearchUsersController(
@@ -69,10 +87,12 @@ public class ChatController extends GridPane {
                     if (!col0.getChildren().contains(listSearch)) col0.getChildren().add(listSearch);
                     System.out.println(textQuery);
 
-                    listSearch.setStrangers(new UserDAO().getMatched(textQuery));
-                    listSearch.setSearchMessages(new UserDAO().getMatchedMessages(textQuery));
+                    listSearch.setStrangers(UserDAO.getMatched(textQuery));
+                    listSearch.setSearchMessages(ConversationDAO.getMatchedMessages(textQuery));
                 },
                 () -> {
+                    dmList.clear();
+                    dmList.addAll(ConversationDAO.getConv());
                     col0.getChildren().remove(listSearch);
                     if (!col0.getChildren().contains(listViewCol2)) col0.getChildren().add(listViewCol2);
                 }
@@ -87,12 +107,12 @@ public class ChatController extends GridPane {
         getChildren().add(chatWindowController);
 
         // Scroll
-        listViewCol2.setCellFactory(param -> new CustomListCell());
+        listViewCol2.setCellFactory(param -> new ConversationCustomListCell<>());
         listViewCol2.setOnMouseClicked(mouseEvent -> {
-            if (listViewCol2.getSelectionModel().getSelectedItem() != null) chatWindowController.changeCurConv(listViewCol2.getSelectionModel().getSelectedItem());
+            if (listViewCol2.getSelectionModel().getSelectedItem() != null) chatWindowController.changeCurConv(listViewCol2.getSelectionModel().getSelectedItem(), ConversationDAO.getRelationShipInAPairConversation(listViewCol2.getSelectionModel().getSelectedItem().getConversationID()));
         });
 
-        chatWindowController.changeCurConv(firstConversation);
+        chatWindowController.changeCurConv(firstConversation, firstConversation == null ? null : ConversationDAO.getRelationShipInAPairConversation(firstConversation.getConversationID()));
 
         // start cell factory
         listViewCol2.setItems(dmList);
@@ -102,10 +122,10 @@ public class ChatController extends GridPane {
 
     void update() {
         dmList.clear();
-        dmList.addAll(new UserDAO().getConv());
+        dmList.addAll(ConversationDAO.getConv());
         listViewCol2.getSelectionModel().select(0);
         if (!dmList.isEmpty()) {
-            chatWindowController.changeCurConv(listViewCol2.getSelectionModel().getSelectedItem());
+            if (listViewCol2.getSelectionModel().getSelectedItem() != null) chatWindowController.changeCurConv(listViewCol2.getSelectionModel().getSelectedItem(), new ConversationDAO().getRelationShipInAPairConversation(listViewCol2.getSelectionModel().getSelectedItem().getConversationID()));
         }
     }
 
@@ -114,17 +134,30 @@ public class ChatController extends GridPane {
     }
 
     public synchronized static void handleNewMessage(Message msg) {
+        int cnt = 0;
         for (Conversation conv : dmList) {
             if (conv.getConversationID() == msg.getConversationId()) {
                 conv.setContent(msg.getContent());
                 conv.setLastContentDateTime(msg.getSentAt());
                 dmList.remove(conv);
                 dmList.add(0, conv);
+                cnt++;
                 break;
             }
         }
-
+        if (cnt == 0) {
+            Conversation conv = ConversationDAO.getConv(msg.getConversationId());
+            if (conv.getType().equals("PAIR")) {
+                conv.setName(msg.getSender());
+            }
+            conv.setContent(msg.getContent());
+            conv.setLastContentDateTime(msg.getSentAt());
+            dmList.add(0, conv);
+        }
         chatWindowController.handleNewMessage(msg);
+
+
+
 
     }
 

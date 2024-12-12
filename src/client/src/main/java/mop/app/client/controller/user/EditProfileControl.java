@@ -1,19 +1,12 @@
 package mop.app.client.controller.user;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import mop.app.client.Client;
-import mop.app.client.dao.user.UserDAO;
-import mop.app.client.model.user.Conversation;
-import mop.app.client.model.user.Message;
 
 import java.io.IOException;
-import java.net.URL;
 
 
 public class EditProfileControl extends VBox {

@@ -9,18 +9,19 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import mop.app.client.Client;
 import mop.app.client.model.user.Conversation;
+import mop.app.client.model.user.MessageInConversation;
+import mop.app.client.model.user.Relationship;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.List;
 
 public class ListSearch extends VBox {
-    ObservableList<Conversation> strangersObs = FXCollections.observableArrayList();
-    ObservableList<Conversation> searchMessagesObs = FXCollections.observableArrayList();
+    ObservableList<Relationship> strangersObs = FXCollections.observableArrayList();
+    ObservableList<MessageInConversation> searchMessagesObs = FXCollections.observableArrayList();
     @FXML
-    ListView<Conversation> strangers;
+    ListView<Relationship> strangers;
     @FXML
-    ListView<Conversation> searchMessages;
+    ListView<MessageInConversation> searchMessages;
 
     public ListSearch(ChatWindowController chatWindowController) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(Client.class.getResource("view/user/search-vbox.fxml"));
@@ -29,18 +30,18 @@ public class ListSearch extends VBox {
         fxmlLoader.load();
 
         VBox.setVgrow(this, Priority.ALWAYS);
-        strangers.setCellFactory(lv -> new CustomListCell());
+        strangers.setCellFactory(lv -> new UserCustomListCell());
         strangers.setItems(strangersObs);
-        searchMessages.setCellFactory(lv -> new CustomListCell());
+        searchMessages.setCellFactory(lv -> new ConversationCustomListCell<>());
         searchMessages.setItems(searchMessagesObs);
     }
 
-    public void setStrangers(List<Conversation> list) {
+    public void setStrangers(List<Relationship> list) {
         strangersObs.clear();
         strangersObs.addAll(list);
     }
 
-    public void setSearchMessages(List<Conversation> list) {
+    public void setSearchMessages(List<MessageInConversation> list) {
         searchMessagesObs.clear();
         searchMessagesObs.addAll(list);
     }

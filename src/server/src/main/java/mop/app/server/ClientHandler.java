@@ -54,11 +54,12 @@ public class ClientHandler implements Runnable {
 
                     Response response = processRequest(request);
                     String jsonResponse = objectMapper.writeValueAsString(response);
-                    logger.info("Response: {}", response);
+
                     synchronized (client.getOut()) {
                         client.getOut().writeObject(jsonResponse);
                         client.getOut().flush();
                     }
+                    logger.info("Response: {}", response);
             }
         } catch (IOException | ClassNotFoundException e) {
             logger.error("Client has disconnected: {}", e.getMessage());

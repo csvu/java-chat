@@ -1,14 +1,12 @@
 package mop.app.client.controller.user;
 
-import javafx.collections.ObservableList;
 import javafx.scene.control.ListCell;
 import mop.app.client.model.user.Conversation;
-import mop.app.client.model.user.Message;
 
-public class CustomListCell extends ListCell<Conversation> {
+public class ConversationCustomListCell<T extends Conversation> extends ListCell<T> {
     IconLabel iconLabel = null;
     @Override
-    protected void updateItem(Conversation item, boolean empty) {
+    protected void updateItem(T item, boolean empty) {
         super.updateItem(item, empty);
         if (empty || item == null) {
             setText(null);

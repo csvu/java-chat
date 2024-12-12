@@ -21,6 +21,7 @@ public class Main {
                     "\tEN.USER_ID = ?");
             Client.main(args);
         } catch (Exception e) {
+            e.printStackTrace();
             logger.error("Error starting client application: " + e.getMessage());
         }
     }

@@ -70,7 +70,7 @@ public class Client extends Application {
                 stage.setResizable(false);
                 stage.setScene(scene);
                 stage.show();
-                socketClient.start();
+
             } else {
                 logger.error("Could not retrieve user role");
                 throw new RuntimeException("Could not retrieve user role");

@@ -18,6 +18,7 @@ public class Message implements Serializable {
     private String content;
     private int conversationId;
     private int senderId;
+    private int msgId;
 
 }
 

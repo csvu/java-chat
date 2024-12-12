@@ -23,7 +23,7 @@ public class SocketClient implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(SocketClient.class);
     private static final String SERVER_HOST = "localhost";
     private static final int SERVER_PORT = 8888;
-    Thread thread;
+    Thread thread = new Thread(this);;
 
     private Socket socket;
     private ObjectOutputStream out;
@@ -35,7 +35,7 @@ public class SocketClient implements Runnable {
             out = new ObjectOutputStream(socket.getOutputStream());
             in = new ObjectInputStream(socket.getInputStream());
 
-            thread = new Thread(this);
+
             thread.setDaemon(true);
 
 
@@ -54,14 +54,16 @@ public class SocketClient implements Runnable {
 
     public String sendRequest(String request) {
         try {
-                    logger.info("Sending request to server: {}", request);
-                    out.writeObject(request);
-                    out.flush();
+            logger.info("Sending request to server: {}", request);
+            out.writeObject(request);
+            out.flush();
+            String response;
+            synchronized (in) {
+                response = (String) in.readObject();
+                logger.info("Received response from server: {}", response);
+            }
 
-                    String response = (String) in.readObject();
-                    logger.info("Received response from server: {}", response);
-
-                    return response;
+            return response;
         } catch (IOException | ClassNotFoundException e) {
             logger.error("Failed to send request to server: {}", e.getMessage());
             return null;
@@ -84,6 +86,7 @@ public class SocketClient implements Runnable {
             if (socket != null) socket.close();
             if (out != null) out.close();
             if (in != null) in.close();
+            if (thread != null) thread.interrupt();
         } catch (IOException e) {
             logger.error("Failed to close connection: {}", e.getMessage());
         }
@@ -95,6 +98,7 @@ public class SocketClient implements Runnable {
             // Register CHAT_ACTIVITY
             registerActivity();
             while (true) {
+                logger.info("Waiting for data from server...");
                 String rawInputFromServer = in.readObject().toString();
                 if (rawInputFromServer == null) {
                     logger.error("Data from server is null");
@@ -111,6 +115,8 @@ public class SocketClient implements Runnable {
             }
         } catch (IOException | ClassNotFoundException e) {
             logger.error("Client has disconnected: {}", e.getMessage());
+        } catch (Exception e) {
+            logger.error("Error: {}", e.getMessage());
         } finally {
             close();
         }

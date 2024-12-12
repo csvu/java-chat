@@ -13,7 +13,7 @@ import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 import javafx.util.Pair;
 import mop.app.client.Client;
-import mop.app.client.dao.user.UserDAO;
+import mop.app.client.dao.user.ConversationDAO;
 import mop.app.client.model.user.Conversation;
 import mop.app.client.model.user.Message;
 import org.slf4j.Logger;
@@ -60,14 +60,14 @@ public class FriendController extends GridPane {
 
 
         // Default pressed
-        friendListObservable.addAll(new UserDAO().getFriends());
+        friendListObservable.addAll(ConversationDAO.getFriends());
         friendList.getStyleClass().clear();
         friendList.getStyleClass().add("PressedWrapper");
 
 
         curFriend = friendListObservable == null ? null : !friendListObservable.isEmpty() ? friendListObservable.getFirst() : null;
 
-        chatWindowController = new ChatWindowController(curFriend, () -> {}, (msg, curConv) -> {});
+        chatWindowController = new ChatWindowController(curFriend, null, () -> {}, (msg, curConv) -> {});
         //Init GUI
 
 
@@ -80,8 +80,8 @@ public class FriendController extends GridPane {
             }
             Conversation curConv = new Conversation(item);
             curConv.setType("PAIR");
-            curConv.setConversationID(new UserDAO().getPairConversationId(item.getConversationID()));
-            chatWindowController.changeCurConv(curConv);
+            curConv.setConversationID(ConversationDAO.getPairConversationId(item.getConversationID()));
+            chatWindowController.changeCurConv(curConv, ConversationDAO.getRelationShipInAPairConversation(curConv.getConversationID()));
 
         };
 
@@ -98,7 +98,7 @@ public class FriendController extends GridPane {
                 (item)->{},
                 Arrays.asList(new Pair<String, Consumer<Conversation>>(
                         "view/user/accept-svgrepo-com.png", item -> {
-                            new UserDAO().acceptFriendRequest(item.getConversationID(), item.getName());
+                            ConversationDAO.acceptFriendRequest(item.getConversationID(), item.getName());
                             Conversation newItem = new Conversation(item);
                             newItem.setType("PAIR");
                             ChatController.getDmList().add(newItem);
@@ -116,7 +116,7 @@ public class FriendController extends GridPane {
         //Handlers
         friendList.setOnMouseClicked((e)->{
             friendListObservable.clear();
-            friendListObservable.addAll(new UserDAO().getFriends());
+            friendListObservable.addAll(new ConversationDAO().getFriends());
             getChildren().remove(1);
             getChildren().add(col2);
             curOption.setText("Friend List");
@@ -130,7 +130,7 @@ public class FriendController extends GridPane {
         });
         friendRequests.setOnMouseClicked((e)->{
             friendRequestsList.clear();
-            friendRequestsList.addAll(new UserDAO().getFriendRequests());
+            friendRequestsList.addAll(new ConversationDAO().getFriendRequests());
             getChildren().remove(1);
             getChildren().add(col2);
             curOption.setText("Friend Requests");

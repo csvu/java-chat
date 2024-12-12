@@ -33,10 +33,11 @@ public class MessageController {
 
                 try {
                     String jsonResponse = objectMapper.writeValueAsString(request);
-                    System.out.println("Sending message to client: " + jsonResponse);
+
                     synchronized (client.getOut()) {
                         client.getOut().writeObject(jsonResponse);
                         client.getOut().flush();
+                        System.out.println("Sending message to client: " + jsonResponse);
                     }
 
                 } catch (IOException e) {
