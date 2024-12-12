@@ -4,10 +4,15 @@ package mop.app.client.controller.admin;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import mop.app.client.Client;
+import mop.app.client.dao.AuthDAO;
+import mop.app.client.util.PreProcess;
 import mop.app.client.util.ViewHelper;
 import mop.app.client.util.ViewModel;
 import org.slf4j.Logger;
@@ -26,6 +31,8 @@ public class NavigationController implements Initializable {
     private Button statisticButton;
     @FXML
     private Button spamButton;
+    @FXML
+    private Button friendButton;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -34,6 +41,7 @@ public class NavigationController implements Initializable {
         groupButton.setOnAction(event -> onGroup());
         statisticButton.setOnAction(event -> onStatistic());
         spamButton.setOnAction(event -> onSpam());
+        friendButton.setOnAction(event -> onFriend());
     }
 
     private void onDashboard() {
@@ -44,6 +52,11 @@ public class NavigationController implements Initializable {
     private void onUser() {
         logger.info("User button clicked");
         ViewModel.getInstance().getViewFactory().getSelectedView().set("User");
+    }
+
+    private void onFriend() {
+        logger.info("Friend button clicked");
+        ViewModel.getInstance().getViewFactory().getSelectedView().set("Friend");
     }
 
     private void onGroup() {
@@ -62,6 +75,13 @@ public class NavigationController implements Initializable {
     }
 
     public void handleLogout(ActionEvent event) throws IOException {
+        ExecutorService threadpool = Executors.newSingleThreadExecutor();
+        threadpool.execute(() -> {
+            PreProcess.deleteUserInformation();
+            AuthDAO authDAO = new AuthDAO();
+            authDAO.updateUserStatus(Client.currentUser.getUserId(), false);
+        });
+
         ViewHelper.getIndexScene(event);
     }
 }

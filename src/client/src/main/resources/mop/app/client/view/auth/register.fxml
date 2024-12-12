@@ -106,7 +106,8 @@
                                 <!-- Date of Birth -->
                                 <Label styleClass="form-text" text="Date of Birth:" GridPane.columnIndex="0"
                                        GridPane.rowIndex="5"/>
-                                <DatePicker fx:id="dateOfBirthPicker" promptText="Select your date of birth (MM/dd/yyyy)"
+                                <DatePicker fx:id="dateOfBirthPicker"
+                                            promptText="Select your date of birth (MM/dd/yyyy)"
                                             styleClass="date-picker" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
 
                                 <!-- Address -->

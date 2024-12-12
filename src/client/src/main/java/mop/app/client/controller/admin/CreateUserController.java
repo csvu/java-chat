@@ -1,9 +1,12 @@
 package mop.app.client.controller.admin;
 
+import java.sql.Date;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -13,7 +16,11 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.util.StringConverter;
+import mop.app.client.dao.AuthDAO;
+import mop.app.client.dao.RoleDAO;
+import mop.app.client.dto.UserDTO;
 import mop.app.client.util.AlertDialog;
+import mop.app.client.util.PasswordUtil;
 import mop.app.client.util.ViewModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,23 +29,30 @@ public class CreateUserController {
     private static final Logger logger = LoggerFactory.getLogger(CreateUserController.class);
 
     @FXML
-    public TextField usernameField;
+    private TextField usernameField;
     @FXML
-    public TextField displayNameField;
+    private TextField displayNameField;
     @FXML
-    public TextField emailField;
+    private TextField emailField;
     @FXML
-    public ComboBox<String> genderComboBox;
+    private ComboBox<String> genderComboBox;
     @FXML
-    public DatePicker birthdayPicker;
+    private DatePicker birthdayPicker;
     @FXML
-    public ComboBox<String> roleComboBox;
+    private ComboBox<String> roleComboBox;
     @FXML
-    public TextArea addressArea;
+    private TextArea addressArea;
     @FXML
-    public PasswordField passwordField;
+    private PasswordField passwordField;
     @FXML
-    public PasswordField confirmPasswordField;
+    private PasswordField confirmPasswordField;
+    private final AuthDAO authDAO;
+    private final RoleDAO roleDAO;
+
+    public CreateUserController() {
+        this.authDAO = new AuthDAO();
+        this.roleDAO = new RoleDAO();
+    }
 
     @FXML
     public void initialize() {
@@ -115,10 +129,178 @@ public class CreateUserController {
         }
     }
 
+    @FXML
     public void handleBack(ActionEvent event) {
         ViewModel.getInstance().getViewFactory().getSelectedView().set("User");
     }
 
-    public void createSave(ActionEvent event) {
+    @FXML
+    public void handleCreate(ActionEvent event) {
+        String email = emailField.getText();
+        String username = usernameField.getText();
+        String password = passwordField.getText();
+        String confirmPassword = confirmPasswordField.getText();
+        String displayName = displayNameField.getText();
+        String gender = genderComboBox.getValue();
+        String address = addressArea.getText();
+        String role = roleComboBox.getValue();
+
+        if (email.isEmpty() || username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() ||
+            displayName.isEmpty() || address.isEmpty() || gender == null || role == null) {
+            AlertDialog.showAlertDialog(
+                Alert.AlertType.ERROR,
+                "Validation Error",
+                "Please fill in all fields.",
+                ""
+            );
+            return;
+        }
+
+        if (!password.equals(confirmPassword)) {
+            AlertDialog.showAlertDialog(
+                Alert.AlertType.ERROR,
+                "Validation Error",
+                "Passwords do not match.",
+                ""
+            );
+            return;
+        }
+
+        LocalDate birthDate = birthdayPicker.getValue();
+        if (birthDate == null) {
+            AlertDialog.showAlertDialog(
+                Alert.AlertType.ERROR,
+                "Validation Error",
+                "Please enter a valid birth date.",
+                ""
+            );
+            return;
+        }
+        Date sqlDate = Date.valueOf(birthDate);
+
+        // Check if the email is unique
+        if (!authDAO.isEmailExists(email)) {
+            AlertDialog.showAlertDialog(
+                Alert.AlertType.ERROR,
+                "Validation Error",
+                "Email is already taken.",
+                ""
+            );
+            return;
+        }
+
+        // Check if the username is unique
+        if (!authDAO.isUsernameExists(username)) {
+            AlertDialog.showAlertDialog(
+                Alert.AlertType.ERROR,
+                "Validation Error",
+                "Username is already taken.",
+                ""
+            );
+            return;
+        }
+
+        // Check password strength
+        if (!PasswordUtil.isStrongPassword(password)) {
+            logger.info("Password is not strong enough: " + password);
+            AlertDialog.showAlertDialog(
+                Alert.AlertType.ERROR,
+                "Error",
+                "Invalid password",
+                """
+                    Password must be at least 8 characters long and contain:
+                    - At least one uppercase letter
+                    - At least one lowercase letter
+                    - At least one number
+                    - At least one special character (@$!%*?&_-)
+                    """
+            );
+            return;
+        }
+
+        if (displayName.equals("Deleted User")) {
+            AlertDialog.showAlertDialog(
+                Alert.AlertType.ERROR,
+                "Validation Error",
+                "Display name cannot be 'Deleted User'.",
+                ""
+            );
+            return;
+        }
+
+        long roleId = roleDAO.getRoleIdByRoleName(role.toUpperCase());
+
+        UserDTO user = UserDTO.builder()
+            .email(email)
+            .username(username)
+            .password(PasswordUtil.hash(password))
+            .gender(gender)
+            .displayName(displayName)
+            .birthDate(sqlDate)
+            .address(address)
+            .roleID(roleId)
+            .createdAt(new Timestamp(System.currentTimeMillis()))
+            .isActive(false)
+            .isBanned(false)
+            .build();
+
+        Task<UserDTO> createUserTask = new Task<>() {
+            @Override
+            protected UserDTO call() throws Exception {
+                return authDAO.register(user);
+            }
+
+            @Override
+            protected void succeeded() {
+                super.succeeded();
+                UserDTO registeredUser = getValue();
+                if (registeredUser != null) {
+                    Platform.runLater(() -> {
+                        AlertDialog.showAlertDialog(
+                            Alert.AlertType.INFORMATION,
+                            "Registration Successful",
+                            "You have successfully registered.",
+                            "You can now login with your email and password."
+                        );
+                        emailField.clear();
+                        usernameField.clear();
+                        passwordField.clear();
+                        confirmPasswordField.clear();
+                        genderComboBox.setValue(null);
+                        genderComboBox.setPromptText("Select your gender");
+                        displayNameField.clear();
+                        birthdayPicker.setValue(null);
+                        birthdayPicker.setPromptText("Select your date of birth (MM/dd/yyyy)");
+                        roleComboBox.setValue(null);
+                        roleComboBox.setPromptText("Select your role");
+                        addressArea.clear();
+                    });
+                } else {
+                    Platform.runLater(() -> {
+                        AlertDialog.showAlertDialog(
+                            Alert.AlertType.ERROR,
+                            "Registration Error",
+                            "An error occurred during registration. Please try again.",
+                            ""
+                        );
+                    });
+                }
+            }
+
+            @Override
+            protected void failed() {
+                super.failed();
+                Platform.runLater(() -> {
+                    AlertDialog.showAlertDialog(
+                        Alert.AlertType.ERROR,
+                        "Registration Error",
+                        "An error occurred during registration. Please try again.",
+                        ""
+                    );
+                });
+            }
+        };
+
+        new Thread(createUserTask).start();
     }
 }

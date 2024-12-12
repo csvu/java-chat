@@ -20,6 +20,7 @@ public enum ViewPath {
     USER_LOGIN(String.format("%s/admin/user-login.fxml", Constant.viewFolder)),
     USER_DETAILS(String.format("%s/admin/user-details.fxml", Constant.viewFolder)),
     USER_ACTIVITY(String.format("%s/admin/user-activity.fxml", Constant.viewFolder)),
+    FRIEND(String.format("%s/admin/friend.fxml", Constant.viewFolder)),
     GROUP(String.format("%s/admin/group.fxml", Constant.viewFolder)),
     GROUP_DETAILS(String.format("%s/admin/group-details.fxml", Constant.viewFolder)),
     STATISTIC(String.format("%s/admin/statistic.fxml", Constant.viewFolder)),

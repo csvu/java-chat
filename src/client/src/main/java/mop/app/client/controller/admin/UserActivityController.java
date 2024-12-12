@@ -1,11 +1,8 @@
 package mop.app.client.controller.admin;
 
-import java.sql.Date;
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -30,13 +27,10 @@ public class UserActivityController {
 
     @FXML
     private Label usernameLabel;
-
     @FXML
     private ComboBox<String> filterComboBox;
-
     @FXML
     private AnchorPane contentPane;
-
     private TableView<UserLoginDTO> activityTable;
     private TableView<FriendDTO> friendsTable;
     private TableView<FriendsOfFriendsDTO> friendsOfFriendsTable;
@@ -65,7 +59,7 @@ public class UserActivityController {
         initializeFriendsOfFriendsTable();
 
         userManagementDAO = new UserManagementDAO();
-        applyFilter(null);
+        applyFilter();
     }
 
     private void initializeActivityTable() {
@@ -93,7 +87,7 @@ public class UserActivityController {
         AnchorPane.setRightAnchor(activityTable, 0.0);
         AnchorPane.setBottomAnchor(activityTable, 0.0);
 
-        activityTable.getColumns().addAll(usernameCol, emailCol, displayNameCol, loginDateCol);
+        activityTable.getColumns().addAll(usernameCol, displayNameCol, emailCol, loginDateCol);
         TableStyle.styleTable(
             activityTable,
             List.of(Pos.CENTER_LEFT, Pos.CENTER_LEFT, Pos.CENTER_LEFT, Pos.CENTER_LEFT),
@@ -189,7 +183,7 @@ public class UserActivityController {
     }
 
     @FXML
-    public void applyFilter(ActionEvent event) {
+    private void applyFilter() {
         if (contentPane != null) {
             contentPane.getChildren().clear();
 

@@ -1,12 +1,12 @@
 package mop.app.client.dao;
 
 import java.time.LocalDate;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.control.Alert;
-import mop.app.client.dto.LoginTimeDTO;
+import mop.app.client.dto.FriendStatisticDTO;
 import mop.app.client.dto.UserDTO;
 import mop.app.client.util.HibernateUtil;
 import org.hibernate.Session;
@@ -204,6 +204,21 @@ public class UserManagementDAO {
         return count;
     }
 
+    public long userLoginToday() {
+        long count = 0;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            LocalDate today = LocalDate.now();
+
+            count = session.createQuery(
+                    "SELECT COUNT(DISTINCT o.userId) FROM OpenTimeDTO o WHERE DATE(o.openAt) = :today", Long.class)
+                .setParameter("today", today)
+                .uniqueResult();
+        } catch (Exception e) {
+            logger.error("Failed to get user login count for today: {}", e.getMessage());
+        }
+        return count;
+    }
+
     public List<Object[]> getLoginTimeByUserId(long userId) {
         List<Object[]> loginTimes = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
@@ -265,6 +280,90 @@ public class UserManagementDAO {
         return friendsOfFriends;
     }
 
+    public long totalFriends(long userId) {
+        long friends = 0;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "SELECT COUNT(r) FROM RelationshipDTO r " +
+                "JOIN RelationshipTypeDTO rt ON r.status = rt.id " +
+                "WHERE r.userId1 = :userId AND rt.typeName = 'FRIEND'";
+            Query<Long> query = session.createQuery(hql, Long.class);
+            query.setParameter("userId", userId);
+            friends = query.uniqueResult();
+        } catch (Exception e) {
+            logger.error("Failed to get total friends for user {}: {}", userId, e.getMessage());
+        }
+        return friends;
+    }
+
+    public long totalFriendsOfFriends(long userId) {
+        long friendsOfFriends = 0;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "SELECT COUNT(DISTINCT u) FROM UserDTO u " +
+                "JOIN RelationshipDTO r1 ON u.id = r1.userId2 " +
+                "JOIN RelationshipTypeDTO rt1 ON r1.status = rt1.id " +
+                "JOIN RelationshipDTO r2 ON r1.userId1 = r2.userId2 " +
+                "JOIN RelationshipTypeDTO rt2 ON r2.status = rt2.id " +
+                "WHERE r2.userId1 = :userId " +
+                "AND rt1.typeName = 'FRIEND' " +
+                "AND rt2.typeName = 'FRIEND' " +
+                "AND u.id != :userId " +
+                "AND u.id NOT IN (" +
+                "SELECT f.userId2 FROM RelationshipDTO f " +
+                "JOIN RelationshipTypeDTO ft ON f.status = ft.id " +
+                "WHERE f.userId1 = :userId AND ft.typeName = 'FRIEND'" +
+                ")";
+            Query<Long> query = session.createQuery(hql, Long.class);
+            query.setParameter("userId", userId);
+            friendsOfFriends = query.uniqueResult();
+        } catch (Exception e) {
+            logger.error("Failed to get total friends of friends for user {}: {}", userId, e.getMessage());
+        }
+        return friendsOfFriends;
+    }
+
+    public List<FriendStatisticDTO> getUserStatistics() {
+        List<FriendStatisticDTO> userStatistics = new ArrayList<>();
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "SELECT " +
+                "u.username, " +
+                "u.email, " +
+                "u.displayName, " +
+                "(SELECT COUNT(r1) FROM RelationshipDTO r1 " +
+                "JOIN RelationshipTypeDTO rt1 ON r1.status = rt1.id " +
+                "WHERE r1.userId1 = u.userId AND rt1.typeName = 'FRIEND'), " +
+                "(SELECT COUNT(DISTINCT u2) FROM UserDTO u2 " +
+                "JOIN RelationshipDTO r1 ON u2.id = r1.userId2 " +
+                "JOIN RelationshipTypeDTO rt1 ON r1.status = rt1.id " +
+                "JOIN RelationshipDTO r2 ON r1.userId1 = r2.userId2 " +
+                "JOIN RelationshipTypeDTO rt2 ON r2.status = rt2.id " +
+                "WHERE r2.userId1 = u.userId " +
+                "AND rt1.typeName = 'FRIEND' " +
+                "AND rt2.typeName = 'FRIEND' " +
+                "AND u2.id != u.userId " +
+                "AND u2.id NOT IN (" +
+                "SELECT f.userId2 FROM RelationshipDTO f " +
+                "JOIN RelationshipTypeDTO ft ON f.status = ft.id " +
+                "WHERE f.userId1 = u.userId AND ft.typeName = 'FRIEND')) " +
+                "FROM UserDTO u";
+
+            List<Object[]> results = session.createQuery(hql, Object[].class).list();
+
+            for (Object[] result : results) {
+                FriendStatisticDTO statistic = new FriendStatisticDTO(
+                    (String) result[0],
+                    (String) result[1],
+                    (String) result[2],
+                    (Long) result[3],
+                    (Long) result[4]
+                );
+                userStatistics.add(statistic);
+            }
+        } catch (Exception e) {
+            logger.error("Failed to get user statistics: {}", e.getMessage());
+        }
+        return userStatistics;
+    }
+
     public List<Object[]> getNewRegistrationsByMonth(int year) {
         List<Object[]> result = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
@@ -301,8 +400,8 @@ public class UserManagementDAO {
         return result;
     }
 
-//    public static void main(String[] args) {
-//        UserManagementDAO dao = new UserManagementDAO();
+    public static void main(String[] args) {
+        UserManagementDAO dao = new UserManagementDAO();
 //        List<Object[]> friendsOfFriendsData = dao.getFriendsOfFriendsByUserId(9);
 //        for (Object[] data : friendsOfFriendsData) {
 //            UserDTO friendOfFriend = (UserDTO) data[0];
@@ -310,5 +409,10 @@ public class UserManagementDAO {
 //            System.out.println("Friend of Friend: " + friendOfFriend.getUsername() +
 //                ", Direct Friend: " + directFriend.getUsername());
 //        }
-//    }
+
+        List<FriendStatisticDTO> userStatistics = dao.getUserStatistics();
+        for (FriendStatisticDTO statistic : userStatistics) {
+            logger.info(statistic.toString());
+        }
+    }
 }

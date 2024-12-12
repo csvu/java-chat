@@ -16,6 +16,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.StringConverter;
 import mop.app.client.dao.LoginTimeDAO;
+import mop.app.client.dao.OpenTimeDAO;
 import mop.app.client.dto.UserDTO;
 import mop.app.client.dto.UserLoginDTO;
 import mop.app.client.util.AlertDialog;
@@ -31,9 +32,9 @@ public class UserLoginController {
     private static final Logger logger = LoggerFactory.getLogger(UserLoginController.class);
 
     @FXML
-    public TextField usernameFilter;
+    private TextField usernameFilter;
     @FXML
-    public DatePicker dateFilter;
+    private DatePicker dateFilter;
     @FXML
     private TableView<UserLoginDTO> userLoginTable;
     @FXML
@@ -45,12 +46,14 @@ public class UserLoginController {
     private ObservableList<UserLoginDTO> loginTimeObservableList;
     private ObservableList<UserLoginDTO> filteredLoginTimeList;
     private final LoginTimeDAO loginTimeDAO;
+    private final OpenTimeDAO openTimeDAO;
 
     public UserLoginController() {
         logger.info("Initializing UserLoginController");
         loginTimeObservableList = FXCollections.observableArrayList();
         filteredLoginTimeList = FXCollections.observableArrayList();
         loginTimeDAO = new LoginTimeDAO();
+        openTimeDAO = new OpenTimeDAO();
     }
 
     public void initialize() {
@@ -185,7 +188,8 @@ public class UserLoginController {
         } else {
             ObservableList<UserLoginDTO> filteredList = loginTimeObservableList.filtered(userLoginDTO -> {
                 String username = userLoginDTO.getUsername() != null ? userLoginDTO.getUsername().toLowerCase() : "";
-                String displayName = userLoginDTO.getDisplayName() != null ? userLoginDTO.getDisplayName().toLowerCase() : "";
+                String displayName =
+                    userLoginDTO.getDisplayName() != null ? userLoginDTO.getDisplayName().toLowerCase() : "";
 
                 return username.contains(filterText.toLowerCase()) || displayName.contains(filterText.toLowerCase());
             });
@@ -195,7 +199,7 @@ public class UserLoginController {
     }
 
     @FXML
-    public void applyFilter(ActionEvent event) {
+    private void applyFilter() {
         LocalDate selectedDate = dateFilter.getValue();
         String currentUsername = usernameFilter.getText().trim();
 
@@ -235,7 +239,8 @@ public class UserLoginController {
                         boolean dateMatches = loginDateString.equals(selectedDateString);
 
                         String username = loginDTO.getUsername() != null ? loginDTO.getUsername().toLowerCase() : "";
-                        String displayName = loginDTO.getDisplayName() != null ? loginDTO.getDisplayName().toLowerCase() : "";
+                        String displayName =
+                            loginDTO.getDisplayName() != null ? loginDTO.getDisplayName().toLowerCase() : "";
 
                         boolean usernameMatches = username.contains(currentUsername.toLowerCase()) ||
                             displayName.contains(currentUsername.toLowerCase());

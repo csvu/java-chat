@@ -32,9 +32,9 @@ public class SpamController {
     private static final Logger logger = LoggerFactory.getLogger(SpamController.class);
 
     @FXML
-    public TextField usernameFilter;
+    private TextField usernameFilter;
     @FXML
-    public DatePicker dateFilter;
+    private DatePicker dateFilter;
     @FXML
     private TableView<ReportDTO> spamReportsTable;
     @FXML
@@ -401,7 +401,7 @@ public class SpamController {
     }
 
     @FXML
-    public void applyFilter(ActionEvent event) {
+    private void applyFilter() {
         LocalDate selectedDate = dateFilter.getValue();
         String currentUsername = usernameFilter.getText().trim();
 

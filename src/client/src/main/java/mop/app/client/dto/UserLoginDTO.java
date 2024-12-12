@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserLoginDTO {
     private String username;
-    private String displayName;
     private String email;
+    private String displayName;
     private Timestamp loginAt;
 
     public UserLoginDTO(UserDTO user, Timestamp loginTime) {

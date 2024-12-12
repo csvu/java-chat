@@ -43,14 +43,27 @@
             </StackPane>
 
             <!-- Active Users Card -->
-            <StackPane styleClass="metric-card, clickable-card" fx:id="activeUsersCard"
+            <StackPane styleClass="metric-card, clickable-card" fx:id="onlineUsersCard"
                        onMouseClicked="#showActiveUsers">
                 <padding>
                     <Insets top="15.0" right="20.0" bottom="15.0" left="20.0"/>
                 </padding>
                 <VBox>
-                    <Label styleClass="metric-label" text="Active Users"/>
-                    <Label fx:id="activeUsersLabel" styleClass="metric-value" text="0"/>
+                    <Label styleClass="metric-label" text="Online Users"/>
+                    <Label fx:id="onlineUsersLabel" styleClass="metric-value" text="0"/>
+                    <Label styleClass="metric-subtitle" text="Click to view more details"/>
+                </VBox>
+            </StackPane>
+
+            <!-- User Login History Card -->
+            <StackPane styleClass="metric-card, clickable-card" fx:id="userLoginHistoryCard"
+                       onMouseClicked="#showUserLoginHistory">
+                <padding>
+                    <Insets top="15.0" right="20.0" bottom="15.0" left="20.0"/>
+                </padding>
+                <VBox>
+                    <Label styleClass="metric-label" text="Users Access Today"/>
+                    <Label fx:id="userLoginHistoryLabel" styleClass="metric-value" text="0"/>
                     <Label styleClass="metric-subtitle" text="Click to view more details"/>
                 </VBox>
             </StackPane>
