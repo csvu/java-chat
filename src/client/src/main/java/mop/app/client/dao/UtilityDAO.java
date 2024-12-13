@@ -58,7 +58,7 @@ public class UtilityDAO {
             String connString = "jdbc:" + dbms + "://" + serverName +
                 ":" + this.port + "/" + dbName;
             conn = DriverManager.getConnection(connString, connectionProps);
-            conn.setAutoCommit(false);
+//            conn.setAutoCommit(false);
 //            conn.setCatalog(dbName);
 
             logger.info("Connected to database: {}", conn.getCatalog());

@@ -28,13 +28,14 @@ import mop.app.client.dto.RequestType;
 import mop.app.client.model.user.Conversation;
 import mop.app.client.model.user.Message;
 import mop.app.client.model.user.Relationship;
-import mop.app.client.network.SocketClient;
+import mop.app.client.network.AsyncSocketClient;
 import mop.app.client.util.ObjectMapperConfig;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.util.ArrayList;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 
@@ -85,6 +86,10 @@ public class ChatWindowController extends GridPane {
 
     private final IconLabel addFriend;
 
+    private final ContextMenu msgContextMenu = new ContextMenu();
+    private final MenuItem deleteMsg = new MenuItem("Delete Message");
+
+
     private final Text sizeHelper = new Text();;
     private double oldHeight = 0;
 
@@ -95,7 +100,7 @@ public class ChatWindowController extends GridPane {
     private int cursorMsgId = maxCursor;
     private final BiConsumer<Message, Conversation> onNewMessage;
 
-    public ChatWindowController(Conversation inpConversation, Relationship inpRelationship, Runnable onUpdate, BiConsumer<Message, Conversation> onNewMessage) throws IOException {
+    public ChatWindowController(Conversation inpConversation, Relationship inpRelationship, Runnable onChatControllerUpdate, BiConsumer<Message, Conversation> onNewMessage) throws IOException {
         this.curConversation = inpConversation;
         this.onNewMessage = onNewMessage;
         this.curRelationship = inpRelationship;
@@ -104,6 +109,8 @@ public class ChatWindowController extends GridPane {
         fxmlLoader.setController(this);
         fxmlLoader.load();
         System.out.println(col2.getChildren().size());
+
+
 
         if (this.curRelationship == null) {
             addFriend = new IconLabel(null, "null", null, null);
@@ -116,17 +123,26 @@ public class ChatWindowController extends GridPane {
         addFriend.setOnMouseClicked(e -> {
             if (curRelationship == null) return;
             if (curRelationship.getStatus().equals("N/A")) {
-                new ConversationDAO().makeFriendRequest(curRelationship.getId());
+                ConversationDAO.makeFriendRequest(curRelationship.getId());
                 this.curRelationship.setStatus("PENDING");
                 addFriend.update(null, "Cancel Friend Request", null, null);
             } else {
-                new ConversationDAO().cancelFriendRequest(this.curRelationship.getId());
+                ConversationDAO.cancelFriendRequest(this.curRelationship.getId());
                 this.curRelationship.setStatus("N/A");
                 addFriend.update(Client.class.getResource("view/user/add-friend-basic-outline-svgrepo-com.png"), "Add Friend", null, null);
             }
         });
 
+        msgWindow.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
+
+        deleteMsg.setOnAction(e->{
+            for (Message msg : new ArrayList<>(msgWindow.getSelectionModel().getSelectedItems())) {
+                MessageDAO.deleteMessage(msg.getMsgId());
+                convMsg.remove(msg);
+            }
+        });
+        msgContextMenu.getItems().add(deleteMsg);
 
         updateChatInfo();
 
@@ -145,6 +161,8 @@ public class ChatWindowController extends GridPane {
                 par.setPrefHeight(chatArea.getPrefHeight() + par.getPadding().getBottom() + par.getPadding().getTop());
             }
         });
+
+        //Event Handling
         chatArea.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.ENTER) {
                 if (event.isShiftDown()) {
@@ -162,28 +180,29 @@ public class ChatWindowController extends GridPane {
         });
 
         groupAdd.setOnMouseClicked(e -> {
-            Stage stage = new Stage();
-            Scene scene = null;
             try {
-                scene = new Scene(new GroupAddController(this.curConversation, () -> {
-                    onUpdate.run();
-                    stage.close();
+                ModalUtil modal = new ModalUtil(e);
+                modal.setScene(new GroupAddController(this.curConversation, () -> {
+                    onChatControllerUpdate.run();
+                    modal.close();
+                }));
+                modal.show();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+
+        searchInInfo.setOnMouseClicked(e->{
+            ModalUtil modal = new ModalUtil(e);
+            try {
+                modal.setScene(new SearchMessageControl(this.curConversation, (msg) -> {
+                    this.setConvMsg(msg.getMsgId());
+                    modal.close();
                 }));
             } catch (IOException ex) {
-                System.out.println(ex.getMessage());
+                throw new RuntimeException(ex);
             }
-            stage.setScene(scene);
-            stage.setResizable(false);
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.initOwner(((Node)e.getSource()).getScene().getWindow() );
-            try {
-                stage.getIcons().add(new Image(Objects.requireNonNull(Client.class.getResourceAsStream("images/app-icon.png"))));
-            } catch (Exception ex) {
-                System.out.println("Failed to load application icon" +  ex);
-            }
-
-            stage.setTitle("MOP Application");
-            stage.show();
+            modal.show();
         });
 
         members.setOnMouseClicked(e -> {
@@ -191,7 +210,7 @@ public class ChatWindowController extends GridPane {
             Scene scene = null;
             try {
                 scene = new Scene(new GroupMembersController(this.curConversation, () -> {
-                    onUpdate.run();
+                    onChatControllerUpdate.run();
                     stage.close();
                 }));
             } catch (IOException ex) {
@@ -241,6 +260,8 @@ public class ChatWindowController extends GridPane {
             }
         });
 
+        msgWindow.setContextMenu(msgContextMenu);
+
 
         msgWindow.setItems(convMsg);
         Platform.runLater(() -> {
@@ -275,7 +296,7 @@ public class ChatWindowController extends GridPane {
         }
         writeMsg.setVisible(true);
         col3.setVisible(true);
-        if (curConversation.getType().equals("GROUP")) {
+        if (curConversation.getType().equals(Conversation.GROUP)) {
             if (!topVBox.getChildren().contains(editName)) {
                 topVBox.getChildren().add(1,editName);
             }
@@ -286,7 +307,7 @@ public class ChatWindowController extends GridPane {
             chatInfoHBox.getChildren().add(groupAdd);
 
 
-        } else if (curConversation.getType().equals("PAIR")){
+        } else if (curConversation.getType().equals(Conversation.PAIR)){
             chatOptions.getChildren().add(block);
             chatOptions.getChildren().add(report);
             chatOptions.getChildren().add(deleteChat);
@@ -310,7 +331,7 @@ public class ChatWindowController extends GridPane {
         }
         col2.setVisible(true);
 
-        if (this.curRelationship == null || (!this.curRelationship.getStatus().equals("N/A") && !this.curRelationship.getStatus().equals("PENDING"))) {
+        if (this.curRelationship == null || (!this.curRelationship.getStatus().equals(Relationship.NA) && !this.curRelationship.getStatus().equals(Relationship.PENDING))) {
             col2.getChildren().remove(addFriend);
             if (!col2.getChildren().contains(writeMsg)) {
                 col2.getChildren().add(writeMsg);
@@ -320,7 +341,7 @@ public class ChatWindowController extends GridPane {
                 col2.getChildren().add(1, addFriend);
             }
 
-            if (this.curRelationship.getStatus().equals("PENDING")) {
+            if (this.curRelationship.getStatus().equals(Relationship.PENDING)) {
                 addFriend.update(null, "Cancel Friend Request", null, null);
             } else {
                 addFriend.update(null, "Add Friend", null, null);
@@ -375,7 +396,7 @@ public class ChatWindowController extends GridPane {
     }
 
     void sendMessageNet(Message msg) throws JsonProcessingException {
-            SocketClient socketClient = Client.socketClient;
+            AsyncSocketClient socketClient = Client.socketClient;
 
             if (!socketClient.isConnectionValid()) {
                 return;

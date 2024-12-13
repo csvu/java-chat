@@ -2,7 +2,7 @@ package mop.app.client.controller.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
-import java.sql.Timestamp;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -21,7 +21,9 @@ import mop.app.client.dto.Request;
 import mop.app.client.dto.RequestType;
 import mop.app.client.dto.Response;
 import mop.app.client.dto.UserDTO;
+import mop.app.client.network.AsyncSocketClient;
 import mop.app.client.network.SocketClient;
+import mop.app.client.network.SyncSocketClient;
 import mop.app.client.util.AlertDialog;
 import mop.app.client.util.ObjectMapperConfig;
 import mop.app.client.util.PreProcess;
@@ -78,7 +80,7 @@ public class LoginController {
         logger.info("Attempting to login with email: {}", email);
         logger.info("Attempting to login with password: {}", password);
 
-        SocketClient socketClient = Client.socketClient;
+        AsyncSocketClient socketClient = Client.socketClient;
 
         if (!socketClient.isConnectionValid()) {
             AlertDialog.showAlertDialog(
@@ -99,7 +101,9 @@ public class LoginController {
 
         Request loginRequest = new Request(RequestType.LOGIN, loginData);
         String jsonLoginRequest = mapper.writeValueAsString(loginRequest);
-        String jsonLoginResponse = socketClient.sendRequest(jsonLoginRequest);
+        SyncSocketClient socket = new SyncSocketClient();
+        String jsonLoginResponse = socket.sendRequest(jsonLoginRequest);
+        socket.close();
         Response loginResponse = mapper.readValue(jsonLoginResponse, Response.class);
 
         if (loginResponse.isSuccess()) {
@@ -161,6 +165,7 @@ public class LoginController {
                 stage.setResizable(false);
                 stage.setScene(scene);
                 stage.show();
+                Client.registerActivity();
             }
             LoginTimeDAO loginTimeDAO = new LoginTimeDAO();
             boolean isLoginTime = loginTimeDAO.addLoginTime(user.getUserId());

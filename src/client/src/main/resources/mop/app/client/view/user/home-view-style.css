@@ -55,7 +55,7 @@ TextField:focused {
     -fx-background-color: rgba(255, 255, 255, 0.1);
 }
 
-#listFriend .list-cell:selected {
+#listFriend .list-cell:selected, #listMessage .list-cell:selected, #msgWindow .list-cell:selected {
     -fx-background-color: rgba(255, 255, 255, 0.1);
 }
 

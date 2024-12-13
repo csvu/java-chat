@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory;
 @ToString
 public class ClientHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(ClientHandler.class);
-
     @Getter
     private Client client;
     private AuthController authController;

@@ -4,6 +4,7 @@ import mop.app.client.Client;
 import mop.app.client.dao.UtilityDAO;
 import mop.app.client.model.user.Conversation;
 import mop.app.client.model.user.Message;
+import mop.app.client.model.user.MessageInConversation;
 import mop.app.client.model.user.Relationship;
 
 import java.sql.*;
@@ -101,5 +102,159 @@ public class MessageDAO {
         System.out.println(list);
         list.sort(Comparator.comparingInt(Message::getMsgId));
         return list;
+    }
+
+    public static ArrayList<MessageInConversation> getMatchedMessages(String query) {
+        //Return Users!
+        UtilityDAO utilityDAO = new UtilityDAO();
+        ArrayList<MessageInConversation> list = new ArrayList<>();
+        Connection conn = utilityDAO.getConnection();
+        if(conn == null) {
+            return list;
+        }
+
+        try (PreparedStatement preparedStatement = conn.prepareStatement(
+                "SELECT\n" +
+                        "\tCASE\n" +
+                        "\t\tWHEN CO_TYPE.TYPE_NAME = 'PAIR' THEN (\n" +
+                        "\t\t\tSELECT\n" +
+                        "\t\t\t\tPARTNER.DISPLAY_NAME\n" +
+                        "\t\t\tFROM\n" +
+                        "\t\t\t\tPUBLIC.ENROLLMENT AS EN\n" +
+                        "\t\t\t\tJOIN PUBLIC.\"user\" AS PARTNER ON EN.USER_ID = PARTNER.USER_ID\n" +
+                        "\t\t\tWHERE\n" +
+                        "\t\t\t\tEN.USER_ID <> ?\n" +
+                        "\t\t\t\tAND CONVERSATION_ID = CO.CONVERSATION_ID\n" +
+                        "\t\t\tLIMIT\n" +
+                        "\t\t\t\t1\n" +
+                        "\t\t)\n" +
+                        "\t\tELSE CO.NAME\n" +
+                        "\tEND AS DISPLAY_NAME,\n" +
+                        "\tCO.CONVERSATION_ID,\n" +
+                        "\tME.CONTENT,\n" +
+                        "\tCO_TYPE.TYPE_NAME,\n" +
+                        "\tME.MSG_ID\n" +
+                        "FROM\n" +
+                        "\tPUBLIC.ENROLLMENT EN\n" +
+                        "\tJOIN PUBLIC.CONVERSATION CO ON EN.CONVERSATION_ID = CO.CONVERSATION_ID\n" +
+                        "\tJOIN PUBLIC.CONVERSATION_TYPE CO_TYPE ON CO.TYPE_ID = CO_TYPE.TYPE_ID\n" +
+                        "\tJOIN PUBLIC.MESSAGE ME ON EN.CONVERSATION_ID = ME.CONVERSATION_ID\n" +
+                        "WHERE\n" +
+                        "\tEN.USER_ID = ?\n" +
+                        "\tAND ME.CONTENT ILIKE ?")) {
+
+            preparedStatement.setInt(1, (int) Client.currentUser.getUserId());
+            preparedStatement.setInt(2, (int) Client.currentUser.getUserId());
+            preparedStatement.setString(3, "%" + query + "%");
+
+
+            System.out.println("SHI");
+            ResultSet rs = preparedStatement.executeQuery();
+
+            while (rs.next()) {
+                int userId = rs.getInt("conversation_id");
+                System.out.print(userId);
+                String displayName = rs.getString("DISPLAY_NAME");
+                String content = rs.getString("content");
+                String type = rs.getString("type_name");
+                int msgId = rs.getInt("msg_id");
+                MessageInConversation conversation = new MessageInConversation(msgId, userId, type, null , displayName, false, null, content);
+                list.add(conversation);
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return list;
+    }
+
+    public static ArrayList<MessageInConversation> getMatchedMessages(int conversationId, String query) {
+        //Return Users!
+        UtilityDAO utilityDAO = new UtilityDAO();
+        ArrayList<MessageInConversation> list = new ArrayList<>();
+        Connection conn = utilityDAO.getConnection();
+        if(conn == null) {
+            return list;
+        }
+
+        try (PreparedStatement preparedStatement = conn.prepareStatement(
+                "SELECT\n" +
+                        "\tCASE\n" +
+                        "\t\tWHEN CO_TYPE.TYPE_NAME = 'PAIR' THEN (\n" +
+                        "\t\t\tSELECT\n" +
+                        "\t\t\t\tPARTNER.DISPLAY_NAME\n" +
+                        "\t\t\tFROM\n" +
+                        "\t\t\t\tPUBLIC.ENROLLMENT AS EN\n" +
+                        "\t\t\t\tJOIN PUBLIC.\"user\" AS PARTNER ON EN.USER_ID = PARTNER.USER_ID\n" +
+                        "\t\t\tWHERE\n" +
+                        "\t\t\t\tEN.USER_ID <> ?\n" +
+                        "\t\t\t\tAND CONVERSATION_ID = CO.CONVERSATION_ID\n" +
+                        "\t\t\tLIMIT\n" +
+                        "\t\t\t\t1\n" +
+                        "\t\t)\n" +
+                        "\t\tELSE CO.NAME\n" +
+                        "\tEND AS DISPLAY_NAME,\n" +
+                        "\tCO.CONVERSATION_ID,\n" +
+                        "\tME.CONTENT,\n" +
+                        "\tCO_TYPE.TYPE_NAME,\n" +
+                        "\tME.MSG_ID\n" +
+                        "FROM\n" +
+                        "\tPUBLIC.ENROLLMENT EN\n" +
+                        "\tJOIN PUBLIC.CONVERSATION CO ON EN.CONVERSATION_ID = CO.CONVERSATION_ID\n" +
+                        "\tJOIN PUBLIC.CONVERSATION_TYPE CO_TYPE ON CO.TYPE_ID = CO_TYPE.TYPE_ID\n" +
+                        "\tJOIN PUBLIC.MESSAGE ME ON EN.CONVERSATION_ID = ME.CONVERSATION_ID\n" +
+                        "WHERE\n" +
+                        "\tEN.USER_ID = ?\n" +
+                        "\tAND ME.CONTENT ILIKE ?\n" +
+                        "\tAND CO.CONVERSATION_ID = ?"
+        )) {
+
+            preparedStatement.setInt(1, (int) Client.currentUser.getUserId());
+            preparedStatement.setInt(2, (int) Client.currentUser.getUserId());
+            preparedStatement.setString(3, "%" + query + "%");
+            preparedStatement.setInt(4, conversationId);
+
+            System.out.println("SHI");
+            ResultSet rs = preparedStatement.executeQuery();
+
+            while (rs.next()) {
+                int userId = rs.getInt("conversation_id");
+                System.out.print(userId);
+                String displayName = rs.getString("DISPLAY_NAME");
+                String content = rs.getString("content");
+                String type = rs.getString("type_name");
+                int msgId = rs.getInt("msg_id");
+                MessageInConversation conversation = new MessageInConversation(msgId, userId, type, null , displayName, false, null, content);
+                list.add(conversation);
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        System.out.println("GET MSG IN CONV " + list.size());
+        return list;
+    }
+
+    public static void deleteMessage(int msgId) {
+        UtilityDAO utilityDAO = new UtilityDAO();
+        Connection conn = utilityDAO.getConnection();
+        if(conn == null) {
+            return;
+        }
+
+        try (PreparedStatement preparedStatement = conn.prepareStatement(
+                "delete from public.message where msg_id = ?")) {
+
+            preparedStatement.setInt(1, msgId);
+            preparedStatement.executeUpdate();
+
+            System.out.println("Delete message " + msgId);
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public static void main(String[] args) {
+        deleteMessage(212);
     }
 }

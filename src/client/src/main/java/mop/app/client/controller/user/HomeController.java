@@ -13,14 +13,11 @@ import javafx.scene.shape.Circle;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import mop.app.client.Client;
-import mop.app.client.network.SocketClient;
 import mop.app.client.util.PreProcess;
 import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.util.Objects;
-
-import static mop.app.client.Client.socketClient;
 
 
 public class HomeController {
@@ -46,7 +43,7 @@ public class HomeController {
     public void initialize() throws IOException {
         chatController = new ChatController();
         friendController = new FriendController();
-        socketClient.start();
+
         //Event handling
         friendsHBox.setOnMouseClicked((e) -> {
             chatHBox.getStyleClass().clear();
@@ -71,8 +68,6 @@ public class HomeController {
             PreProcess.deleteUserInformation();
             Stage stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
             stage.close();
-            socketClient.close();
-            socketClient = new SocketClient();
             Client.currentUser = null;
             try {
                 FXMLLoader fxmlLoader = new FXMLLoader(Client.class.getResource("view/index.fxml"));

@@ -17,6 +17,9 @@ public class Conversation {
     private LocalDateTime lastContentDateTime;
     private String content;
 
+    public static final String PAIR = "PAIR";
+    public static final String GROUP = "GROUP";
+
     public Conversation() {}
 
     public Conversation(int conversationID, String type, URL icon, String name, boolean seen, LocalDateTime lastContentDateTime, String content) {

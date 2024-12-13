@@ -15,9 +15,8 @@ import mop.app.client.dao.OpenTimeDAO;
 import mop.app.client.dao.RoleDAO;
 import mop.app.client.dto.Request;
 import mop.app.client.dto.RequestType;
-import mop.app.client.dto.Response;
 import mop.app.client.dto.UserDTO;
-import mop.app.client.network.SocketClient;
+import mop.app.client.network.AsyncSocketClient;
 import mop.app.client.util.HibernateUtil;
 import mop.app.client.util.ObjectMapperConfig;
 import mop.app.client.util.PreProcess;
@@ -28,7 +27,7 @@ import org.slf4j.LoggerFactory;
 
 public class Client extends Application {
     private static final Logger logger = LoggerFactory.getLogger(Client.class);
-    public static SocketClient socketClient;
+    public static AsyncSocketClient socketClient;
 
     public static UserDTO currentUser;
 
@@ -47,7 +46,7 @@ public class Client extends Application {
             throw new ExceptionInInitializerError(e);
         }
 
-        socketClient = new SocketClient();
+        socketClient = new AsyncSocketClient();
         currentUser = PreProcess.loadUserInformation();
         if (currentUser != null) {
             logger.info("User information loaded successfully");
@@ -70,6 +69,7 @@ public class Client extends Application {
                 stage.setResizable(false);
                 stage.setScene(scene);
                 stage.show();
+                Client.registerActivity();
 
             } else {
                 logger.error("Could not retrieve user role");

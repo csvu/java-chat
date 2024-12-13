@@ -1,22 +1,13 @@
 package mop.app.client.controller.auth;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
-import mop.app.client.Client;
 import mop.app.client.dao.AuthDAO;
-import mop.app.client.dto.Request;
-import mop.app.client.dto.RequestType;
-import mop.app.client.dto.Response;
 import mop.app.client.dto.UserDTO;
-import mop.app.client.network.SocketClient;
 import mop.app.client.util.AlertDialog;
-import mop.app.client.util.EmailSender;
-import mop.app.client.util.ObjectMapperConfig;
 import mop.app.client.util.ViewHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

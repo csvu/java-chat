@@ -43,16 +43,16 @@ public class ChatController extends GridPane {
         fxmlLoader.load();
         // Mock data
         dmList.clear();
-        dmList.addAll(new ConversationDAO().getConv());
+        dmList.addAll(ConversationDAO.getConv());
         //Init
 
         Conversation firstConversation = dmList == null || dmList.isEmpty() ? null : dmList.getFirst();
         chatWindowController = new ChatWindowController(
                 firstConversation,
-                (firstConversation == null) ? null :new ConversationDAO().getRelationShipInAPairConversation(firstConversation.getConversationID()),
+                (firstConversation == null) ? null : ConversationDAO.getRelationShipInAPairConversation(firstConversation.getConversationID()),
                 () -> {
                     dmList.clear();
-                    dmList.addAll(new ConversationDAO().getConv());
+                    dmList.addAll(ConversationDAO.getConv());
                 },
                 (msg, curConv) -> {
                     dmList.remove(curConv);
@@ -65,7 +65,7 @@ public class ChatController extends GridPane {
         listSearch = new ListSearch(chatWindowController);
         listSearch.strangers.setOnMouseClicked(mouseEvent -> {
             Relationship selected = listSearch.strangers.getSelectionModel().getSelectedItem();
-            int conversationID = new ConversationDAO().getPairConversationId(selected.getId());
+            int conversationID = ConversationDAO.getPairConversationId(selected.getId());
             Conversation conv;
             if (conversationID != -1) {
                 conv = new Conversation(conversationID, "PAIR", null, selected.getUserDisplayName(), false, null, null);
@@ -88,7 +88,7 @@ public class ChatController extends GridPane {
                     System.out.println(textQuery);
 
                     listSearch.setStrangers(UserDAO.getMatched(textQuery));
-                    listSearch.setSearchMessages(ConversationDAO.getMatchedMessages(textQuery));
+                    listSearch.setSearchMessages(MessageDAO.getMatchedMessages(textQuery));
                 },
                 () -> {
                     dmList.clear();
