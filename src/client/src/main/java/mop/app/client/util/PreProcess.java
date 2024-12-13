@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import mop.app.client.dao.AuthDAO;
 import mop.app.client.dto.UserDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +43,13 @@ public class PreProcess {
             UserDTO user;
             try (ObjectInputStream in = new ObjectInputStream(new FileInputStream("user.bin"))) {
                 user = (UserDTO) in.readObject();
+                logger.info("User loaded: {}", user);
+                AuthDAO authDAO = new AuthDAO();
+                boolean isUserExists = authDAO.isUserExists(user);
+                if (!isUserExists) {
+                    logger.error("User information does not exist");
+                    return null;
+                }
             }
             logger.info("User information loaded successfully");
             return user;
