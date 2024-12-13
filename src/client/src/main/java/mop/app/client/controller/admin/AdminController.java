@@ -42,6 +42,9 @@ public class AdminController implements Initializable {
                 case "CreateUser":
                     borderPane.setCenter(ViewModel.getInstance().getViewFactory().getCreateUserView());
                     break;
+                case "Friend":
+                    borderPane.setCenter(ViewModel.getInstance().getViewFactory().getFriendView());
+                    break;
                 case "Group":
                     // 3 => Group View
                     borderPane.setCenter(ViewModel.getInstance().getViewFactory().getGroupView());

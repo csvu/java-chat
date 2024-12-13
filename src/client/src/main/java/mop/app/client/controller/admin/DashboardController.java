@@ -30,11 +30,15 @@ public class DashboardController {
     @FXML
     private Label todayRegistrationsLabel;
     @FXML
-    private Label activeUsersLabel;
+    private Label onlineUsersLabel;
     @FXML
-    private StackPane activeUsersCard;
+    private Label userLoginHistoryLabel;
+    @FXML
+    private StackPane onlineUsersCard;
     @FXML
     private StackPane todayRegistrationsCard;
+    @FXML
+    private StackPane userLoginHistoryCard;
 
     private final UserManagementDAO userManagementDAO;
 
@@ -83,18 +87,21 @@ public class DashboardController {
     private void updateMetricCards() {
         long todayRegistrations = userManagementDAO.newRegistrationCount();
         long activeUsers = userManagementDAO.activeUserCount();
+        long userLoginToday = userManagementDAO.userLoginToday();
 
         todayRegistrationsLabel.setText(String.valueOf(todayRegistrations));
-        activeUsersLabel.setText(String.valueOf(activeUsers));
+        onlineUsersLabel.setText(String.valueOf(activeUsers));
+        userLoginHistoryLabel.setText(String.valueOf(userLoginToday));
     }
 
     @FXML
-    public void showActiveUsers(MouseEvent mouseEvent) {
+    private void showActiveUsers() {
         logger.info("Showing active users list");
-        ViewModel.getInstance().getViewFactory().getSelectedView().set("UserLogin");
+        ViewModel.getInstance().getViewFactory().getSelectedView().set("ActiveUsers");
     }
 
-    public void showTodayRegistrations(MouseEvent mouseEvent) {
+    @FXML
+    private void showTodayRegistrations() {
         logger.info("Showing today's registrations list");
         ViewModel.getInstance().getViewFactory().getSelectedView().set("NewUser");
     }
@@ -105,5 +112,11 @@ public class DashboardController {
             "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
         };
         return months[month];
+    }
+
+    @FXML
+    private void showUserLoginHistory() {
+        logger.info("Showing user login history");
+        ViewModel.getInstance().getViewFactory().getSelectedView().set("UserLogin");
     }
 }

@@ -17,10 +17,14 @@ import org.slf4j.LoggerFactory;
 public class ResetPasswordController {
     private static final Logger logger = LoggerFactory.getLogger(ResetPasswordController.class);
 
-    public TextField emailField;
-    public PasswordField currentPasswordField;
-    public PasswordField newPasswordField;
-    public PasswordField confirmPasswordField;
+    @FXML
+    private TextField emailField;
+    @FXML
+    private PasswordField currentPasswordField;
+    @FXML
+    private PasswordField newPasswordField;
+    @FXML
+    private PasswordField confirmPasswordField;
 
     @FXML
     private void handleBack(ActionEvent event) {
@@ -70,12 +74,12 @@ public class ResetPasswordController {
                 "Error",
                 "Invalid password",
                 """
-                Password must be at least 8 characters long and contain:
-                - At least one uppercase letter
-                - At least one lowercase letter
-                - At least one number
-                - At least one special character (@$!%*?&_-)
-                """
+                    Password must be at least 8 characters long and contain:
+                    - At least one uppercase letter
+                    - At least one lowercase letter
+                    - At least one number
+                    - At least one special character (@$!%*?&_-)
+                    """
             );
             return;
         }

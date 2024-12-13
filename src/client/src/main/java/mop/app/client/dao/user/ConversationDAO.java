@@ -1,5 +1,6 @@
 package mop.app.client.dao.user;
 
+import java.util.Objects;
 import mop.app.client.Client;
 import mop.app.client.dao.UtilityDAO;
 import mop.app.client.model.user.Conversation;
@@ -83,7 +84,8 @@ public class ConversationDAO {
             return list;
         }
 
-        SqlReader reader = new SqlReader("src/main/java/mop/app/client/dao/user/getConv.sql");
+        URL url = Client.class.getClassLoader().getResource("getConv.sql");
+        SqlReader reader = new SqlReader(Objects.requireNonNull(url).getPath());
         String query = reader.read();
 
         try (PreparedStatement preparedStatement = conn.prepareStatement(query)) {

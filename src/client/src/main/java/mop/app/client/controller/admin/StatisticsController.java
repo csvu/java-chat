@@ -3,7 +3,6 @@ package mop.app.client.controller.admin;
 import java.time.Year;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.XYChart;
@@ -13,24 +12,22 @@ import javafx.scene.control.ComboBox;
 import mop.app.client.dao.UserManagementDAO;
 
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class StatisticsController {
+    private static final Logger logger = LoggerFactory.getLogger(StatisticsController.class);
 
     @FXML
     private ComboBox<String> filterComboBox;
-
     @FXML
     private ComboBox<String> yearComboBox;
-
     @FXML
     private BarChart<String, Number> barChart;
-
     @FXML
     private CategoryAxis monthAxis;
-
     @FXML
     private NumberAxis userAxis;
-
     private final UserManagementDAO userManagementDAO;
 
     public StatisticsController() {
@@ -38,7 +35,7 @@ public class StatisticsController {
     }
 
     @FXML
-    public void applyFilter(ActionEvent event) {
+    private void applyFilter() {
         String selectedYear = yearComboBox.getValue();
         String selectedFilter = filterComboBox.getValue();
 
@@ -123,14 +120,14 @@ public class StatisticsController {
         filterComboBox.getSelectionModel().select("Monthly Registrations");
 
         filterComboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            applyFilter(null);
+            applyFilter();
         });
 
         int currentYear = Year.now().getValue();
         populateYearComboBox(currentYear);
         yearComboBox.setValue(String.valueOf(currentYear));
 
-        applyFilter(null);
+        applyFilter();
     }
 
     private void populateYearComboBox(int currentYear) {

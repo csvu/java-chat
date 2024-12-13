@@ -60,13 +60,14 @@
             <!-- Gender -->
             <VBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="1">
                 <Label styleClass="field-label" text="Gender *"/>
-                <ComboBox fx:id="genderComboBox" prefWidth="500"/>
+                <ComboBox fx:id="genderComboBox" prefWidth="500" promptText="Select your gender"/>
             </VBox>
 
             <!-- Birthday -->
             <VBox spacing="5" GridPane.columnIndex="0" GridPane.rowIndex="2">
-                <Label styleClass="field-label" text="Birthday"/>
-                <DatePicker fx:id="birthdayPicker" prefWidth="500" styleClass="date-picker"/>
+                <Label styleClass="field-label" text="Birthday *"/>
+                <DatePicker fx:id="birthdayPicker" prefWidth="500" styleClass="date-picker"
+                            promptText="Select your date of birth (MM/dd/yyyy)"/>
             </VBox>
 
             <!-- Role -->
@@ -126,7 +127,7 @@
             </padding>
             <Button fx:id="backButton" onAction="#handleBack" styleClass="delete-button" text="BACK"/>
             <!--            <Region HBox.hgrow="ALWAYS" />-->
-            <Button fx:id="createButton" onAction="#createSave" styleClass="save-button" text="CREATE">
+            <Button fx:id="createButton" onAction="#handleCreate" styleClass="save-button" text="CREATE">
                 <HBox.margin>
                     <Insets left="695.0"/>
                 </HBox.margin>

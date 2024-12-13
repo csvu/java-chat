@@ -46,7 +46,6 @@ public class UserDetailsController {
     private TextField passwordField;
     @FXML
     private TextField confirmPasswordField;
-
     private long userId;
     private String userName;
     private final UserManagementDAO userManagementDAO;
@@ -286,12 +285,12 @@ public class UserDetailsController {
                                     "Error",
                                     "Invalid password",
                                     """
-                                    Password must be at least 8 characters long and contain:
-                                    - At least one uppercase letter
-                                    - At least one lowercase letter
-                                    - At least one number
-                                    - At least one special character (@$!%*?&_-)
-                                    """
+                                        Password must be at least 8 characters long and contain:
+                                        - At least one uppercase letter
+                                        - At least one lowercase letter
+                                        - At least one number
+                                        - At least one special character (@$!%*?&_-)
+                                        """
                                 );
                                 return;
                             }

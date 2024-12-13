@@ -2,7 +2,10 @@ package mop.app.client.controller.admin;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -11,26 +14,24 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+
 import mop.app.client.dao.UserManagementDAO;
 import mop.app.client.dto.UserDTO;
 import mop.app.client.util.TableStyle;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class NewUserController {
     private static final Logger logger = LoggerFactory.getLogger(NewUserController.class);
 
     @FXML
-    public TextField emailFilter;
+    private TextField emailFilter;
     @FXML
     private ComboBox<String> filterComboBox;
     @FXML
@@ -45,11 +46,13 @@ public class NewUserController {
     private TableColumn<UserDTO, Timestamp> createdCol;
 
     private ObservableList<UserDTO> userList;
+    private ObservableList<UserDTO> filteredUsers;
     private UserManagementDAO userManagementDAO;
 
     public NewUserController() {
         userManagementDAO = new UserManagementDAO();
         userList = FXCollections.observableArrayList();
+        filteredUsers = FXCollections.observableArrayList();
     }
 
     @FXML
@@ -67,15 +70,17 @@ public class NewUserController {
             "14px"
         );
 
-        newUserTable.setItems(userList);
-
         newUserTable.setRowFactory(tv -> {
             TableRow<UserDTO> row = new TableRow<>();
             row.setPrefHeight(50);
             return row;
         });
 
+        newUserTable.setItems(userList);
+
         loadUsers();
+
+        setupEmailFilter();
     }
 
     private void loadUsers() {
@@ -108,8 +113,49 @@ public class NewUserController {
         new Thread(task).start();
     }
 
+    private void setupEmailFilter() {
+        emailFilter.textProperty().addListener((observable, oldValue, newValue) -> {
+            Task<List<UserDTO>> filterTask = new Task<>() {
+                @Override
+                protected List<UserDTO> call() throws Exception {
+                    if (newValue == null || newValue.trim().isEmpty()) {
+                        return userList;
+                    }
+
+                    String filterLower = newValue.toLowerCase().trim();
+                    return userList.stream()
+                        .filter(user ->
+                            user.getEmail().toLowerCase().contains(filterLower) ||
+                                user.getDisplayName().toLowerCase().contains(filterLower)
+                        )
+                        .collect(Collectors.toList());
+                }
+            };
+
+            filterTask.setOnSucceeded(event -> {
+                Platform.runLater(() -> {
+                    filteredUsers.clear();
+                    filteredUsers.addAll(filterTask.getValue());
+
+                    applyDateFilter(filteredUsers);
+                });
+            });
+
+            new Thread(filterTask).start();
+        });
+    }
+
     @FXML
-    public void applyFilter(ActionEvent event) {
+    private void applyFilter() {
+        // If email filter is active, filter from filtered users
+        // Otherwise, filter from the full user list
+        ObservableList<UserDTO> sourceList =
+            !emailFilter.getText().trim().isEmpty() ? filteredUsers : userList;
+
+        applyDateFilter(sourceList);
+    }
+
+    private void applyDateFilter(ObservableList<UserDTO> sourceList) {
         String selectedFilter = filterComboBox.getSelectionModel().getSelectedItem();
         ObservableList<UserDTO> filteredList = FXCollections.observableArrayList();
 
@@ -119,7 +165,7 @@ public class NewUserController {
 
         switch (selectedFilter) {
             case "Today":
-                filteredList.setAll(userList.stream()
+                filteredList.setAll(sourceList.stream()
                     .filter(user -> {
                         LocalDate userCreationDate = user.getCreatedAt().toLocalDateTime().toLocalDate();
                         return userCreationDate.equals(currentDate);
@@ -139,15 +185,15 @@ public class NewUserController {
                 timeLimit = currentTime - TimeUnit.DAYS.toMillis(365);
                 break;
             case "All time":
-                filteredList = userList;
+                filteredList = sourceList;
                 break;
             default:
-                filteredList = userList;
+                filteredList = sourceList;
         }
 
         if (!selectedFilter.equals("All time") && !selectedFilter.equals("Today")) {
             long finalTimeLimit = timeLimit;
-            filteredList.setAll(userList.stream()
+            filteredList.setAll(sourceList.stream()
                 .filter(user -> user.getCreatedAt().getTime() >= finalTimeLimit)
                 .collect(Collectors.toList()));
         }

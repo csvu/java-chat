@@ -24,15 +24,24 @@ import org.slf4j.LoggerFactory;
 public class RegisterController {
     private static final Logger logger = LoggerFactory.getLogger(RegisterController.class);
 
-    public TextField emailField;
-    public TextField usernameField;
-    public PasswordField passwordField;
-    public TextField fullNameField;
-    public DatePicker dateOfBirthPicker;
-    public TextArea addressArea;
-    public Button registerButton;
-    public ComboBox<String> genderComboBox;
-    public CheckBox showPassword;
+    @FXML
+    private TextField emailField;
+    @FXML
+    private TextField usernameField;
+    @FXML
+    private PasswordField passwordField;
+    @FXML
+    private TextField fullNameField;
+    @FXML
+    private DatePicker dateOfBirthPicker;
+    @FXML
+    private TextArea addressArea;
+    @FXML
+    private Button registerButton;
+    @FXML
+    private ComboBox<String> genderComboBox;
+    @FXML
+    private CheckBox showPassword;
     private final AuthDAO authDAO = new AuthDAO();
 
     @FXML
@@ -214,12 +223,12 @@ public class RegisterController {
                 "Error",
                 "Invalid password",
                 """
-                Password must be at least 8 characters long and contain:
-                - At least one uppercase letter
-                - At least one lowercase letter
-                - At least one number
-                - At least one special character (@$!%*?&_-)
-                """
+                    Password must be at least 8 characters long and contain:
+                    - At least one uppercase letter
+                    - At least one lowercase letter
+                    - At least one number
+                    - At least one special character (@$!%*?&_-)
+                    """
             );
             return;
         }
@@ -247,6 +256,8 @@ public class RegisterController {
             .address(address)
             .roleID(roleId)
             .createdAt(new Timestamp(System.currentTimeMillis()))
+            .isActive(false)
+            .isBanned(false)
             .build();
 
         UserDTO registeredUser = authDAO.register(user);

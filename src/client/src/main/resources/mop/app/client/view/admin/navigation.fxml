@@ -60,6 +60,11 @@
                             <FontAwesomeIconView glyphName="USER" size="29" styleClass="nav-icon"/>
                         </graphic>
                     </Button>
+                    <Button fx:id="friendButton" mnemonicParsing="false" styleClass="nav-button" text="Friend">
+                        <graphic>
+                            <FontAwesomeIconView glyphName="USERS" size="22" styleClass="nav-icon"/>
+                        </graphic>
+                    </Button>
                     <Button fx:id="groupButton" mnemonicParsing="false" styleClass="nav-button" text="Group">
                         <graphic>
                             <FontAwesomeIconView glyphName="GROUP" size="19" styleClass="nav-icon"/>

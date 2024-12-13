@@ -37,7 +37,7 @@ public class GroupDetailsController {
     @FXML
     private TableColumn<UserDTO, Date> birthdayCol;
     @FXML
-    public TableColumn<UserDTO, String> genderCol;
+    private TableColumn<UserDTO, String> genderCol;
     private ObservableList<UserDTO> userList;
     private final GroupDAO groupDAO;
     private long groupId;

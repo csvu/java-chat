@@ -28,6 +28,7 @@ public class ViewFactory {
     private AnchorPane userActivityView;
     private AnchorPane userLoginView;
     private AnchorPane newUserView;
+    private AnchorPane friendView;
     private AnchorPane groupView;
     private AnchorPane groupDetailView;
     private AnchorPane statisticView;
@@ -64,6 +65,16 @@ public class ViewFactory {
         return userView;
     }
 
+    public AnchorPane getFriendView() {
+        logger.info("Friend view requested");
+        try {
+            friendView = ViewHelper.getView(ViewPath.FRIEND.getPath());
+        } catch (Exception e) {
+            logger.error("Could not load friend view: {}", e.getMessage());
+        }
+        return friendView;
+    }
+
     public AnchorPane getGroupView() {
         logger.info("Group view requested");
         try {
@@ -77,7 +88,7 @@ public class ViewFactory {
     public AnchorPane getStatisticView() {
         logger.info("New Statistic view requested");
         try {
-            return ViewHelper.getView(ViewPath.STATISTIC.getPath());
+            statisticView = ViewHelper.getView(ViewPath.STATISTIC.getPath());
         } catch (Exception e) {
             logger.error("Could not load statistic view: {}", e.getMessage());
         }

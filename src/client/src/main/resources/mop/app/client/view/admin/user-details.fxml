@@ -67,7 +67,7 @@
             </VBox>
 
             <VBox spacing="5" GridPane.columnIndex="0" GridPane.rowIndex="2">
-                <Label styleClass="field-label" text="Birthday"/>
+                <Label styleClass="field-label" text="Birthday *"/>
                 <DatePicker fx:id="birthdayPicker" prefWidth="500" styleClass="date-picker"/>
             </VBox>
 

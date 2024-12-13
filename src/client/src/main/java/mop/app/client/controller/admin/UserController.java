@@ -45,9 +45,9 @@ public class UserController {
     @FXML
     private TableColumn<UserDTO, Timestamp> createdAtCol;
     @FXML
-    public TableColumn<UserDTO, Boolean> blockCol;
+    private TableColumn<UserDTO, Boolean> blockCol;
     @FXML
-    public TableColumn<UserDTO, String> statusCol;
+    private TableColumn<UserDTO, String> statusCol;
     @FXML
     private TableColumn<UserDTO, String> updateCol;
     private final ObservableList<UserDTO> userList;
@@ -209,7 +209,9 @@ public class UserController {
                 detailButton.setMaxHeight(Double.MAX_VALUE);
                 detailButton.setOnAction(event -> {
                     UserDTO user = getTableRow().getItem();
-                    if (user != null) userDetails(user);
+                    if (user != null) {
+                        userDetails(user);
+                    }
                 });
                 return detailButton;
             }
@@ -357,7 +359,7 @@ public class UserController {
     }
 
     @FXML
-    public void createUser(ActionEvent event) {
+    public void createUser() {
         ViewModel.getInstance().getViewFactory().getSelectedView().set("CreateUser");
     }
 }

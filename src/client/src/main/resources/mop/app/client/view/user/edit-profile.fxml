@@ -17,7 +17,8 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
-<fx:root alignment="CENTER" prefHeight="200.0" prefWidth="850.0" styleClass="right-side" type="javafx.scene.layout.VBox" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root alignment="CENTER" prefHeight="200.0" prefWidth="850.0" styleClass="right-side" type="javafx.scene.layout.VBox"
+         xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml">
     <children>
         <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="mop-text" text="Edit Profile" textAlignment="CENTER">
             <VBox.margin>

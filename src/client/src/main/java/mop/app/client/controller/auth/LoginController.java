@@ -37,10 +37,8 @@ public class LoginController {
 
     @FXML
     private TextField emailField;
-
     @FXML
     private PasswordField passwordField;
-
     private final AuthDAO authDAO;
 
     public LoginController() {
