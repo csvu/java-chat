@@ -315,9 +315,20 @@ public class ChatWindowController extends GridPane {
         });
 
         deleteChat.setOnMouseClicked(e->{
-            MessageDAO.hideAllMessages(curConversation.getConversationID());
-            convMsg.clear();
-            // update dmList
+            Task<Void> task = new Task<>() {
+                @Override
+                protected Void call() {
+                    MessageDAO.hideAllMessages(curConversation.getConversationID());
+                    return null;
+                }
+            };
+            task.setOnSucceeded(event -> {
+                convMsg.clear();
+                // update dmList
+            });
+
+            new Thread(task).start();
+
         });
 
         block.setOnMouseClicked(e->{
