@@ -4,10 +4,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.util.Pair;
 import mop.app.client.Client;
-import mop.app.client.controller.user.IconLabel;
 import mop.app.client.model.user.Conversation;
 
-import java.net.URL;
 import java.util.List;
 import java.util.function.Consumer;
 

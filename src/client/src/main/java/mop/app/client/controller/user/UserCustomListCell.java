@@ -1,7 +1,6 @@
 package mop.app.client.controller.user;
 
 import javafx.scene.control.ListCell;
-import mop.app.client.model.user.Conversation;
 import mop.app.client.model.user.Relationship;
 
 public class UserCustomListCell extends ListCell<Relationship> {

@@ -1,12 +1,15 @@
 package mop.app.client.dao;
 
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.control.Alert;
 import mop.app.client.dto.FriendStatisticDTO;
+import mop.app.client.dto.UserActivityDTO;
 import mop.app.client.dto.UserDTO;
 import mop.app.client.util.HibernateUtil;
 import org.hibernate.Session;
@@ -235,6 +238,22 @@ public class UserManagementDAO {
         return loginTimes;
     }
 
+    public List<Object[]> getOpenTimeByUserId(long userId) {
+        List<Object[]> openTimes = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "SELECT u, o FROM UserDTO u " +
+                "JOIN OpenTimeDTO o ON u.id = o.userId " +
+                "WHERE o.userId = :userId " +
+                "ORDER BY o.openAt DESC";
+            Query<Object[]> query = session.createQuery(hql, Object[].class);
+            query.setParameter("userId", userId);
+            openTimes = query.list();
+        } catch (Exception e) {
+            logger.error("Failed to get open times for user {}: {}", userId, e.getMessage());
+        }
+        return openTimes;
+    }
+
     public List<Object[]> getFriendByUserId(long userId) {
         List<Object[]> friends = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
@@ -400,6 +419,72 @@ public class UserManagementDAO {
         return result;
     }
 
+    public List<UserActivityDTO> getUserActivity() {
+        List<UserActivityDTO> userActivity = new ArrayList<>();
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "SELECT u.username, u.displayName, u.createdAt, " +
+                "COUNT(DISTINCT ot.instance) as totalOpenTime, " +
+                "COUNT(DISTINCT CASE WHEN c.typeId = 1 THEN m.conversationId END) as friendChats, " +
+                "COUNT(DISTINCT CASE WHEN c.typeId = 2 THEN m.conversationId END) as groupChats " +
+                "FROM UserDTO u " +
+                "LEFT JOIN OpenTimeDTO ot ON ot.userId = u.userId " +
+                "LEFT JOIN MessageDTO m ON m.userId = u.userId " +
+                "LEFT JOIN ConversationDTO c ON c.conversationId = m.conversationId " +
+                "GROUP BY u.username, u.displayName, u.createdAt";
+
+            List<Object[]> results = session.createQuery(hql, Object[].class).getResultList();
+
+            for (Object[] result : results) {
+                UserActivityDTO activity = new UserActivityDTO();
+                activity.setUsername((String) result[0]);
+                activity.setDisplayName((String) result[1]);
+                activity.setCreatedAt((Timestamp) result[2]);
+                activity.setAmountOpenTime((Long) result[3]);
+                activity.setAmountChatWithFriend((Long) result[4]);
+                activity.setAmountChatWithGroup((Long) result[5]);
+                userActivity.add(activity);
+            }
+        } catch (Exception e) {
+            logger.error("Failed to get user activity: {}", e.getMessage());
+        }
+        return userActivity;
+    }
+
+    public List<UserActivityDTO> getUserOpenInRange(LocalDate from, LocalDate to) {
+        List<UserActivityDTO> userActivity = new ArrayList<>();
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "SELECT u.username, u.displayName, u.createdAt, " +
+                "COUNT(DISTINCT ot.instance) as totalOpenTime, " +
+                "COUNT(DISTINCT CASE WHEN c.typeId = 1 THEN m.conversationId END) as friendChats, " +
+                "COUNT(DISTINCT CASE WHEN c.typeId = 2 THEN m.conversationId END) as groupChats " +
+                "FROM UserDTO u " +
+                "LEFT JOIN OpenTimeDTO ot ON ot.userId = u.userId " +
+                "LEFT JOIN MessageDTO m ON m.userId = u.userId " +
+                "LEFT JOIN ConversationDTO c ON c.conversationId = m.conversationId " +
+                "WHERE DATE(ot.openAt) BETWEEN :from AND :to " +
+                "GROUP BY u.username, u.displayName, u.createdAt";
+
+            List<Object[]> results = session.createQuery(hql, Object[].class)
+                .setParameter("from", from)
+                .setParameter("to", to)
+                .getResultList();
+
+            for (Object[] result : results) {
+                UserActivityDTO activity = new UserActivityDTO();
+                activity.setUsername((String) result[0]);
+                activity.setDisplayName((String) result[1]);
+                activity.setCreatedAt((Timestamp) result[2]);
+                activity.setAmountOpenTime((Long) result[3]);
+                activity.setAmountChatWithFriend((Long) result[4]);
+                activity.setAmountChatWithGroup((Long) result[5]);
+                userActivity.add(activity);
+            }
+        } catch (Exception e) {
+            logger.error("Failed to get user activity: {}", e.getMessage());
+        }
+        return userActivity;
+    }
+
     public static void main(String[] args) {
         UserManagementDAO dao = new UserManagementDAO();
 //        List<Object[]> friendsOfFriendsData = dao.getFriendsOfFriendsByUserId(9);
@@ -413,6 +498,16 @@ public class UserManagementDAO {
         List<FriendStatisticDTO> userStatistics = dao.getUserStatistics();
         for (FriendStatisticDTO statistic : userStatistics) {
             logger.info(statistic.toString());
+        }
+
+        List<UserActivityDTO> userActivity = dao.getUserActivity();
+        for (UserActivityDTO activity : userActivity) {
+            logger.info(activity.toString());
+        }
+
+        List<UserActivityDTO> userOpenInRange = dao.getUserOpenInRange(LocalDate.now().minusDays(7), LocalDate.now());
+        for (UserActivityDTO activity : userOpenInRange) {
+            logger.info(activity.toString());
         }
     }
 }

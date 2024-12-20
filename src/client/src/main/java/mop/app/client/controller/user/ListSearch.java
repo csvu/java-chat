@@ -8,7 +8,6 @@ import javafx.scene.control.ListView;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import mop.app.client.Client;
-import mop.app.client.model.user.Conversation;
 import mop.app.client.model.user.MessageInConversation;
 import mop.app.client.model.user.Relationship;
 

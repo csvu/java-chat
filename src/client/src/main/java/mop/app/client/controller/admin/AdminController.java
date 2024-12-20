@@ -42,6 +42,9 @@ public class AdminController implements Initializable {
                 case "CreateUser":
                     borderPane.setCenter(ViewModel.getInstance().getViewFactory().getCreateUserView());
                     break;
+                case "UserActivity":
+                    borderPane.setCenter(ViewModel.getInstance().getViewFactory().gerUserActivityView());
+                    break;
                 case "Friend":
                     borderPane.setCenter(ViewModel.getInstance().getViewFactory().getFriendView());
                     break;
@@ -65,13 +68,13 @@ public class AdminController implements Initializable {
                         logger.info("Group detail view requested for group id: {}, group name: {}", groupId, groupName);
                         borderPane.setCenter(
                             ViewModel.getInstance().getViewFactory().getGroupDetailsView(groupId, groupName));
-                    } else if (newValue.startsWith("UserActivity-")) {
+                    } else if (newValue.startsWith("UserRelation-")) {
                         // User-1-Nam => User ID: 1, User Name: Nam
                         long userId = Integer.parseInt(newValue.split("-")[1]);
                         String userName = newValue.split("-")[2];
                         logger.info("User detail view requested for user id: {}, user name: {}", userId, userName);
                         borderPane.setCenter(
-                            ViewModel.getInstance().getViewFactory().getUserActivityView(userId, userName));
+                            ViewModel.getInstance().getViewFactory().getUserRelationView(userId, userName));
                     } else if (newValue.startsWith("User-")) {
                         // User-1-Nam => User ID: 1, User Name: Nam
                         long userId = Integer.parseInt(newValue.split("-")[1]);

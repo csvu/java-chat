@@ -2,6 +2,7 @@ package mop.app.client.controller.admin;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -13,7 +14,7 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
-import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
@@ -33,8 +34,6 @@ public class NewUserController {
     @FXML
     private TextField emailFilter;
     @FXML
-    private ComboBox<String> filterComboBox;
-    @FXML
     private TableView<UserDTO> newUserTable;
     @FXML
     private TableColumn<UserDTO, String> usernameCol;
@@ -44,6 +43,10 @@ public class NewUserController {
     private TableColumn<UserDTO, String> displayNameCol;
     @FXML
     private TableColumn<UserDTO, Timestamp> createdCol;
+    @FXML
+    private DatePicker fromDatePicker;
+    @FXML
+    private DatePicker toDatePicker;
 
     private ObservableList<UserDTO> userList;
     private ObservableList<UserDTO> filteredUsers;
@@ -57,8 +60,10 @@ public class NewUserController {
 
     @FXML
     public void initialize() {
-        filterComboBox.getItems().addAll("Today", "1 day ago", "1 week ago", "1 month ago", "1 year ago", "All time");
-        filterComboBox.getSelectionModel().select("All time");
+        // Set default date pickers to current date
+        LocalDate currentDate = LocalDate.now();
+        fromDatePicker.setValue(currentDate);
+        toDatePicker.setValue(currentDate);
 
         usernameCol.setCellValueFactory(new PropertyValueFactory<>("username"));
         emailCol.setCellValueFactory(new PropertyValueFactory<>("email"));
@@ -81,6 +86,12 @@ public class NewUserController {
         loadUsers();
 
         setupEmailFilter();
+        setupDatePickerListeners();
+    }
+
+    private void setupDatePickerListeners() {
+        fromDatePicker.valueProperty().addListener((obs, oldVal, newVal) -> applyFilter());
+        toDatePicker.valueProperty().addListener((obs, oldVal, newVal) -> applyFilter());
     }
 
     private void loadUsers() {
@@ -101,6 +112,7 @@ public class NewUserController {
                 userList.setAll(task.getValue());
                 newUserTable.refresh();
                 logger.info("Loaded {} users from database", userList.size());
+                applyFilter(); // Apply initial filter
             });
         });
 
@@ -137,7 +149,7 @@ public class NewUserController {
                     filteredUsers.clear();
                     filteredUsers.addAll(filterTask.getValue());
 
-                    applyDateFilter(filteredUsers);
+                    applyFilter();
                 });
             });
 
@@ -152,51 +164,32 @@ public class NewUserController {
         ObservableList<UserDTO> sourceList =
             !emailFilter.getText().trim().isEmpty() ? filteredUsers : userList;
 
-        applyDateFilter(sourceList);
-    }
+        // Get the date range from date pickers
+        LocalDate fromDate = fromDatePicker.getValue();
+        LocalDate toDate = toDatePicker.getValue();
 
-    private void applyDateFilter(ObservableList<UserDTO> sourceList) {
-        String selectedFilter = filterComboBox.getSelectionModel().getSelectedItem();
-        ObservableList<UserDTO> filteredList = FXCollections.observableArrayList();
-
-        LocalDate currentDate = LocalDate.now();
-        long currentTime = System.currentTimeMillis();
-        long timeLimit = 0;
-
-        switch (selectedFilter) {
-            case "Today":
-                filteredList.setAll(sourceList.stream()
-                    .filter(user -> {
-                        LocalDate userCreationDate = user.getCreatedAt().toLocalDateTime().toLocalDate();
-                        return userCreationDate.equals(currentDate);
-                    })
-                    .collect(Collectors.toList()));
-                break;
-            case "1 day ago":
-                timeLimit = currentTime - TimeUnit.DAYS.toMillis(1);
-                break;
-            case "1 week ago":
-                timeLimit = currentTime - TimeUnit.DAYS.toMillis(7);
-                break;
-            case "1 month ago":
-                timeLimit = currentTime - TimeUnit.DAYS.toMillis(30);
-                break;
-            case "1 year ago":
-                timeLimit = currentTime - TimeUnit.DAYS.toMillis(365);
-                break;
-            case "All time":
-                filteredList = sourceList;
-                break;
-            default:
-                filteredList = sourceList;
+        // Ensure fromDate is not after toDate
+        if (fromDate.isAfter(toDate)) {
+            // Swap dates if needed
+            LocalDate temp = fromDate;
+            fromDate = toDate;
+            toDate = temp;
+            fromDatePicker.setValue(fromDate);
+            toDatePicker.setValue(toDate);
         }
 
-        if (!selectedFilter.equals("All time") && !selectedFilter.equals("Today")) {
-            long finalTimeLimit = timeLimit;
-            filteredList.setAll(sourceList.stream()
-                .filter(user -> user.getCreatedAt().getTime() >= finalTimeLimit)
-                .collect(Collectors.toList()));
-        }
+        // Create the filtered list based on date range and email filter
+        LocalDate finalFromDate = fromDate;
+        LocalDate finalToDate = toDate;
+        ObservableList<UserDTO> filteredList = FXCollections.observableArrayList(
+            sourceList.stream()
+                .filter(user -> {
+                    LocalDate userCreationDate = user.getCreatedAt().toLocalDateTime().toLocalDate();
+                    return !userCreationDate.isBefore(finalFromDate) &&
+                        !userCreationDate.isAfter(finalToDate);
+                })
+                .collect(Collectors.toList())
+        );
 
         newUserTable.setItems(filteredList);
         newUserTable.refresh();

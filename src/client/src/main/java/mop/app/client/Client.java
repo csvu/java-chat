@@ -83,11 +83,7 @@ public class Client extends Application {
                 logger.error("Failed to add open time for user: {}", currentUser.getUserId());
             }
         } else {
-            // ViewFactory viewFactory = new ViewFactory();
-            // viewFactory.getAdminView();
             FXMLLoader fxmlLoader = new FXMLLoader(Client.class.getResource("view/index.fxml"));
-            // FXMLLoader fxmlLoader = new
-            // FXMLLoader(Client.class.getResource("view/user/home-view.fxml"));
             Scene scene = new Scene(fxmlLoader.load());
 
             try {

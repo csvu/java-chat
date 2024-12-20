@@ -1,6 +1,5 @@
 package mop.app.client.util;
 
-import java.io.File;
 import lombok.Getter;
 
 @Getter
@@ -19,6 +18,7 @@ public enum ViewPath {
     NEW_USER(String.format("%s/admin/new-user.fxml", Constant.viewFolder)),
     USER_LOGIN(String.format("%s/admin/user-login.fxml", Constant.viewFolder)),
     USER_DETAILS(String.format("%s/admin/user-details.fxml", Constant.viewFolder)),
+    USER_RELATION(String.format("%s/admin/user-relation.fxml", Constant.viewFolder)),
     USER_ACTIVITY(String.format("%s/admin/user-activity.fxml", Constant.viewFolder)),
     FRIEND(String.format("%s/admin/friend.fxml", Constant.viewFolder)),
     GROUP(String.format("%s/admin/group.fxml", Constant.viewFolder)),

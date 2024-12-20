@@ -25,9 +25,12 @@
     <VBox layoutX="20" layoutY="20" spacing="10" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0"
           AnchorPane.topAnchor="100.0">
         <HBox spacing="30.0">
-            <TextField prefWidth="250" promptText="Filter by email/display name" styleClass="data-filter"
+            <TextField prefWidth="200" promptText="Filter by email/display name" styleClass="data-filter"
                        fx:id="emailFilter"/>
-            <ComboBox fx:id="filterComboBox" prefWidth="200" promptText="Filter"/>
+            <Label text="From:" styleClass="field-label"/>
+            <DatePicker fx:id="fromDatePicker" prefWidth="150"/>
+            <Label text="To:" styleClass="field-label"/>
+            <DatePicker fx:id="toDatePicker" prefWidth="150"/>
             <Button onAction="#applyFilter" prefWidth="100" styleClass="apply-button" text="Apply"/>
         </HBox>
     </VBox>
