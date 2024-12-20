@@ -64,8 +64,8 @@ public class ChatWindowController extends GridPane {
     private HBox report;
     @FXML
     private HBox deleteChat;
-    @FXML
-    private HBox leaveChat;
+//    @FXML
+//    private HBox leaveChat;
 
     @FXML
     private HBox searchInInfo;
@@ -383,7 +383,7 @@ public class ChatWindowController extends GridPane {
                 topVBox.getChildren().add(1,editName);
             }
             chatOptions.getChildren().add(deleteChat);
-            chatOptions.getChildren().add(leaveChat);
+//            chatOptions.getChildren().add(leaveChat);
             chatInfoHBox.getChildren().add(searchInInfo);
             chatInfoHBox.getChildren().add(members);
             chatInfoHBox.getChildren().add(groupAdd);
