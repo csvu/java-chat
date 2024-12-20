@@ -3,17 +3,9 @@ module mop.app.client {
     requires javafx.fxml;
     requires javafx.web;
 
-    requires org.controlsfx.controls;
-    requires com.dlsc.formsfx;
-    requires net.synedra.validatorfx;
-    requires org.kordamp.ikonli.javafx;
-    requires org.kordamp.bootstrapfx.core;
-    requires eu.hansolo.tilesfx;
-
-    requires de.jensd.fx.glyphs.fontawesome;
-
     requires bcrypt;
     requires com.zaxxer.hikari;
+    requires de.jensd.fx.glyphs.fontawesome;
     requires jakarta.mail;
     requires jakarta.persistence;
     requires javafaker;

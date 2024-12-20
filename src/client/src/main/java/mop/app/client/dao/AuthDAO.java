@@ -166,4 +166,21 @@ public class AuthDAO {
         }
         return null;
     }
+
+    public boolean isUserExists(UserDTO user) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            UserDTO userDTO = session.createQuery(
+                    "FROM UserDTO WHERE username = :username AND email = :email AND password = :password", UserDTO.class)
+                .setParameter("username", user.getUsername())
+                .setParameter("email", user.getEmail())
+                .setParameter("password", user.getPassword())
+                .uniqueResult();
+            if (userDTO != null) {
+                return true;
+            }
+        } catch (Exception e) {
+            logger.error("Failed to check user existence: {}", e.getMessage());
+        }
+        return false;
+    }
 }
