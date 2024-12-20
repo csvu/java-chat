@@ -23,13 +23,15 @@ public class MessageDAO {
         try (PreparedStatement relationshipStatement = conn.prepareStatement(
                 "insert into public.message(conversation_id, user_id, \"content\") values(?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
              PreparedStatement createConversation = conn.prepareStatement(
-                     "insert into \n" +
-                             "public.conversation(\"name\", icon, type_id)\n" +
-                             "values (NULL, NULL, 1)" , Statement.RETURN_GENERATED_KEYS);
+                     """
+                             insert into
+                             public.conversation("name", icon, type_id)
+                             values (NULL, NULL, 1)""", Statement.RETURN_GENERATED_KEYS);
              PreparedStatement enroll = conn.prepareStatement(
-                     "insert into \n" +
-                             "public.enrollment\n" +
-                             "values (?, ?, 2), (?, ?, 2)" );
+                     """
+                             insert into
+                             public.enrollment
+                             values (?, ?, 2), (?, ?, 2)""");
 
         ) {
             if (relationship != null && ConversationDAO.getPairConversationId(relationship.getId()) == -1) {
@@ -74,12 +76,16 @@ public class MessageDAO {
         }
 
         try (PreparedStatement preparedStatement = conn.prepareStatement(
-                "select us.user_id, us.display_name as sender, me.sent_at, me.content, me.msg_id\n" +
-                        "from public.message as me join public.\"user\" as us on me.user_id = us.user_id\n" +
-                        "where conversation_id = ? and me.msg_id < ? order by me.msg_id desc limit 10 " )) {
+                """
+                        select us.user_id, us.display_name as sender, me.sent_at, me.content, me.msg_id
+                        from public.message as me join public."user" as us on me.user_id = us.user_id
+                        left join public.hidden_message hm on me.msg_id = hm.msg_id and hm.user_id = ?
+                        where me.conversation_id = ? and me.msg_id < ? and hm.msg_id is NULL
+                        order by me.msg_id desc limit 10""")) {
 
-            preparedStatement.setInt(1, conversationId);
-            preparedStatement.setInt(2, msgId);
+            preparedStatement.setInt(1, (int) Client.currentUser.getUserId());
+            preparedStatement.setInt(2, conversationId);
+            preparedStatement.setInt(3, msgId);
             System.out.println("getMessages " + conversationId + " " + msgId);
             ResultSet rs = preparedStatement.executeQuery();
 
@@ -114,38 +120,42 @@ public class MessageDAO {
         }
 
         try (PreparedStatement preparedStatement = conn.prepareStatement(
-                "SELECT\n" +
-                        "\tCASE\n" +
-                        "\t\tWHEN CO_TYPE.TYPE_NAME = 'PAIR' THEN (\n" +
-                        "\t\t\tSELECT\n" +
-                        "\t\t\t\tPARTNER.DISPLAY_NAME\n" +
-                        "\t\t\tFROM\n" +
-                        "\t\t\t\tPUBLIC.ENROLLMENT AS EN\n" +
-                        "\t\t\t\tJOIN PUBLIC.\"user\" AS PARTNER ON EN.USER_ID = PARTNER.USER_ID\n" +
-                        "\t\t\tWHERE\n" +
-                        "\t\t\t\tEN.USER_ID <> ?\n" +
-                        "\t\t\t\tAND CONVERSATION_ID = CO.CONVERSATION_ID\n" +
-                        "\t\t\tLIMIT\n" +
-                        "\t\t\t\t1\n" +
-                        "\t\t)\n" +
-                        "\t\tELSE CO.NAME\n" +
-                        "\tEND AS DISPLAY_NAME,\n" +
-                        "\tCO.CONVERSATION_ID,\n" +
-                        "\tME.CONTENT,\n" +
-                        "\tCO_TYPE.TYPE_NAME,\n" +
-                        "\tME.MSG_ID\n" +
-                        "FROM\n" +
-                        "\tPUBLIC.ENROLLMENT EN\n" +
-                        "\tJOIN PUBLIC.CONVERSATION CO ON EN.CONVERSATION_ID = CO.CONVERSATION_ID\n" +
-                        "\tJOIN PUBLIC.CONVERSATION_TYPE CO_TYPE ON CO.TYPE_ID = CO_TYPE.TYPE_ID\n" +
-                        "\tJOIN PUBLIC.MESSAGE ME ON EN.CONVERSATION_ID = ME.CONVERSATION_ID\n" +
-                        "WHERE\n" +
-                        "\tEN.USER_ID = ?\n" +
-                        "\tAND ME.CONTENT ILIKE ?")) {
+                """
+                        SELECT
+                        CASE
+                        WHEN CO_TYPE.TYPE_NAME = 'PAIR' THEN (
+                        SELECT
+                        PARTNER.DISPLAY_NAME
+                        FROM
+                        PUBLIC.ENROLLMENT AS EN
+                        JOIN PUBLIC."user" AS PARTNER ON EN.USER_ID = PARTNER.USER_ID
+                        WHERE
+                        EN.USER_ID <> ?
+                        AND CONVERSATION_ID = CO.CONVERSATION_ID
+                        LIMIT
+                        1
+                        )
+                        ELSE CO.NAME
+                        END AS DISPLAY_NAME,
+                        CO.CONVERSATION_ID,
+                        ME.CONTENT,
+                        CO_TYPE.TYPE_NAME,
+                        ME.MSG_ID
+                        FROM
+                        PUBLIC.ENROLLMENT EN
+                        JOIN PUBLIC.CONVERSATION CO ON EN.CONVERSATION_ID = CO.CONVERSATION_ID
+                        JOIN PUBLIC.CONVERSATION_TYPE CO_TYPE ON CO.TYPE_ID = CO_TYPE.TYPE_ID
+                        JOIN PUBLIC.MESSAGE ME ON EN.CONVERSATION_ID = ME.CONVERSATION_ID
+                        LEFT JOIN PUBLIC.HIDDEN_MESSAGE HM ON ME.MSG_ID = HM.MSG_ID AND HM.USER_ID = ?
+                        WHERE
+                        EN.USER_ID = ?
+                        AND HM.USER_ID IS NULL
+                        AND ME.CONTENT ILIKE ?""")) {
 
             preparedStatement.setInt(1, (int) Client.currentUser.getUserId());
             preparedStatement.setInt(2, (int) Client.currentUser.getUserId());
-            preparedStatement.setString(3, "%" + query + "%");
+            preparedStatement.setInt(3, (int) Client.currentUser.getUserId());
+            preparedStatement.setString(4, "%" + query + "%");
 
 
             System.out.println("SHI");
@@ -158,7 +168,7 @@ public class MessageDAO {
                 String content = rs.getString("content");
                 String type = rs.getString("type_name");
                 int msgId = rs.getInt("msg_id");
-                MessageInConversation conversation = new MessageInConversation(msgId, userId, type, null , displayName, false, null, content);
+                MessageInConversation conversation = new MessageInConversation(msgId, userId, type, null , displayName, true, null, content);
                 list.add(conversation);
             }
         } catch (SQLException e) {
@@ -177,41 +187,45 @@ public class MessageDAO {
         }
 
         try (PreparedStatement preparedStatement = conn.prepareStatement(
-                "SELECT\n" +
-                        "\tCASE\n" +
-                        "\t\tWHEN CO_TYPE.TYPE_NAME = 'PAIR' THEN (\n" +
-                        "\t\t\tSELECT\n" +
-                        "\t\t\t\tPARTNER.DISPLAY_NAME\n" +
-                        "\t\t\tFROM\n" +
-                        "\t\t\t\tPUBLIC.ENROLLMENT AS EN\n" +
-                        "\t\t\t\tJOIN PUBLIC.\"user\" AS PARTNER ON EN.USER_ID = PARTNER.USER_ID\n" +
-                        "\t\t\tWHERE\n" +
-                        "\t\t\t\tEN.USER_ID <> ?\n" +
-                        "\t\t\t\tAND CONVERSATION_ID = CO.CONVERSATION_ID\n" +
-                        "\t\t\tLIMIT\n" +
-                        "\t\t\t\t1\n" +
-                        "\t\t)\n" +
-                        "\t\tELSE CO.NAME\n" +
-                        "\tEND AS DISPLAY_NAME,\n" +
-                        "\tCO.CONVERSATION_ID,\n" +
-                        "\tME.CONTENT,\n" +
-                        "\tCO_TYPE.TYPE_NAME,\n" +
-                        "\tME.MSG_ID\n" +
-                        "FROM\n" +
-                        "\tPUBLIC.ENROLLMENT EN\n" +
-                        "\tJOIN PUBLIC.CONVERSATION CO ON EN.CONVERSATION_ID = CO.CONVERSATION_ID\n" +
-                        "\tJOIN PUBLIC.CONVERSATION_TYPE CO_TYPE ON CO.TYPE_ID = CO_TYPE.TYPE_ID\n" +
-                        "\tJOIN PUBLIC.MESSAGE ME ON EN.CONVERSATION_ID = ME.CONVERSATION_ID\n" +
-                        "WHERE\n" +
-                        "\tEN.USER_ID = ?\n" +
-                        "\tAND ME.CONTENT ILIKE ?\n" +
-                        "\tAND CO.CONVERSATION_ID = ?"
+                """
+                        SELECT
+                        CASE
+                        WHEN CO_TYPE.TYPE_NAME = 'PAIR' THEN (
+                        SELECT
+                        PARTNER.DISPLAY_NAME
+                        FROM
+                        PUBLIC.ENROLLMENT AS EN
+                        JOIN PUBLIC."user" AS PARTNER ON EN.USER_ID = PARTNER.USER_ID
+                        WHERE
+                        EN.USER_ID <> ?
+                        AND CONVERSATION_ID = CO.CONVERSATION_ID
+                        LIMIT
+                        1
+                        )
+                        ELSE CO.NAME
+                        END AS DISPLAY_NAME,
+                        CO.CONVERSATION_ID,
+                        ME.CONTENT,
+                        CO_TYPE.TYPE_NAME,
+                        ME.MSG_ID
+                        FROM
+                        PUBLIC.ENROLLMENT EN
+                        JOIN PUBLIC.CONVERSATION CO ON EN.CONVERSATION_ID = CO.CONVERSATION_ID
+                        JOIN PUBLIC.CONVERSATION_TYPE CO_TYPE ON CO.TYPE_ID = CO_TYPE.TYPE_ID
+                        JOIN PUBLIC.MESSAGE ME ON EN.CONVERSATION_ID = ME.CONVERSATION_ID
+                        LEFT JOIN PUBLIC.HIDDEN_MESSAGE HM ON ME.MSG_ID = HM.MSG_ID AND HM.USER_ID = ?
+                        WHERE
+                        EN.USER_ID = ?
+                        AND HM.USER_ID IS NULL
+                        AND ME.CONTENT ILIKE ?
+                        AND CO.CONVERSATION_ID = ?"""
         )) {
 
             preparedStatement.setInt(1, (int) Client.currentUser.getUserId());
             preparedStatement.setInt(2, (int) Client.currentUser.getUserId());
-            preparedStatement.setString(3, "%" + query + "%");
-            preparedStatement.setInt(4, conversationId);
+            preparedStatement.setInt(3, (int) Client.currentUser.getUserId());
+            preparedStatement.setString(4, "%" + query + "%");
+            preparedStatement.setInt(5, conversationId);
 
             System.out.println("SHI");
             ResultSet rs = preparedStatement.executeQuery();
@@ -253,6 +267,59 @@ public class MessageDAO {
             System.out.println(e.getMessage());
         }
     }
+
+    public static void hideMessage(int msgId) {
+        UtilityDAO utilityDAO = new UtilityDAO();
+        Connection conn = utilityDAO.getConnection();
+        if(conn == null) {
+            return;
+        }
+
+        try (PreparedStatement preparedStatement = conn.prepareStatement(
+                "insert into hidden_message values(?, ?)")) {
+
+            preparedStatement.setInt(1, (int) Client.currentUser.getUserId());
+            preparedStatement.setInt(2, msgId);
+            preparedStatement.executeUpdate();
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public static void hideAllMessages(int conversationId) {
+        UtilityDAO utilityDAO = new UtilityDAO();
+        Connection conn = utilityDAO.getConnection();
+        if(conn == null) {
+            return;
+        }
+
+        try (PreparedStatement preparedStatement = conn.prepareStatement(
+                """
+                        insert into hidden_message
+                        select ? as user_id, msg_id
+                        from public.message
+                        where conversation_id = ?
+                        except
+                        select *
+                        from hidden_message
+                        where user_id = ?
+                        """)) {
+
+            preparedStatement.setInt(1, (int) Client.currentUser.getUserId());
+            preparedStatement.setInt(2, conversationId);
+            preparedStatement.setInt(3, (int) Client.currentUser.getUserId());
+            preparedStatement.executeUpdate();
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+
+
+
+
 
     public static void main(String[] args) {
         deleteMessage(212);

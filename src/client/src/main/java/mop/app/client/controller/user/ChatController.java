@@ -10,6 +10,7 @@ import javafx.scene.layout.VBox;
 import mop.app.client.Client;
 import mop.app.client.dao.user.ConversationDAO;
 import mop.app.client.dao.user.MessageDAO;
+import mop.app.client.dao.user.RelationshipDAO;
 import mop.app.client.dao.user.UserDAO;
 import mop.app.client.model.user.Conversation;
 import mop.app.client.model.user.Message;
@@ -18,6 +19,7 @@ import mop.app.client.model.user.Relationship;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 
 
 public class ChatController extends GridPane {
@@ -56,11 +58,14 @@ public class ChatController extends GridPane {
                 },
                 (msg, curConv) -> {
                     dmList.remove(curConv);
+                    curConv.setSeen(true);
                     curConv.setContent(msg.getContent());
                     curConv.setLastContentDateTime(msg.getSentAt());
                     dmList.add(0, curConv);
                     listViewCol2.getSelectionModel().select(0);
-                });
+                },
+                this::onSeen
+        );
 
         listSearch = new ListSearch(chatWindowController);
         listSearch.strangers.setOnMouseClicked(mouseEvent -> {
@@ -76,7 +81,8 @@ public class ChatController extends GridPane {
         });
         listSearch.searchMessages.setOnMouseClicked(mouseEvent -> {
             MessageInConversation msg = listSearch.searchMessages.getSelectionModel().getSelectedItem();
-            chatWindowController.changeCurConv(msg, null);
+           ;
+            chatWindowController.changeCurConv(msg,  ConversationDAO.getRelationShipInAPairConversation(msg.getConversationID()));
             chatWindowController.setConvMsg(msg.getMsgId());
         });
 
@@ -109,7 +115,11 @@ public class ChatController extends GridPane {
         // Scroll
         listViewCol2.setCellFactory(param -> new ConversationCustomListCell<>());
         listViewCol2.setOnMouseClicked(mouseEvent -> {
-            if (listViewCol2.getSelectionModel().getSelectedItem() != null) chatWindowController.changeCurConv(listViewCol2.getSelectionModel().getSelectedItem(), ConversationDAO.getRelationShipInAPairConversation(listViewCol2.getSelectionModel().getSelectedItem().getConversationID()));
+            Conversation selected = listViewCol2.getSelectionModel().getSelectedItem();
+            if (selected != null) {
+                chatWindowController.changeCurConv(selected, ConversationDAO.getRelationShipInAPairConversation(listViewCol2.getSelectionModel().getSelectedItem().getConversationID()));
+                onSeen(selected);
+            }
         });
 
         chatWindowController.changeCurConv(firstConversation, firstConversation == null ? null : ConversationDAO.getRelationShipInAPairConversation(firstConversation.getConversationID()));
@@ -133,10 +143,25 @@ public class ChatController extends GridPane {
         return dmList;
     }
 
+    public void onSeen(Conversation selected) {
+        //seen
+        selected.setSeen(true);
+        ConversationDAO.setSeen(selected.getConversationID(), true);
+        //
+        int idx = dmList.indexOf(selected);
+        dmList.remove(selected);
+        dmList.add(idx, selected);
+        listViewCol2.getSelectionModel().select(idx);
+
+
+    }
+
+
     public synchronized static void handleNewMessage(Message msg) {
         int cnt = 0;
         for (Conversation conv : dmList) {
             if (conv.getConversationID() == msg.getConversationId()) {
+                conv.setSeen(false);
                 conv.setContent(msg.getContent());
                 conv.setLastContentDateTime(msg.getSentAt());
                 dmList.remove(conv);
@@ -147,9 +172,10 @@ public class ChatController extends GridPane {
         }
         if (cnt == 0) {
             Conversation conv = ConversationDAO.getConv(msg.getConversationId());
-            if (conv.getType().equals("PAIR")) {
+            if (conv.getType().equals(Conversation.PAIR)) {
                 conv.setName(msg.getSender());
             }
+            conv.setSeen(false);
             conv.setContent(msg.getContent());
             conv.setLastContentDateTime(msg.getSentAt());
             dmList.add(0, conv);

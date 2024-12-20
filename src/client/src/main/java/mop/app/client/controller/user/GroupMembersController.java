@@ -33,7 +33,7 @@ public class GroupMembersController extends VBox {
         fxmlLoader.setController(this);
         fxmlLoader.load();
 
-        ArrayList<ArrayList<Conversation>> l = new ConversationDAO().getMembers(cur.getConversationID());
+        ArrayList<ArrayList<Conversation>> l = ConversationDAO.getMembers(cur.getConversationID());
         adminList.addAll(l.get(0));
         memberList.addAll(l.get(1));
         admin.setCellFactory(param -> new ListCell<Conversation>() {
@@ -55,11 +55,12 @@ public class GroupMembersController extends VBox {
 
         if (adminList.stream().anyMatch(item -> item.getConversationID() == (int) Client.currentUser.getUserId())) {
             rightIcons.add(new Pair<>("view/user/remove-ellipse-svgrepo-com.png", (item) -> {
-//                new UserDAO().removeMember(cur.getConversationID(), item.getConversationID());
+                // Remember to consider Group fewer than two members...
+                ConversationDAO.removeMember(cur.getConversationID(), item.getConversationID());
                 memberList.remove(item);
             }));
             rightIcons.add(new Pair<>("view/user/admin-1-svgrepo-com.png", (item) -> {
-//                new UserDAO().removeMember(cur.getConversationID(), item.getConversationID());
+                ConversationDAO.addAdmin(cur.getConversationID(), item.getConversationID());
                 memberList.remove(item);
                 adminList.add(item);
             }));

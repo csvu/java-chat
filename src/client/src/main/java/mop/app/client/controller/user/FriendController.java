@@ -2,8 +2,10 @@ package mop.app.client.controller.user;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -14,16 +16,17 @@ import javafx.util.Callback;
 import javafx.util.Pair;
 import mop.app.client.Client;
 import mop.app.client.dao.user.ConversationDAO;
+import mop.app.client.dao.user.RelationshipDAO;
 import mop.app.client.model.user.Conversation;
-import mop.app.client.model.user.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 public class FriendController extends GridPane {
     private static final Logger log = LoggerFactory.getLogger(FriendController.class);
@@ -41,14 +44,28 @@ public class FriendController extends GridPane {
     private VBox col2;
     @FXML
     private HBox friendListAllOnl;
+    @FXML
+    private Button all;
+    @FXML
+    private Button online;
+
+    private SearchUsersController searchUsersController;
+
+    private final SearchUsersController friendListSearchUsersController;
+    private final SearchUsersController friendRequestsSearchUsersController;
+
+
 
     private final ChatWindowController chatWindowController;
 
+    private Predicate<Conversation> showWhich;
+    private final Predicate<Conversation> showOnline;
+    Predicate<Conversation> filter = (conv)->true;
+
+
     Conversation curFriend;
-    ObservableList<Conversation> friendListObservable = FXCollections.observableArrayList();;
-    ObservableList<Conversation> groupChad;
-    HashMap<Integer, ObservableList<Message>> convMsg = new HashMap<>();
-    ObservableList<Conversation> friendRequestsList = FXCollections.observableArrayList();;
+    FilteredList<Conversation> friendListObservable;
+    FilteredList<Conversation> friendRequestsList;
 
 
     public FriendController() throws IOException {
@@ -56,18 +73,65 @@ public class FriendController extends GridPane {
         fxmlLoader.setRoot(this);
         fxmlLoader.setController(this);
         fxmlLoader.load();
-        URL placeholder = Client.class.getResource("images/place-holder.png");
-
 
         // Default pressed
-        friendListObservable.addAll(ConversationDAO.getFriends());
+        friendListObservable = new FilteredList<>(FXCollections.observableArrayList(RelationshipDAO.getFriends()));
         friendList.getStyleClass().clear();
         friendList.getStyleClass().add("PressedWrapper");
+
+        showOnline = (conv) -> conv.getContent().equals("Online");
+        showWhich = (conv)->true;
+
+
+
+        friendListSearchUsersController = new SearchUsersController(
+                (text) -> {
+                    filter = (conv) -> conv.getName().toLowerCase().contains(text.toLowerCase());
+                    friendListObservable.setPredicate(filter.and(showWhich));
+                },
+                () -> {
+                    filter = (conv)->true;
+                    friendListObservable.setPredicate(filter.and(showWhich));
+                }
+        );
+
+        friendRequestsSearchUsersController = new SearchUsersController(
+                (text) -> {
+                    friendRequestsList.setPredicate((conv) -> conv.getName().toLowerCase().contains(text.toLowerCase()));
+                },
+                () -> {
+                    friendRequestsList.setPredicate(conv->true);
+                }
+        );
+
+        searchUsersController = friendListSearchUsersController;
+
+        all.setOnAction(e->{
+            showWhich = (conv)->true;
+            friendListObservable.setPredicate(filter.and(showWhich));
+
+        });
+        online.setOnAction(e->{
+            showWhich = showOnline;
+            friendListObservable.setPredicate(filter.and(showWhich));
+
+        });
+
+
+        col2.getChildren().add(col2.getChildren().indexOf(listF), friendListSearchUsersController);
+
+
+
 
 
         curFriend = friendListObservable == null ? null : !friendListObservable.isEmpty() ? friendListObservable.getFirst() : null;
 
-        chatWindowController = new ChatWindowController(curFriend, null, () -> {}, (msg, curConv) -> {});
+        chatWindowController = new ChatWindowController(curFriend, null, () -> {}, (msg, curConv) -> {}, (item)->{
+            //seen
+            item.setSeen(true);
+            ConversationDAO.setSeen(item.getConversationID(), true);
+            //
+        });
         //Init GUI
 
 
@@ -89,21 +153,25 @@ public class FriendController extends GridPane {
         Callback<ListView<Conversation>, ListCell<Conversation>> friendListFactory = param -> new ListCellWithButtons(
                 changeToChat,
                 Arrays.asList(new Pair<String, Consumer<Conversation>>(
-                                "view/user/decline-svgrepo-com.png", item -> {}),
+                                "view/user/decline-svgrepo-com.png", item -> {
+                                    RelationshipDAO.block(item.getConversationID());
+                                    friendListObservable.getSource().remove(item);
+                        }),
                         new Pair<String, Consumer<Conversation>>(
-                                "view/user/unfriend-svgrepo-com.png", item -> {})
+                                "view/user/unfriend-svgrepo-com.png", item -> {
+                            RelationshipDAO.unfriend(item.getConversationID());
+                            friendListObservable.getSource().remove(item);
+                        })
                 )
         );
         Callback<ListView<Conversation>, ListCell<Conversation>> friendRequestsFactory = param -> new ListCellWithButtons(
                 (item)->{},
                 Arrays.asList(new Pair<String, Consumer<Conversation>>(
                         "view/user/accept-svgrepo-com.png", item -> {
-                            ConversationDAO.acceptFriendRequest(item.getConversationID(), item.getName());
-                            Conversation newItem = new Conversation(item);
-                            newItem.setType("PAIR");
-                            ChatController.getDmList().add(newItem);
-                            friendListObservable.add(newItem);
-                            friendRequestsList.remove(item);
+                            Conversation newItem = RelationshipDAO.acceptFriendRequest(item.getConversationID(), item.getName());
+                            ChatController.getDmList().add(0, newItem);
+                            ((ObservableList<Conversation>)friendListObservable.getSource()).add(newItem);
+                            friendRequestsList.getSource().remove(item);
                         }),
                         new Pair<String, Consumer<Conversation>>(
                         "view/user/decline-svgrepo-com.png", item -> {})
@@ -112,11 +180,12 @@ public class FriendController extends GridPane {
 
 
 
-
         //Handlers
         friendList.setOnMouseClicked((e)->{
-            friendListObservable.clear();
-            friendListObservable.addAll(new ConversationDAO().getFriends());
+            friendListObservable = new FilteredList<>(FXCollections.observableArrayList(RelationshipDAO.getFriends()));
+            col2.getChildren().set(col2.getChildren().indexOf(searchUsersController), friendListSearchUsersController);
+            searchUsersController = friendListSearchUsersController;
+
             getChildren().remove(1);
             getChildren().add(col2);
             curOption.setText("Friend List");
@@ -129,8 +198,11 @@ public class FriendController extends GridPane {
             listF.setCellFactory(friendListFactory);
         });
         friendRequests.setOnMouseClicked((e)->{
-            friendRequestsList.clear();
-            friendRequestsList.addAll(new ConversationDAO().getFriendRequests());
+            friendRequestsList = new FilteredList<>(FXCollections.observableArrayList(RelationshipDAO.getFriendRequests()));
+            col2.getChildren().set(col2.getChildren().indexOf(searchUsersController), friendRequestsSearchUsersController);
+            searchUsersController = friendRequestsSearchUsersController;
+
+
             getChildren().remove(1);
             getChildren().add(col2);
             curOption.setText("Friend Requests");

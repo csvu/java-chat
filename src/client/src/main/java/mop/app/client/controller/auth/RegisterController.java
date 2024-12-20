@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 public class RegisterController {
     private static final Logger logger = LoggerFactory.getLogger(RegisterController.class);
+    public static final String DELETED_USER = "Deleted User";
 
     @FXML
     private TextField emailField;
@@ -233,7 +234,7 @@ public class RegisterController {
             return;
         }
 
-        if (fullName.equals("Deleted User")) {
+        if (fullName.equals(DELETED_USER)) {
             AlertDialog.showAlertDialog(
                 Alert.AlertType.ERROR,
                 "Validation Error",

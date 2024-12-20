@@ -6,9 +6,6 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
@@ -16,8 +13,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<fx:root hgap="2.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1200.0" style="-fx-background-color: black;"
-         stylesheets="@home-view-style.css" type="javafx.scene.layout.GridPane" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml">
+<fx:root hgap="2.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1200.0" style="-fx-background-color: black;" stylesheets="@home-view-style.css" type="javafx.scene.layout.GridPane" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml">
   <columnConstraints>
     <ColumnConstraints hgrow="SOMETIMES" maxWidth="1090.0" minWidth="10.0" percentWidth="20.0" />
       <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" />
@@ -95,7 +91,7 @@
                         <Insets />
                      </HBox.margin>
                      <children>
-                        <Button mnemonicParsing="false" styleClass="HoverWrapper" text="ALL" textFill="WHITE">
+                        <Button fx:id="all" mnemonicParsing="false" styleClass="HoverWrapper" text="ALL" textFill="WHITE">
                            <font>
                               <Font size="16.0" />
                            </font>
@@ -105,7 +101,7 @@
                   <Separator maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" opacity="0.2" orientation="VERTICAL" />
                   <HBox alignment="CENTER" HBox.hgrow="ALWAYS">
                      <children>
-                        <Button mnemonicParsing="false" styleClass="HoverWrapper" text="ONLINE" textFill="WHITE">
+                        <Button fx:id="online" mnemonicParsing="false" styleClass="HoverWrapper" text="ONLINE" textFill="WHITE">
                            <font>
                               <Font size="16.0" />
                            </font>
@@ -115,19 +111,6 @@
                </children>
                <padding>
                   <Insets left="20.0" right="20.0" />
-               </padding>
-            </HBox>
-            <HBox alignment="CENTER_LEFT" prefHeight="65.0" spacing="10.0" style="-fx-background-color: transparent;">
-               <children>
-                  <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@search-alt-2-svgrepo-com.png" />
-                     </image>
-                  </ImageView>
-                  <TextField promptText="Search" />
-               </children>
-               <padding>
-                  <Insets bottom="10.0" left="20.0" right="10.0" top="10.0" />
                </padding>
             </HBox>
             <ListView fx:id="listF" focusTraversable="false" prefHeight="566.0" prefWidth="883.0" style="-fx-background-color: transparent;" styleClass="noHoverListView" VBox.vgrow="ALWAYS" />

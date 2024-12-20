@@ -21,8 +21,11 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import mop.app.client.Client;
+import mop.app.client.controller.auth.RegisterController;
 import mop.app.client.dao.user.MessageDAO;
 import mop.app.client.dao.user.ConversationDAO;
+import mop.app.client.dao.user.RelationshipDAO;
+import mop.app.client.dao.user.UserDAO;
 import mop.app.client.dto.Request;
 import mop.app.client.dto.RequestType;
 import mop.app.client.model.user.Conversation;
@@ -32,12 +35,14 @@ import mop.app.client.network.AsyncSocketClient;
 import mop.app.client.util.ObjectMapperConfig;
 
 import java.io.IOException;
+import java.sql.SQLException;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
-import java.util.ArrayList;
 import java.util.Objects;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 
 public class ChatWindowController extends GridPane {
@@ -53,6 +58,8 @@ public class ChatWindowController extends GridPane {
     private VBox chatOptions;
     @FXML
     private HBox block;
+    @FXML
+    private Label blockLabel;
     @FXML
     private HBox report;
     @FXML
@@ -80,14 +87,16 @@ public class ChatWindowController extends GridPane {
     @FXML
     private HBox editName;
     @FXML
-    private Label chatWindowName;
+    private TextField chatWindowName;
     @FXML
     private Button sendButton;
 
     private final IconLabel addFriend;
 
     private final ContextMenu msgContextMenu = new ContextMenu();
-    private final MenuItem deleteMsg = new MenuItem("Delete Message");
+    private final MenuItem removeForYou = new MenuItem("Remove for you");
+    private final MenuItem removeForEveryone = new MenuItem("Remove for Everyone");
+
 
 
     private final Text sizeHelper = new Text();;
@@ -100,7 +109,7 @@ public class ChatWindowController extends GridPane {
     private int cursorMsgId = maxCursor;
     private final BiConsumer<Message, Conversation> onNewMessage;
 
-    public ChatWindowController(Conversation inpConversation, Relationship inpRelationship, Runnable onChatControllerUpdate, BiConsumer<Message, Conversation> onNewMessage) throws IOException {
+    public ChatWindowController(Conversation inpConversation, Relationship inpRelationship, Runnable onChatControllerUpdate, BiConsumer<Message, Conversation> onNewMessage, Consumer<Conversation> onSeen) throws IOException {
         this.curConversation = inpConversation;
         this.onNewMessage = onNewMessage;
         this.curRelationship = inpRelationship;
@@ -122,27 +131,41 @@ public class ChatWindowController extends GridPane {
         addFriend.getStyleClass().add("HoverWrapper");
         addFriend.setOnMouseClicked(e -> {
             if (curRelationship == null) return;
-            if (curRelationship.getStatus().equals("N/A")) {
-                ConversationDAO.makeFriendRequest(curRelationship.getId());
-                this.curRelationship.setStatus("PENDING");
-                addFriend.update(null, "Cancel Friend Request", null, null);
+            if (curRelationship.getStatus().equals(Relationship.NA)) {
+                String rel = RelationshipDAO.getReverseRelationship(curRelationship.getId());
+                if (rel != null && rel.equals(Relationship.PENDING)) {
+                    Conversation newItem = RelationshipDAO.acceptFriendRequest(curRelationship.getId(), curRelationship.getUserDisplayName());
+                    this.curRelationship.setStatus(Relationship.FRIEND);
+                    col2.getChildren().remove(addFriend);
+                    ChatController.getDmList().add(newItem);
+                } else {
+                    RelationshipDAO.makeFriendRequest(curRelationship.getId());
+                    this.curRelationship.setStatus(Relationship.PENDING);
+                    addFriend.update(null, "Cancel Friend Request", null, null);
+                }
             } else {
-                ConversationDAO.cancelFriendRequest(this.curRelationship.getId());
-                this.curRelationship.setStatus("N/A");
-                addFriend.update(Client.class.getResource("view/user/add-friend-basic-outline-svgrepo-com.png"), "Add Friend", null, null);
+                RelationshipDAO.cancelFriendRequest(this.curRelationship.getId());
+                this.curRelationship.setStatus(Relationship.NA);
+                addFriend.update(null, "Add Friend", null, null);
             }
         });
 
-        msgWindow.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
 
-        deleteMsg.setOnAction(e->{
-            for (Message msg : new ArrayList<>(msgWindow.getSelectionModel().getSelectedItems())) {
-                MessageDAO.deleteMessage(msg.getMsgId());
-                convMsg.remove(msg);
-            }
+        removeForYou.setOnAction(e->{
+            Message msg = msgWindow.getSelectionModel().getSelectedItem();
+            if (msg == null) return;
+            MessageDAO.hideMessage(msg.getMsgId());
+            convMsg.remove(msg);
         });
-        msgContextMenu.getItems().add(deleteMsg);
+
+        removeForEveryone.setOnAction(e->{
+            Message msg = msgWindow.getSelectionModel().getSelectedItem();
+            if (msg == null) return;
+            MessageDAO.deleteMessage(msg.getMsgId());
+            convMsg.remove(msg);
+        });
+
 
         updateChatInfo();
 
@@ -237,6 +260,24 @@ public class ChatWindowController extends GridPane {
             }
         });
 
+        editName.setOnMouseClicked(e->{
+            chatWindowName.setEditable(true);
+            Platform.runLater(() -> {
+                chatWindowName.requestFocus();
+                chatWindowName.selectAll();
+            });
+        });
+
+        chatWindowName.setOnKeyPressed(e->{
+            if (e.getCode() == KeyCode.ENTER) {
+                ConversationDAO.setConversationName(curConversation.getConversationID(), chatWindowName.getText());
+                chatWindowName.setEditable(false);
+                curConversation.setName(chatWindowName.getText());
+                updateTopBarCol3(curConversation);
+                onSeen.accept(curConversation);
+            }
+        });
+
         msgWindow.setCellFactory(params -> new ListCell<>(){
             IconLabel iconLabel = null;
             @Override
@@ -260,7 +301,47 @@ public class ChatWindowController extends GridPane {
             }
         });
 
-        msgWindow.setContextMenu(msgContextMenu);
+        msgWindow.setOnContextMenuRequested(e -> {
+            Message msg = msgWindow.getSelectionModel().getSelectedItem();
+            if (msg == null) return;
+            msgContextMenu.getItems().clear();
+            msgContextMenu.getItems().add(removeForYou);
+            if (msg.getSenderId() == Client.currentUser.getUserId() && Duration.between(msg.getSentAt(), LocalDateTime.now()).toHours() < 24) {
+                msgContextMenu.getItems().add(removeForEveryone);
+            }
+            msgContextMenu.show(msgWindow, e.getScreenX(), e.getScreenY());
+        });
+
+        deleteChat.setOnMouseClicked(e->{
+            MessageDAO.hideAllMessages(curConversation.getConversationID());
+            convMsg.clear();
+            // update dmList
+        });
+
+        block.setOnMouseClicked(e->{
+            if (blockLabel.getText().equals("Block")) {
+                RelationshipDAO.block(curRelationship.getId());
+                blockLabel.setText("Unblock");
+                writeMsg.setDisable(true);
+                topVBox.setDisable(true);
+            } else {
+                RelationshipDAO.unblock(curRelationship.getId());
+                blockLabel.setText("Block");
+                writeMsg.setDisable(false);
+                topVBox.setDisable(false);
+
+            }
+        });
+
+        report.setOnMouseClicked(e->{
+            UserDAO.report(ConversationDAO.getRemainingInAPair(curConversation.getConversationID()));
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Report");
+            alert.setHeaderText("Reported");
+            alert.setContentText("User has been reported");
+            alert.showAndWait();
+
+        });
 
 
         msgWindow.setItems(convMsg);
@@ -271,6 +352,7 @@ public class ChatWindowController extends GridPane {
                 bar.valueProperty().addListener((src, ov, nv) -> {
                     if (nv.doubleValue() == 1.) {
                         System.out.print("Scrolled to bottom");
+                        onSeen.accept(curConversation);
                     } else if (nv.doubleValue() == 0.) {
                         System.out.print("Scrolled to top");
                         convMsg.addAll(0, MessageDAO.getMessages(curConversation.getConversationID(), cursorMsgId));
@@ -331,7 +413,7 @@ public class ChatWindowController extends GridPane {
         }
         col2.setVisible(true);
 
-        if (this.curRelationship == null || (!this.curRelationship.getStatus().equals(Relationship.NA) && !this.curRelationship.getStatus().equals(Relationship.PENDING))) {
+        if (curConversation.getType().equals(Conversation.GROUP) || this.curRelationship == null || (!this.curRelationship.getStatus().equals(Relationship.NA) && !this.curRelationship.getStatus().equals(Relationship.PENDING))) {
             col2.getChildren().remove(addFriend);
             if (!col2.getChildren().contains(writeMsg)) {
                 col2.getChildren().add(writeMsg);
@@ -344,7 +426,14 @@ public class ChatWindowController extends GridPane {
             if (this.curRelationship.getStatus().equals(Relationship.PENDING)) {
                 addFriend.update(null, "Cancel Friend Request", null, null);
             } else {
-                addFriend.update(null, "Add Friend", null, null);
+                String rel = RelationshipDAO.getReverseRelationship(this.curRelationship.getId());
+                if (rel != null && rel.equals(Relationship.PENDING)) {
+                    addFriend.update(null, "Accept Friend Request", null, null);
+
+                } else {
+                    addFriend.update(null, "Add Friend", null, null);
+
+                }
             }
 
         }
@@ -357,9 +446,34 @@ public class ChatWindowController extends GridPane {
 
     void changeCurConv(Conversation item, Relationship relationship) {
         curConversation = item;
+        System.out.println(item.getName());
+
         curRelationship = relationship;
         chatWindowName.setText(item == null ? null : item.getName());
         cursorMsgId = maxCursor;
+
+        if (relationship != null && relationship.getStatus().equals(Relationship.BLOCK)) {
+            blockLabel.setText("Unblock");
+            writeMsg.setDisable(true);
+            topVBox.setDisable(true);
+        } else {
+            blockLabel.setText("Block");
+            writeMsg.setDisable(false);
+            topVBox.setDisable(false);
+        }
+
+
+
+
+        if (relationship != null) {
+            String rel = RelationshipDAO.getReverseRelationship(relationship.getId());
+            this.setDisable(rel != null && rel.equals(Relationship.BLOCK));
+        } else {
+            this.setDisable(false);
+
+        }
+
+
         updateChatInfo();
         updateTopBarIfNotFriend();
         //Update activity status too
@@ -375,16 +489,25 @@ public class ChatWindowController extends GridPane {
         }
         
 
-        topBarCol3.getChildren().clear();
-        if (item != null) topBarCol3.getChildren().add(new IconLabel(item.getIcon(), item.getName(), null, null));
+        updateTopBarCol3(item);
 
         msgWindow.setItems(convMsg);
 
         msgWindow.scrollTo(convMsg.size());
+
+        if (curConversation.getName().equals(RegisterController.DELETED_USER)) {
+            this.setDisable(true);
+        }
+    }
+
+    void updateTopBarCol3(Conversation item) {
+        topBarCol3.getChildren().clear();
+        if (item != null) topBarCol3.getChildren().add(new IconLabel(item.getIcon(), item.getName(), null, null));
     }
 
     void sendMessage() throws JsonProcessingException {
         if (!chatArea.getText().trim().isEmpty()) {
+            ConversationDAO.setSeen(curConversation.getConversationID(), false);
             int msgId = MessageDAO.sendMessage(curConversation, curRelationship, chatArea.getText());
             sendMessageNet(new Message(Client.currentUser.getDisplayName(), null, LocalDateTime.now(), chatArea.getText(), curConversation.getConversationID(), (int)Client.currentUser.getUserId(), msgId));
             Message newMsg = new Message("You", null, LocalDateTime.now(),chatArea.getText(), curConversation.getConversationID(), (int)Client.currentUser.getUserId(), msgId);
@@ -425,3 +548,5 @@ public class ChatWindowController extends GridPane {
         }
     }
 }
+
+

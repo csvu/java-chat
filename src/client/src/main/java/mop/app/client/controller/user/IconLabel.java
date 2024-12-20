@@ -61,6 +61,17 @@ public class IconLabel extends HBox {
 
     }
 
+    public IconLabel(URL icon, String title, String titleSide, String content, boolean bold) {
+        this(icon, title, titleSide, content);
+        if (contentLabel != null) {
+            if (bold) {
+                contentLabel.setStyle("-fx-font-weight: bold;");
+            } else {
+                contentLabel.setStyle("-fx-font-weight: normal;");
+            }
+        }
+    }
+
     public void update(URL icon, String title, String titleSide, String content) {
         if (icon != null) {
             if (circleImage != null) circleImage.update(icon.toString());
@@ -75,6 +86,17 @@ public class IconLabel extends HBox {
         }
         if (content != null) {
             contentLabel.setText(content);
+        }
+    }
+
+    public void update(URL icon, String title, String titleSide, String content, boolean bold) {
+        update(icon, title, titleSide, content);
+        if (contentLabel != null) {
+            if (bold) {
+                contentLabel.setStyle("-fx-font-weight: bold;");
+            } else {
+                contentLabel.setStyle("-fx-font-weight: normal;");
+            }
         }
     }
 

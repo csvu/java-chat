@@ -15,6 +15,8 @@ import java.util.List;
 
 public class ConversationDAO {
 
+
+
     public static int getRemainingInAPair(int conversationId) {
         UtilityDAO utilityDAO = new UtilityDAO();
         Connection conn = utilityDAO.getConnection();
@@ -49,9 +51,10 @@ public class ConversationDAO {
         Relationship res = null;
 
         try (PreparedStatement preparedStatement = conn.prepareStatement(
-                "select user_id2, type_name\n" +
-                        "from public.relationship join public.relationship_type on status = type_id\n" +
-                        "where user_id1 = ? and user_id2 = (select user_id from public.enrollment where conversation_id = ? and user_id <> ?);")) {
+                """
+                        select user_id2, type_name
+                        from public.relationship join public.relationship_type on status = type_id
+                        where user_id1 = ? and user_id2 = (select user_id from public.enrollment where conversation_id = ? and user_id <> ?);""")) {
             preparedStatement.setInt(1, (int) Client.currentUser.getUserId());
             preparedStatement.setInt(2, conversationId);
             preparedStatement.setInt(3, (int) Client.currentUser.getUserId());
@@ -76,6 +79,58 @@ public class ConversationDAO {
 
     }
 
+    public static void setSeen(int conversationId, boolean seen) {
+        UtilityDAO utilityDAO = new UtilityDAO();
+        Connection conn = utilityDAO.getConnection();
+        if (conn == null) {
+            return;
+        }
+
+        if (!seen) {
+            try (PreparedStatement preparedStatement = conn.prepareStatement(
+                    """
+                            update public.enrollment
+                            set is_seen = false
+                            where conversation_id = ? and user_id <> ?""")) {
+                preparedStatement.setInt(1, conversationId);
+                preparedStatement.setInt(2, (int) Client.currentUser.getUserId());
+                preparedStatement.executeUpdate();
+            } catch (SQLException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+        try (PreparedStatement preparedStatement = conn.prepareStatement(
+                """
+                        update public.enrollment
+                        set is_seen = true
+                        where conversation_id = ? and user_id = ?""")) {
+            preparedStatement.setInt(1, conversationId);
+            preparedStatement.setInt(2, (int) Client.currentUser.getUserId());
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+    public static void setConversationName(int conversationId, String name) {
+        UtilityDAO utilityDAO = new UtilityDAO();
+        Connection conn = utilityDAO.getConnection();
+        if (conn == null) {
+            return;
+        }
+
+        try (PreparedStatement preparedStatement = conn.prepareStatement(
+                """
+                        update public.conversation
+                        set name = ?
+                        where conversation_id = ?""")) {
+            preparedStatement.setString(1, name);
+            preparedStatement.setInt(2, conversationId);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
     public static ArrayList<Conversation> getConv() {
         UtilityDAO utilityDAO = new UtilityDAO();
         ArrayList<Conversation> list = new ArrayList<>();
@@ -92,6 +147,7 @@ public class ConversationDAO {
 
             preparedStatement.setInt(1, (int) Client.currentUser.getUserId());
             preparedStatement.setInt(2, (int) Client.currentUser.getUserId());
+            preparedStatement.setInt(3, (int) Client.currentUser.getUserId());
 
 
             System.out.println("SHI");
@@ -153,202 +209,6 @@ public class ConversationDAO {
         return res;
     }
 
-    public static void makeFriendRequest(int userId) {
-        UtilityDAO utilityDAO = new UtilityDAO();
-        ArrayList<Conversation> list = new ArrayList<>();
-        Connection conn = utilityDAO.getConnection();
-        if(conn == null) {
-            return;
-        }
-
-        try (PreparedStatement preparedStatement = conn.prepareStatement(
-                "insert into public.relationship\n" +
-                        "values (?, ?, NOW(), 3)")) {
-
-            preparedStatement.setInt(1, (int) Client.currentUser.getUserId());
-            preparedStatement.setInt(2, userId);
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-    }
-    public static ArrayList<Conversation> getFriendRequests() {
-        UtilityDAO utilityDAO = new UtilityDAO();
-        ArrayList<Conversation> list = new ArrayList<>();
-        Connection conn = utilityDAO.getConnection();
-        if(conn == null) {
-            return list;
-        }
-
-        try (PreparedStatement preparedStatement = conn.prepareStatement(
-                "SELECT\n" +
-                        "\tR2.USER_ID AS \"id\",\n" +
-                        "\tR2.DISPLAY_NAME AS \"display_name\",\n" +
-                        "\tR2.AVATAR AS \"avatar\",\n" +
-                        "\tTYPE_NAME AS \"type\"\n" +
-                        "FROM\n" +
-                        "\t(\n" +
-                        "\t\tSELECT\n" +
-                        "\t\t\tUSER_ID1,\n" +
-                        "\t\t\tTYPE_NAME\n" +
-                        "\t\tFROM\n" +
-                        "\t\t\tPUBLIC.RELATIONSHIP\n" +
-                        "\t\t\tJOIN PUBLIC.RELATIONSHIP_TYPE ON TYPE_ID = STATUS\n" +
-                        "\t\tWHERE\n" +
-                        "\t\t\tUSER_ID2 = ?\n" +
-                        "\t\t\tAND STATUS = 3\n" +
-                        "\t) AS R1\n" +
-                        "\tJOIN PUBLIC.\"user\" AS R2 ON R1.USER_ID1 = R2.USER_ID" )) {
-
-            preparedStatement.setInt(1, (int) Client.currentUser.getUserId());
-
-
-            System.out.println("SHI");
-            ResultSet rs = preparedStatement.executeQuery();
-
-            while (rs.next()) {
-                int id = rs.getInt("id");
-                String displayName = rs.getString("DISPLAY_NAME");
-                String avatar = rs.getString("AVATAR");
-                String type = rs.getString("type");
-                Conversation conversation = new Conversation(id, type, avatar == null ? null : URL.of(URI.create(avatar), null) , displayName, false, null, null);
-                list.add(conversation);
-            }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
-        }
-        return list;
-    }
-
-    public static void cancelFriendRequest(int userId) {
-        UtilityDAO utilityDAO = new UtilityDAO();
-        ArrayList<Conversation> list = new ArrayList<>();
-        Connection conn = utilityDAO.getConnection();
-        if(conn == null) {
-            return;
-        }
-
-        try (PreparedStatement preparedStatement = conn.prepareStatement(
-                "delete \n" +
-                        "from public.relationship\n" +
-                        "where user_id1 = ? and user_id2 = ?" )) {
-
-            preparedStatement.setInt(1, (int) Client.currentUser.getUserId());
-            preparedStatement.setInt(2, userId);
-
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
-    public static void acceptFriendRequest(int userId, String displayName) {
-        UtilityDAO utilityDAO = new UtilityDAO();
-        Connection conn = utilityDAO.getConnection();
-        if(conn == null) {
-            return;
-        }
-
-        try (PreparedStatement relationshipStatement1 = conn.prepareStatement(
-                     "update public.relationship\n" +
-                             "set created_at = NOW(), status = 1\n" +
-                             "where user_id1 = ? and user_id2 = ?\n");
-             PreparedStatement relationshipStatement2 = conn.prepareStatement(
-                     "insert into\n" +
-                             "public.relationship\n" +
-                             "values (?, ?, NOW(), 1)\n" +
-                             "on conflict(user_id1, user_id2)\n" +
-                             "do\n" +
-                             "update\n" +
-                             "set created_at = NOW(), status = 1" );
-             PreparedStatement relationshipStatement3 = conn.prepareStatement(
-                     "insert into \n" +
-                             "public.conversation(\"name\", icon, type_id)\n" +
-                             "values (?, NULL, 1)" , Statement.RETURN_GENERATED_KEYS);
-             PreparedStatement relationshipStatement4 = conn.prepareStatement(
-                     "insert into \n" +
-                             "public.enrollment\n" +
-                             "values (?, ?, 2), (?, ?, 2)" );
-        ) {
-            conn.setAutoCommit(false);
-            relationshipStatement1.setInt(1, userId);
-            relationshipStatement1.setInt(2, (int) Client.currentUser.getUserId());
-            relationshipStatement1.executeUpdate();
-            relationshipStatement2.setInt(1, (int) Client.currentUser.getUserId());
-            relationshipStatement2.setInt(2, userId);
-            relationshipStatement2.executeUpdate();
-
-            System.out.println("AcceptFriendRequest " + userId + " " + Client.currentUser.getUserId());
-
-            if (getPairConversationId(userId) != -1) {
-                conn.commit();
-                return;
-            }
-
-            relationshipStatement3.setString(1, displayName);
-            relationshipStatement3.executeUpdate();
-
-
-            ResultSet rs = relationshipStatement3.getGeneratedKeys();
-            rs.next();
-            int conversationId = rs.getInt(1);
-            relationshipStatement4.setInt(1, userId);
-            relationshipStatement4.setInt(2, conversationId);
-            relationshipStatement4.setInt(3, (int) Client.currentUser.getUserId());
-            relationshipStatement4.setInt(4, conversationId);
-            relationshipStatement4.executeUpdate();
-
-            conn.commit();
-        } catch (SQLException e) {
-            try {
-                System.err.print(e.getMessage());
-                conn.rollback();
-            } catch (SQLException excep) {
-                excep.printStackTrace();
-            }
-        }
-    }
-
-    public static ArrayList<Conversation> getFriendsNotInConversation(int conversationId) {
-        UtilityDAO utilityDAO = new UtilityDAO();
-        ArrayList<Conversation> list = new ArrayList<>();
-        Connection conn = utilityDAO.getConnection();
-        if(conn == null) {
-            return list;
-        }
-
-        try (PreparedStatement preparedStatement = conn.prepareStatement(
-                "SELECT user_id2 as \"id\", display_name, avatar, 'FRIEND' as \"type\" FROM public.relationship join public.relationship_type on status = type_id join public.\"user\" on user_id2 = user_id\n" +
-                        "where user_id1 = ? and type_name = 'FRIEND' and user_id2 not in (\n" +
-                        "\tselect user_id\n" +
-                        "\tfrom public.enrollment\n" +
-                        "\twhere conversation_id = ?\n" +
-                        ")\n" )) {
-
-            preparedStatement.setInt(1, (int) Client.currentUser.getUserId());
-            preparedStatement.setInt(2, conversationId);
-
-            System.out.println("SHI");
-            ResultSet rs = preparedStatement.executeQuery();
-
-            while (rs.next()) {
-                int id = rs.getInt("id");
-                String displayName = rs.getString("DISPLAY_NAME");
-                String avatar = rs.getString("AVATAR");
-                String type = rs.getString("type");
-                Conversation conversation = new Conversation(id, type, avatar == null ? null : URL.of(URI.create(avatar), null) , displayName, false, null, null);
-                list.add(conversation);
-            }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
-        }
-        return list;
-    }
-
     public static ArrayList<ArrayList<Conversation>> getMembers(int conversationId) {
         UtilityDAO utilityDAO = new UtilityDAO();
         ArrayList<ArrayList<Conversation>> ret = new ArrayList<>();
@@ -360,10 +220,11 @@ public class ConversationDAO {
         }
 
         try (PreparedStatement preparedStatement = conn.prepareStatement(
-                "select en.user_id, us.display_name, en_role.role_name\n" +
-                        "from public.enrollment as en join public.\"user\" as us on us.user_id = en.user_id join enrollment_role as en_role on en.role_id = en_role.role_id\n" +
-                        "where en.conversation_id = ?\n" +
-                        "order by en_role.role_id" )) {
+                """
+                        select en.user_id, us.display_name, en_role.role_name
+                        from public.enrollment as en join public."user" as us on us.user_id = en.user_id join enrollment_role as en_role on en.role_id = en_role.role_id
+                        where en.conversation_id = ?
+                        order by en_role.role_id""")) {
 
 
             preparedStatement.setInt(1, conversationId);
@@ -389,39 +250,6 @@ public class ConversationDAO {
         return ret;
     }
 
-    public static ArrayList<Conversation> getFriends() {
-        UtilityDAO utilityDAO = new UtilityDAO();
-        ArrayList<Conversation> list = new ArrayList<>();
-        Connection conn = utilityDAO.getConnection();
-        if(conn == null) {
-            return list;
-        }
-
-        try (PreparedStatement preparedStatement = conn.prepareStatement(
-                "SELECT user_id2 as \"id\", display_name, avatar, 'FRIEND' as \"type\", is_active FROM public.relationship join public.relationship_type on status = type_id join public.\"user\" on user_id2 = user_id\n" +
-                        "where user_id1 = ? and type_name = 'FRIEND'" )) {
-
-            preparedStatement.setInt(1, (int) Client.currentUser.getUserId());
-
-            System.out.println("SHI");
-            ResultSet rs = preparedStatement.executeQuery();
-
-            while (rs.next()) {
-                int id = rs.getInt("id");
-                String displayName = rs.getString("DISPLAY_NAME");
-                String avatar = rs.getString("AVATAR");
-                String type = rs.getString("type");
-                String isActive = rs.getBoolean("is_active") ? "Online" : "Offline";
-                Conversation friend = new Conversation(id, type, avatar == null ? null : URL.of(URI.create(avatar), null) , displayName, false, null, isActive);
-                list.add(friend);
-            }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
-        }
-        return list;
-    }
     public static int getPairConversationId(int friendId) {
         UtilityDAO utilityDAO = new UtilityDAO();
         Connection conn = utilityDAO.getConnection();
@@ -432,11 +260,12 @@ public class ConversationDAO {
         int res = -1;
 
         try (PreparedStatement preparedStatement = conn.prepareStatement(
-                "select co.conversation_id\n" +
-                        "from public.conversation as co join public.enrollment as en on co.conversation_id = en.conversation_id\n" +
-                        "where co.type_id = 1\n" +
-                        "group by co.conversation_id\n" +
-                        "having count(en.user_id) = 2 and SUM(CASE WHEN en.user_id = ? or en.user_id = ? THEN 1 ELSE 0 END) = 2" )) {
+                """
+                        select co.conversation_id
+                        from public.conversation as co join public.enrollment as en on co.conversation_id = en.conversation_id
+                        where co.type_id = 1
+                        group by co.conversation_id
+                        having count(en.user_id) = 2 and SUM(CASE WHEN en.user_id = ? or en.user_id = ? THEN 1 ELSE 0 END) = 2""")) {
 
             preparedStatement.setInt(1, (int) Client.currentUser.getUserId());
             preparedStatement.setInt(2, friendId);
@@ -469,8 +298,10 @@ public class ConversationDAO {
                         "values (?, NULL, 2)" , Statement.RETURN_GENERATED_KEYS);
 
              PreparedStatement relationshipStatement2 = conn.prepareStatement(
-                     "insert into public.enrollment\n" + "select user_id, ?, case when user_id = ? then 1 else 2 end\n" +
-                             "from public.enrollment where conversation_id = ?" );
+                     """
+                             insert into public.enrollment
+                             select user_id, ?, case when user_id = ? then 1 else 2 end
+                             from public.enrollment where conversation_id = ?""");
 
         ) {
             conn.setAutoCommit(false);
@@ -494,9 +325,10 @@ public class ConversationDAO {
 
             for (int userId : userIds) {
                 PreparedStatement relationshipStatement3 = conn.prepareStatement(
-                        "insert into \n" +
-                                "public.enrollment\n" +
-                                "values (?, ?, 2)" );
+                        """
+                                insert into
+                                public.enrollment
+                                values (?, ?, 2)""");
                 relationshipStatement3.setInt(1, userId);
                 relationshipStatement3.setInt(2, conversationId);
                 relationshipStatement3.executeUpdate();
@@ -513,4 +345,42 @@ public class ConversationDAO {
         }
     }
 
+    public static void removeMember(int conversationID, int userId) {
+        UtilityDAO utilityDAO = new UtilityDAO();
+        Connection conn = utilityDAO.getConnection();
+        if (conn == null) {
+            return;
+        }
+
+        try (PreparedStatement preparedStatement = conn.prepareStatement(
+                """
+                        delete from public.enrollment
+                        where conversation_id = ? and user_id = ?""")) {
+            preparedStatement.setInt(1, conversationID);
+            preparedStatement.setInt(2, userId);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public static void addAdmin(int conversationID, int userId) {
+        UtilityDAO utilityDAO = new UtilityDAO();
+        Connection conn = utilityDAO.getConnection();
+        if (conn == null) {
+            return;
+        }
+
+        try (PreparedStatement preparedStatement = conn.prepareStatement(
+                """
+                        update public.enrollment
+                        set role_id = 1
+                        where conversation_id = ? and user_id = ?""")) {
+            preparedStatement.setInt(1, conversationID);
+            preparedStatement.setInt(2, userId);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
 }

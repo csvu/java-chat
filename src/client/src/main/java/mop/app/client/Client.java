@@ -69,6 +69,7 @@ public class Client extends Application {
                 stage.setResizable(false);
                 stage.setScene(scene);
                 stage.show();
+                //Noted
                 Client.registerActivity();
 
             } else {
