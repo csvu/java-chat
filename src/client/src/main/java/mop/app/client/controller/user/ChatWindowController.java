@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
@@ -40,6 +41,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.util.ArrayList;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -482,10 +484,19 @@ public class ChatWindowController extends GridPane {
 
         convMsg.clear();
         if (item != null && (item.getType().equals("PAIR") || item.getType().equals("GROUP"))) {
-            convMsg.addAll(MessageDAO.getMessages(item.getConversationID(), cursorMsgId));
-            if (convMsg.size() > 0) {
-                cursorMsgId = convMsg.get(0).getMsgId();
-            }
+            Task<ArrayList<Message>> task = new Task<>() {
+                @Override
+                protected ArrayList<Message> call() {
+                    return MessageDAO.getMessages(item.getConversationID(), cursorMsgId);
+                }
+            };
+            task.setOnSucceeded(event -> {
+                convMsg.addAll(task.getValue());
+                if (convMsg.size() > 0) {
+                    cursorMsgId = convMsg.get(0).getMsgId();
+                }
+            });
+            new Thread(task).start();
         }
         
 
@@ -507,14 +518,25 @@ public class ChatWindowController extends GridPane {
 
     void sendMessage() throws JsonProcessingException {
         if (!chatArea.getText().trim().isEmpty()) {
-            ConversationDAO.setSeen(curConversation.getConversationID(), false);
-            int msgId = MessageDAO.sendMessage(curConversation, curRelationship, chatArea.getText());
-            sendMessageNet(new Message(Client.currentUser.getDisplayName(), null, LocalDateTime.now(), chatArea.getText(), curConversation.getConversationID(), (int)Client.currentUser.getUserId(), msgId));
-            Message newMsg = new Message("You", null, LocalDateTime.now(),chatArea.getText(), curConversation.getConversationID(), (int)Client.currentUser.getUserId(), msgId);
-            convMsg.add(newMsg);
-            chatArea.clear();
-            msgWindow.scrollTo(convMsg.size());
-            onNewMessage.accept(newMsg, curConversation);
+            Task<Integer> task = new Task<>() {
+                @Override
+                protected Integer call() throws JsonProcessingException {
+                    ConversationDAO.setSeen(curConversation.getConversationID(), false);
+                    int msgId = MessageDAO.sendMessage(curConversation, curRelationship, chatArea.getText());
+
+                    sendMessageNet(new Message(Client.currentUser.getDisplayName(), null, LocalDateTime.now(), chatArea.getText(), curConversation.getConversationID(), (int)Client.currentUser.getUserId(), msgId));
+                    return msgId;
+                }
+            };
+            task.setOnSucceeded(e->{
+                Message newMsg = new Message("You", null, LocalDateTime.now(),chatArea.getText(), curConversation.getConversationID(), (int)Client.currentUser.getUserId(), task.getValue());
+                convMsg.add(newMsg);
+                chatArea.clear();
+                msgWindow.scrollTo(convMsg.size());
+                onNewMessage.accept(newMsg, curConversation);
+            });
+            new Thread(task).start();
+
         }
     }
 
@@ -541,11 +563,21 @@ public class ChatWindowController extends GridPane {
     }
 
     public void setConvMsg(int msgId) {
-        convMsg.clear();
-        convMsg.addAll(MessageDAO.getMessages(curConversation.getConversationID(), msgId + 1));
-        if (convMsg.size() > 0) {
-            cursorMsgId = convMsg.get(0).getMsgId();
-        }
+        Task<ArrayList<Message>> task = new Task<>() {
+            @Override
+            protected ArrayList<Message> call() {
+                return MessageDAO.getMessages(curConversation.getConversationID(), msgId + 1);
+            }
+        };
+        task.setOnSucceeded(event -> {
+            convMsg.clear();
+            convMsg.addAll(task.getValue());
+            if (convMsg.size() > 0) {
+                cursorMsgId = convMsg.get(0).getMsgId();
+            }
+        });
+        new Thread(task).start();
+
     }
 }
 

@@ -3,6 +3,7 @@ package mop.app.client.controller.user;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
@@ -182,37 +183,57 @@ public class FriendController extends GridPane {
 
         //Handlers
         friendList.setOnMouseClicked((e)->{
-            friendListObservable = new FilteredList<>(FXCollections.observableArrayList(RelationshipDAO.getFriends()));
-            col2.getChildren().set(col2.getChildren().indexOf(searchUsersController), friendListSearchUsersController);
-            searchUsersController = friendListSearchUsersController;
+            Task<ArrayList<Conversation>> task = new Task<>() {
+                @Override
+                protected ArrayList<Conversation> call() {
+                    return RelationshipDAO.getFriends();
+                }
+            };
+            task.setOnSucceeded(ev->{
+                friendListObservable = new FilteredList<>(FXCollections.observableArrayList(task.getValue()));
+                col2.getChildren().set(col2.getChildren().indexOf(searchUsersController), friendListSearchUsersController);
+                searchUsersController = friendListSearchUsersController;
 
-            getChildren().remove(1);
-            getChildren().add(col2);
-            curOption.setText("Friend List");
-            friendRequests.getStyleClass().clear();
-            friendList.getStyleClass().clear();
-            friendRequests.getStyleClass().add("HoverWrapper");
-            friendList.getStyleClass().add("PressedWrapper");
-            if (!col2.getChildren().contains(friendListAllOnl)) showFriendListAllOnl();
-            listF.setItems(friendListObservable);
-            listF.setCellFactory(friendListFactory);
+                getChildren().remove(1);
+                getChildren().add(col2);
+                curOption.setText("Friend List");
+                friendRequests.getStyleClass().clear();
+                friendList.getStyleClass().clear();
+                friendRequests.getStyleClass().add("HoverWrapper");
+                friendList.getStyleClass().add("PressedWrapper");
+                if (!col2.getChildren().contains(friendListAllOnl)) showFriendListAllOnl();
+                listF.setItems(friendListObservable);
+                listF.setCellFactory(friendListFactory);
+            });
+            new Thread(task).start();
+
         });
+
         friendRequests.setOnMouseClicked((e)->{
-            friendRequestsList = new FilteredList<>(FXCollections.observableArrayList(RelationshipDAO.getFriendRequests()));
-            col2.getChildren().set(col2.getChildren().indexOf(searchUsersController), friendRequestsSearchUsersController);
-            searchUsersController = friendRequestsSearchUsersController;
+            Task<ArrayList<Conversation>> task = new Task<>() {
+                @Override
+                protected ArrayList<Conversation> call() {
+                    return RelationshipDAO.getFriendRequests();
+                }
+            };
+            task.setOnSucceeded(ev-> {
+                friendRequestsList = new FilteredList<>(FXCollections.observableArrayList(task.getValue()));
+                col2.getChildren().set(col2.getChildren().indexOf(searchUsersController), friendRequestsSearchUsersController);
+                searchUsersController = friendRequestsSearchUsersController;
 
 
-            getChildren().remove(1);
-            getChildren().add(col2);
-            curOption.setText("Friend Requests");
-            friendList.getStyleClass().clear();
-            friendRequests.getStyleClass().clear();
-            friendList.getStyleClass().add("HoverWrapper");
-            friendRequests.getStyleClass().add("PressedWrapper");
-            hideFriendListAllOnl();
-            listF.setItems(friendRequestsList);
-            listF.setCellFactory(friendRequestsFactory);
+                getChildren().remove(1);
+                getChildren().add(col2);
+                curOption.setText("Friend Requests");
+                friendList.getStyleClass().clear();
+                friendRequests.getStyleClass().clear();
+                friendList.getStyleClass().add("HoverWrapper");
+                friendRequests.getStyleClass().add("PressedWrapper");
+                hideFriendListAllOnl();
+                listF.setItems(friendRequestsList);
+                listF.setCellFactory(friendRequestsFactory);
+            });
+            new Thread(task).start();
         });
 
 

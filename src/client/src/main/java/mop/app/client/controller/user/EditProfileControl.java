@@ -37,7 +37,6 @@ public class EditProfileControl extends VBox {
         addressArea.setText(Client.currentUser.getAddress());
         genderComboBox.setValue(Client.currentUser.getGender());
 
-
     }
 
 

@@ -1,7 +1,9 @@
 package mop.app.client.controller.user;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ListView;
@@ -10,16 +12,19 @@ import javafx.scene.layout.VBox;
 import mop.app.client.Client;
 import mop.app.client.dao.user.ConversationDAO;
 import mop.app.client.dao.user.MessageDAO;
-import mop.app.client.dao.user.RelationshipDAO;
 import mop.app.client.dao.user.UserDAO;
+import mop.app.client.dto.FriendStatisticDTO;
 import mop.app.client.model.user.Conversation;
 import mop.app.client.model.user.Message;
 import mop.app.client.model.user.MessageInConversation;
 import mop.app.client.model.user.Relationship;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class ChatController extends GridPane {
@@ -53,8 +58,20 @@ public class ChatController extends GridPane {
                 firstConversation,
                 (firstConversation == null) ? null : ConversationDAO.getRelationShipInAPairConversation(firstConversation.getConversationID()),
                 () -> {
-                    dmList.clear();
-                    dmList.addAll(ConversationDAO.getConv());
+                    Task<ArrayList<Conversation>> task = new Task<>() {
+                        @Override
+                        protected ArrayList<Conversation> call() {
+                            return ConversationDAO.getConv();
+                        }
+                    };
+
+                    task.setOnSucceeded(event -> {
+                        dmList.clear();
+                        dmList.addAll(task.getValue());
+                    });
+
+                    new Thread(task).start();
+
                 },
                 (msg, curConv) -> {
                     dmList.remove(curConv);
@@ -93,14 +110,50 @@ public class ChatController extends GridPane {
                     if (!col0.getChildren().contains(listSearch)) col0.getChildren().add(listSearch);
                     System.out.println(textQuery);
 
-                    listSearch.setStrangers(UserDAO.getMatched(textQuery));
-                    listSearch.setSearchMessages(MessageDAO.getMatchedMessages(textQuery));
+                    Task<ArrayList<Relationship>> taskStranger = new Task<>() {
+                        @Override
+                        protected ArrayList<Relationship> call() {
+                            return UserDAO.getMatched(textQuery);
+                        }
+                    };
+                    taskStranger.setOnSucceeded(event -> {
+                        listSearch.setStrangers(taskStranger.getValue());
+                    });
+                    new Thread(taskStranger).start();
+
+                    Task<ArrayList<MessageInConversation>> taskMessage = new Task<>() {
+                        @Override
+                        protected ArrayList<MessageInConversation> call() {
+                            return MessageDAO.getMatchedMessages(textQuery);
+                        }
+                    };
+
+                    taskMessage.setOnSucceeded(event -> {
+                        listSearch.setSearchMessages(taskMessage.getValue());
+                    });
+                    new Thread(taskMessage).start();
+
+
+
+
                 },
                 () -> {
-                    dmList.clear();
-                    dmList.addAll(ConversationDAO.getConv());
-                    col0.getChildren().remove(listSearch);
-                    if (!col0.getChildren().contains(listViewCol2)) col0.getChildren().add(listViewCol2);
+                    Task<ArrayList<Conversation>> task = new Task<>() {
+                        @Override
+                        protected ArrayList<Conversation> call() {
+                            return ConversationDAO.getConv();
+                        }
+                    };
+
+                    task.setOnSucceeded(event -> {
+                        dmList.clear();
+                        dmList.addAll(task.getValue());
+                        col0.getChildren().remove(listSearch);
+                        if (!col0.getChildren().contains(listViewCol2)) col0.getChildren().add(listViewCol2);
+                    });
+                    new Thread(task).start();
+
+
                 }
         );
 
@@ -131,12 +184,23 @@ public class ChatController extends GridPane {
     }
 
     void update() {
-        dmList.clear();
-        dmList.addAll(ConversationDAO.getConv());
-        listViewCol2.getSelectionModel().select(0);
-        if (!dmList.isEmpty()) {
-            if (listViewCol2.getSelectionModel().getSelectedItem() != null) chatWindowController.changeCurConv(listViewCol2.getSelectionModel().getSelectedItem(), new ConversationDAO().getRelationShipInAPairConversation(listViewCol2.getSelectionModel().getSelectedItem().getConversationID()));
-        }
+        Task<ArrayList<Conversation>> task = new Task<>() {
+            @Override
+            protected ArrayList<Conversation> call() {
+                return ConversationDAO.getConv();
+            }
+        };
+
+        task.setOnSucceeded(event -> {
+            dmList.clear();
+            dmList.addAll(task.getValue());
+            listViewCol2.getSelectionModel().select(0);
+            if (!dmList.isEmpty()) {
+                if (listViewCol2.getSelectionModel().getSelectedItem() != null) chatWindowController.changeCurConv(listViewCol2.getSelectionModel().getSelectedItem(), new ConversationDAO().getRelationShipInAPairConversation(listViewCol2.getSelectionModel().getSelectedItem().getConversationID()));
+            }
+        });
+        new Thread(task).start();
+
     }
 
     static ObservableList<Conversation> getDmList() {
