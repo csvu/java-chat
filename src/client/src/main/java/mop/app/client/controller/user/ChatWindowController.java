@@ -350,7 +350,7 @@ public class ChatWindowController extends GridPane {
         Platform.runLater(() -> {
             try {
                 ScrollBar bar = (ScrollBar) msgWindow.lookup(".scroll-bar");
-                System.out.println("???" + bar);
+//                System.out.println("???" + bar);
                 bar.valueProperty().addListener((src, ov, nv) -> {
                     if (nv.doubleValue() == 1.) {
                         System.out.print("Scrolled to bottom");
@@ -364,7 +364,7 @@ public class ChatWindowController extends GridPane {
                     }
                 });
             } catch (Exception e) {
-                System.out.println(e.getMessage());
+                System.out.println("Bar Workaround");
             }
         });
         if (convMsg != null) msgWindow.scrollTo(convMsg.size());
@@ -448,7 +448,6 @@ public class ChatWindowController extends GridPane {
 
     void changeCurConv(Conversation item, Relationship relationship) {
         curConversation = item;
-        System.out.println(item.getName());
 
         curRelationship = relationship;
         chatWindowName.setText(item == null ? null : item.getName());
@@ -506,7 +505,7 @@ public class ChatWindowController extends GridPane {
 
         msgWindow.scrollTo(convMsg.size());
 
-        if (curConversation.getName().equals(RegisterController.DELETED_USER)) {
+        if (curConversation != null && curConversation.getName().equals(RegisterController.DELETED_USER)) {
             this.setDisable(true);
         }
     }

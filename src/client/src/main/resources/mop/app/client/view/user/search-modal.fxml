@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<fx:root alignment="CENTER" prefHeight="700.0" prefWidth="500.0" style="-fx-background-color: #0E1621;" type="javafx.scene.layout.VBox" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root alignment="CENTER" prefHeight="700.0" prefWidth="500.0" style="-fx-background-color: #0E1621;" type="javafx.scene.layout.VBox" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml">
     <children>
 
       <ListView fx:id="listMessage" VBox.vgrow="ALWAYS" />
