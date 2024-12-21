@@ -139,8 +139,7 @@ public class ConversationDAO {
             return list;
         }
 
-        URL url = Client.class.getClassLoader().getResource("getConv.sql");
-        SqlReader reader = new SqlReader(Objects.requireNonNull(url).getPath());
+        SqlReader reader = new SqlReader("getConv.sql");
         String query = reader.read();
 
         try (PreparedStatement preparedStatement = conn.prepareStatement(query)) {
