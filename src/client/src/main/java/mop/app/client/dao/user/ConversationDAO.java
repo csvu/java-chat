@@ -38,6 +38,12 @@ public class ConversationDAO {
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+        }finally {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         return res;
     }
@@ -73,6 +79,12 @@ public class ConversationDAO {
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+        }finally {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         return res;
 
@@ -109,6 +121,12 @@ public class ConversationDAO {
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+        }finally {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
     public static void setConversationName(int conversationId, String name) {
@@ -128,6 +146,12 @@ public class ConversationDAO {
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+        }finally {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -172,6 +196,12 @@ public class ConversationDAO {
             System.out.println("getConv" + e.getMessage());
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
+        }finally {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
 
         return list;
@@ -206,6 +236,12 @@ public class ConversationDAO {
             }
         } catch (SQLException e) {
             System.out.println("getConv" + e.getMessage());
+        }finally {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
 
         return res;
@@ -248,6 +284,12 @@ public class ConversationDAO {
 
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+        }finally {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         return ret;
     }
@@ -280,6 +322,12 @@ public class ConversationDAO {
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+        }finally {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         return res;
     }
@@ -345,6 +393,13 @@ public class ConversationDAO {
                 excep.printStackTrace();
             }
         }
+        finally {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public static void removeMember(int conversationID, int userId) {
@@ -363,6 +418,12 @@ public class ConversationDAO {
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+        }finally {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -383,6 +444,12 @@ public class ConversationDAO {
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+        }finally {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

@@ -387,7 +387,7 @@ public class ChatWindowController extends GridPane {
                 System.out.println("Bar Workaround");
             }
         });
-        if (convMsg != null && !convMsg.isEmpty()) msgWindow.scrollTo(convMsg.size() - 1);
+        if (convMsg != null && convMsg.size() > 1) msgWindow.scrollTo(convMsg.size() - 2);
     }
 
     void updateChatInfo() {

@@ -26,7 +26,7 @@ import static mop.app.client.Client.currentUser;
 
 public class HomeController {
     private FriendController friendController;
-    private ChatController chatController;
+    public static ChatController chatController;
     @FXML
     private HBox friendsHBox;
     @FXML

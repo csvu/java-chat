@@ -196,7 +196,7 @@ public class ChatController extends GridPane {
             dmList.addAll(task.getValue());
             listViewCol2.getSelectionModel().select(0);
             if (!dmList.isEmpty()) {
-                if (listViewCol2.getSelectionModel().getSelectedItem() != null) chatWindowController.changeCurConv(listViewCol2.getSelectionModel().getSelectedItem(), new ConversationDAO().getRelationShipInAPairConversation(listViewCol2.getSelectionModel().getSelectedItem().getConversationID()));
+                if (listViewCol2.getSelectionModel().getSelectedItem() != null) chatWindowController.changeCurConv(listViewCol2.getSelectionModel().getSelectedItem(), ConversationDAO.getRelationShipInAPairConversation(listViewCol2.getSelectionModel().getSelectedItem().getConversationID()));
             }
         });
         new Thread(task).start();
@@ -219,6 +219,8 @@ public class ChatController extends GridPane {
 
 
     }
+
+
 
 
     public synchronized static void handleNewMessage(Message msg) {
@@ -244,6 +246,8 @@ public class ChatController extends GridPane {
             conv.setLastContentDateTime(msg.getSentAt());
             dmList.add(0, conv);
         }
+
+        HomeController.chatController.listViewCol2.getSelectionModel().select(0);
         chatWindowController.handleNewMessage(msg);
         FriendController.chatWindowController.handleNewMessage(msg);
 

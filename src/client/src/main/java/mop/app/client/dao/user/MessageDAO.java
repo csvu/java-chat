@@ -63,6 +63,12 @@ public class MessageDAO {
             } catch (SQLException excep) {
                 excep.printStackTrace();
             }
+        }finally {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         return res;
     }
@@ -104,6 +110,12 @@ public class MessageDAO {
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+        }finally {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         System.out.println(list);
         list.sort(Comparator.comparingInt(Message::getMsgId));
@@ -173,6 +185,12 @@ public class MessageDAO {
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+        }finally {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         return list;
     }
@@ -242,6 +260,12 @@ public class MessageDAO {
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+        }finally {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
 
         System.out.println("GET MSG IN CONV " + list.size());
@@ -265,6 +289,12 @@ public class MessageDAO {
 
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+        }finally {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -284,6 +314,12 @@ public class MessageDAO {
 
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+        }finally {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -313,6 +349,12 @@ public class MessageDAO {
 
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+        }finally {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
 

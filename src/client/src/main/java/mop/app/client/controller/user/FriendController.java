@@ -181,7 +181,10 @@ public class FriendController extends GridPane {
                             friendRequestsList.getSource().remove(item);
                         }),
                         new Pair<String, Consumer<Conversation>>(
-                        "view/user/decline-svgrepo-com.png", item -> {})
+                        "view/user/decline-svgrepo-com.png", item -> {
+                            RelationshipDAO.declineFriendRequest(item.getConversationID());
+                            friendRequestsList.getSource().remove(item);
+                        })
                 )
         );
 

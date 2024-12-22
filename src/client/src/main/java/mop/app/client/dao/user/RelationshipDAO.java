@@ -34,6 +34,12 @@ public class RelationshipDAO {
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             logger.error(e.getMessage());
+        }finally {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -84,6 +90,12 @@ public class RelationshipDAO {
             logger.error(e.getMessage());
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
+        }finally {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         return list;
     }
@@ -108,6 +120,12 @@ public class RelationshipDAO {
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             logger.error(e.getMessage());
+        }finally {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -185,6 +203,12 @@ public class RelationshipDAO {
 
             }
 
+        }finally {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         return null;
     }
@@ -225,6 +249,12 @@ public class RelationshipDAO {
             logger.error(e.getMessage());
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
+        }finally {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         return list;
     }
@@ -259,6 +289,12 @@ public class RelationshipDAO {
             logger.error(e.getMessage());
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
+        }finally {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         return list;
     }
@@ -287,6 +323,12 @@ public class RelationshipDAO {
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             logger.error(e.getMessage());
+        }finally {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -331,6 +373,12 @@ public class RelationshipDAO {
                 excep.printStackTrace();
             }
             logger.error("Cannot Block: {}", e.getMessage());
+        }finally {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -362,6 +410,12 @@ public class RelationshipDAO {
         } catch (SQLException e) {
             logger.error(e.getMessage());
             return null;
+        }finally {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
 
     }
@@ -387,6 +441,41 @@ public class RelationshipDAO {
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             logger.error(e.getMessage());
+        }finally {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void declineFriendRequest(int userId) {
+        UtilityDAO utilityDAO = new UtilityDAO();
+        Connection conn = utilityDAO.getConnection();
+        if(conn == null) {
+            return;
+        }
+
+        try (PreparedStatement preparedStatement = conn.prepareStatement(
+                """
+                        delete
+                        from public.relationship
+                        where user_id1 = ? and user_id2 = ? and status = 3
+                    """)) {
+
+            preparedStatement.setInt(2, (int) Client.currentUser.getUserId());
+            preparedStatement.setInt(1, userId);
+
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            logger.error(e.getMessage());
+        }finally {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
