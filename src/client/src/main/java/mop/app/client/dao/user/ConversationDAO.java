@@ -162,6 +162,10 @@ public class ConversationDAO {
                 String content = rs.getString("content");
 
                 Conversation conversation = new Conversation(id, type, avatar == null ? null : URL.of(URI.create(avatar), null) , displayName, seen, lastContentDateTime == null ? null : lastContentDateTime.toLocalDateTime(), content);
+                if (conversation.getContent() == null) {
+                    conversation.setSeen(true);
+                    conversation.setContent("No messages yet");
+                }
                 list.add(conversation);
             }
         } catch (SQLException e) {
@@ -196,9 +200,8 @@ public class ConversationDAO {
                 int id = rs.getInt("conversation_id");
                 String name = rs.getString("name");
                 String type = rs.getString("type_name");
-                boolean seen = rs.getBoolean("is_seen");
 
-                res = new Conversation(id, type, null, name, seen, null, null);
+                res = new Conversation(id, type, null, name, false, null, null);
 
             }
         } catch (SQLException e) {

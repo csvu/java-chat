@@ -173,7 +173,7 @@ public class RelationshipDAO {
             relationshipStatement4.executeUpdate();
 
             conn.commit();
-            return new Conversation(conversationId, "PAIR", null, displayName, true, null, null);
+            return new Conversation(conversationId, "PAIR", null, displayName, true, null, "No messages yet");
 
         } catch (SQLException e) {
             try {

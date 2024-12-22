@@ -6,6 +6,7 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -51,8 +52,14 @@ public class HomeController {
             friendsHBox.getStyleClass().clear();
             friendsHBox.getStyleClass().add("PressedWrapper");
 
+
             col2.getChildren().clear();
             col2.getChildren().add(friendController);
+            if (friendController.searchUsersController == friendController.friendRequestsSearchUsersController) {
+                friendController.friendRequests.fireEvent(new MouseEvent(MouseEvent.MOUSE_CLICKED, 0, 0, 0, 0, null, 0, true, true, true, true, true, true, true, true, true, true, null));
+            } else {
+                friendController.friendList.fireEvent(new MouseEvent(MouseEvent.MOUSE_CLICKED, 0, 0, 0, 0, null, 0, true, true, true, true, true, true, true, true, true, true, null));
+            }
         });
         chatHBox.setOnMouseClicked((e) -> {
             friendsHBox.getStyleClass().clear();
