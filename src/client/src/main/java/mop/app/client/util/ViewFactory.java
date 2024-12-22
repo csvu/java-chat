@@ -3,13 +3,12 @@ package mop.app.client.util;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.layout.AnchorPane;
 import lombok.Getter;
 import mop.app.client.Client;
 import mop.app.client.controller.admin.AdminController;
 import mop.app.client.controller.admin.GroupDetailsController;
-import mop.app.client.controller.admin.UserActivityController;
+import mop.app.client.controller.admin.UserRelationController;
 import mop.app.client.controller.admin.UserDetailsController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,14 +18,15 @@ public class ViewFactory {
 
     private FXMLLoader groupDetailsLoader;
     private FXMLLoader userDetailsLoader;
-    private FXMLLoader userActivityLoader;
+    private FXMLLoader userRelationLoader;
     @Getter private final StringProperty selectedView;
     private AnchorPane dashboardView;
     private AnchorPane userView;
     private AnchorPane createUserView;
     private AnchorPane userDetailsView;
-    private AnchorPane userActivityView;
+    private AnchorPane userRelationView;
     private AnchorPane userLoginView;
+    private AnchorPane userActivityView;
     private AnchorPane newUserView;
     private AnchorPane friendView;
     private AnchorPane groupView;
@@ -143,12 +143,12 @@ public class ViewFactory {
         return userDetailsView;
     }
 
-    public AnchorPane getUserActivityView(long userId, String userName) {
+    public AnchorPane getUserRelationView(long userId, String userName) {
         logger.info("User Activity view requested");
         try {
-            userActivityLoader = new FXMLLoader(Client.class.getResource(ViewPath.USER_ACTIVITY.getPath()));
-            userActivityView = userActivityLoader.load();
-            UserActivityController controller = userActivityLoader.getController();
+            userRelationLoader = new FXMLLoader(Client.class.getResource(ViewPath.USER_RELATION.getPath()));
+            userRelationView = userRelationLoader.load();
+            UserRelationController controller = userRelationLoader.getController();
             if (controller != null) {
                 controller.setUserId(userId);
                 controller.setUsername(userName);
@@ -156,6 +156,16 @@ public class ViewFactory {
             } else {
                 logger.error("Could not retrieve UserActivityController from existing view.");
             }
+        } catch (Exception e) {
+            logger.error("Could not load user activity view: {}", e.getMessage());
+        }
+        return userRelationView;
+    }
+
+    public AnchorPane gerUserActivityView() {
+        logger.info("User Activity view requested");
+        try {
+            userActivityView = ViewHelper.getView(ViewPath.USER_ACTIVITY.getPath());
         } catch (Exception e) {
             logger.error("Could not load user activity view: {}", e.getMessage());
         }

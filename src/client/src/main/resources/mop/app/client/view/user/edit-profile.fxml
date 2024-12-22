@@ -67,7 +67,6 @@
                     </padding>
                 </Label>
                 <TextArea fx:id="addressArea" prefRowCount="3" promptText="Enter your address" styleClass="text-area" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-                <Button fx:id="registerButton" alignment="CENTER" mnemonicParsing="false" prefWidth="480.0" styleClass="continue-button" text="Reset Password" textAlignment="CENTER" GridPane.columnIndex="1" GridPane.rowIndex="2" />
             </children>
             <rowConstraints>
                 <RowConstraints />

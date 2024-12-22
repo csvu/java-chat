@@ -300,7 +300,7 @@ public class UserController {
     private void userActivity(UserDTO user) {
         logger.info("User activity: " + user.getUserId());
         ViewModel.getInstance().getViewFactory().getSelectedView()
-            .set("UserActivity-" + user.getUserId() + "-" + user.getUsername());
+            .set("UserRelation-" + user.getUserId() + "-" + user.getUsername());
     }
 
     @FXML

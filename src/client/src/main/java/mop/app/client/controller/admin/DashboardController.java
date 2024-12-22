@@ -97,7 +97,7 @@ public class DashboardController {
     @FXML
     private void showActiveUsers() {
         logger.info("Showing active users list");
-        ViewModel.getInstance().getViewFactory().getSelectedView().set("ActiveUsers");
+        ViewModel.getInstance().getViewFactory().getSelectedView().set("UserActivity");
     }
 
     @FXML

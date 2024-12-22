@@ -2,7 +2,6 @@ package mop.app.client.controller.user;
 
 import javafx.scene.control.ListCell;
 import javafx.util.Pair;
-import mop.app.client.controller.user.IconLabelWrapper;
 import mop.app.client.model.user.Conversation;
 
 import java.util.List;

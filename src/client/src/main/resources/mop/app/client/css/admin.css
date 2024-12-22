@@ -28,7 +28,7 @@
     -fx-font-weight: bold;
 }
 
-.table-view .column-header .label{
+.table-view .column-header .label {
     /* Cell Header Text Color */
     -fx-font-weight: bold;
     -fx-alignment: center-left;
@@ -41,8 +41,8 @@
 .table-view .column-header#membersCol .label,
 .table-view .column-header#adminCol .label,
 .table-view .column-header#updateCol .label,
-/*.table-view .column-header#genderCol .label,*/
-/*.table-view .column-header#birthdayCol .label,*/
+    /*.table-view .column-header#genderCol .label,*/
+    /*.table-view .column-header#birthdayCol .label,*/
 .table-view .column-header#actionCol .label {
     -fx-alignment: center;
 }
@@ -69,6 +69,27 @@
 
 .table-view .table-row-cell:selected {
     -fx-background-color: #202b36;
+}
+
+.table-view .scroll-bar:vertical > .increment-button,
+.table-view .scroll-bar:vertical > .decrement-button {
+    -fx-padding: 0.25em 0.25em;
+}
+
+.table-view .scroll-bar:horizontal .track,
+.table-view .scroll-bar:vertical .track {
+    -fx-background-color: transparent;
+    -fx-border-color: #9b9fa4;
+    -fx-background-radius: 2em;
+    -fx-border-radius: 2em;
+}
+
+.table-view .scroll-bar:horizontal .thumb,
+.table-view .scroll-bar:vertical .thumb {
+    -fx-background-color: #9b9fa4;
+    -fx-background-insets: 2, 0, 0;
+    -fx-background-radius: 2em;
+
 }
 
 .apply-button {
@@ -291,7 +312,7 @@
     -fx-background-color: #C6DAF7;
 }
 
-.chart-legend-item-symbol{
+.chart-legend-item-symbol {
     -fx-background-radius: 10;
 }
 
@@ -319,6 +340,7 @@
 .chart-vertical-grid-lines {
     -fx-stroke: #3587f3;
 }
+
 .chart-horizontal-grid-lines {
     -fx-stroke: #3587f3;
 }
@@ -331,9 +353,17 @@
     -fx-background-color: transparent;
 }
 
-.default-color0.chart-bar { -fx-bar-fill: #556BF4; }
-.default-color1.chart-bar { -fx-bar-fill: orange; }
-.default-color2.chart-bar { -fx-bar-fill: #4b77b3; }
+.default-color0.chart-bar {
+    -fx-bar-fill: #556BF4;
+}
+
+.default-color1.chart-bar {
+    -fx-bar-fill: orange;
+}
+
+.default-color2.chart-bar {
+    -fx-bar-fill: #4b77b3;
+}
 
 /*.data0.chart-bar,*/
 /*.data1.chart-bar,*/

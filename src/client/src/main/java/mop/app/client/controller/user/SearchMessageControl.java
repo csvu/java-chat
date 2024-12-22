@@ -9,7 +9,6 @@ import javafx.scene.layout.VBox;
 import mop.app.client.Client;
 import mop.app.client.dao.user.MessageDAO;
 import mop.app.client.model.user.Conversation;
-import mop.app.client.model.user.Message;
 import mop.app.client.model.user.MessageInConversation;
 
 import java.io.IOException;

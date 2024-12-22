@@ -199,7 +199,7 @@ public class UserDetailsController {
         return new Date(dateToConvert.getTime()).toLocalDate();
     }
 
-    public void handleSave(ActionEvent event) {
+    public void handleSave() {
         String username = usernameField.getText().trim();
         String email = emailField.getText().trim();
 
