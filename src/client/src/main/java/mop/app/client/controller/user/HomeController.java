@@ -14,11 +14,14 @@ import javafx.scene.shape.Circle;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import mop.app.client.Client;
+import mop.app.client.dao.AuthDAO;
 import mop.app.client.util.PreProcess;
 import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.util.Objects;
+
+import static mop.app.client.Client.currentUser;
 
 
 public class HomeController {
@@ -72,10 +75,13 @@ public class HomeController {
             col2.getChildren().add(chatController);
         });
         logOut.setOnMouseClicked(e->{
+            AuthDAO authDAO = new AuthDAO();
+            authDAO.updateUserStatus(currentUser.getUserId(), false);
             PreProcess.deleteUserInformation();
+
             Stage stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
             stage.close();
-            Client.currentUser = null;
+            currentUser = null;
             try {
                 FXMLLoader fxmlLoader = new FXMLLoader(Client.class.getResource("view/index.fxml"));
                 Scene scene = new Scene(fxmlLoader.load());
