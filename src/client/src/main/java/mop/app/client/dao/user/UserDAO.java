@@ -40,6 +40,7 @@ public class UserDAO {
                         				OR DISPLAY_NAME ILIKE ?
                         			)
                         			AND USER_ID <> ?
+                        			AND ROLE_ID = 1
                         	) AS R1
                         	LEFT JOIN PUBLIC.RELATIONSHIP AS R2 ON R1.USER_ID = R2.USER_ID2
                         	AND R2.USER_ID1 = ?
