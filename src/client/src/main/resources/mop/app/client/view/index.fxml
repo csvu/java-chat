@@ -58,10 +58,7 @@
 
         <VBox alignment="CENTER" maxWidth="400" spacing="20.0">
             <children>
-                <Button maxWidth="Infinity" onAction="#handleGoogleLogin" styleClass="google-button"
-                        text="Log in with Google"/>
-
-                <Button maxWidth="Infinity" onAction="#handleLogin" styleClass="email-username-button"
+                <Button maxWidth="Infinity" onAction="#handleLogin" styleClass="google-button"
                         text="Log in with email or username"/>
             </children>
         </VBox>

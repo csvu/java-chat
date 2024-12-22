@@ -12,16 +12,6 @@ public class IndexController {
     private static final Logger logger = org.slf4j.LoggerFactory.getLogger(IndexController.class);
 
     @FXML
-    private void handleGoogleLogin() {
-        AlertDialog.showAlertDialog(
-            Alert.AlertType.INFORMATION,
-            "Google login clicked",
-            "",
-            ""
-        );
-    }
-
-    @FXML
     private void handleLogin(ActionEvent event) {
         try {
             ViewHelper.getLoginScene(event);
