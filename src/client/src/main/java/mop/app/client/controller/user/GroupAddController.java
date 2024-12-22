@@ -41,6 +41,9 @@ public class GroupAddController extends VBox {
             addButton.setDisable(true);
             groupAddTitle.setText("No friends to add");
         }
+        if (cur.getType().equals(Conversation.GROUP)) {
+            groupName.setDisable(true);
+        }
         listFriend.setCellFactory(params -> new ListCell<>() {
             @Override
             protected void updateItem(Conversation item, boolean empty) {
