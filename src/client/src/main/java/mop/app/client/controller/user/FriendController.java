@@ -19,6 +19,7 @@ import mop.app.client.Client;
 import mop.app.client.dao.user.ConversationDAO;
 import mop.app.client.dao.user.RelationshipDAO;
 import mop.app.client.model.user.Conversation;
+import mop.app.client.model.user.Relationship;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,9 +35,9 @@ public class FriendController extends GridPane {
     @FXML
     private Label curOption;
     @FXML
-    private HBox friendList;
+    public HBox friendList;
     @FXML
-    private HBox friendRequests;
+    public HBox friendRequests;
     @FXML
     private ListView<Conversation> listF;
     @FXML
@@ -50,14 +51,14 @@ public class FriendController extends GridPane {
     @FXML
     private Button online;
 
-    private SearchUsersController searchUsersController;
+    SearchUsersController searchUsersController;
 
-    private final SearchUsersController friendListSearchUsersController;
-    private final SearchUsersController friendRequestsSearchUsersController;
+    final SearchUsersController friendListSearchUsersController;
+    final SearchUsersController friendRequestsSearchUsersController;
 
 
 
-    private final ChatWindowController chatWindowController;
+    public static ChatWindowController chatWindowController;
 
     private Predicate<Conversation> showWhich;
     private final Predicate<Conversation> showOnline;
@@ -127,7 +128,12 @@ public class FriendController extends GridPane {
 
         curFriend = friendListObservable == null ? null : !friendListObservable.isEmpty() ? friendListObservable.getFirst() : null;
 
-        chatWindowController = new ChatWindowController(curFriend, null, () -> {}, (msg, curConv) -> {}, (item)->{
+        int convId = curFriend == null ? -1 : ConversationDAO.getPairConversationId(curFriend.getConversationID());
+        Conversation conv = convId == -1 ? null : new Conversation(convId, "PAIR", null, curFriend.getName(), false, null, null);
+        Relationship rel = curFriend == null ? null : new Relationship(curFriend.getConversationID(), curFriend.getName(), "FRIEND");
+
+
+        chatWindowController = new ChatWindowController(conv, rel, () -> {}, (msg, curConv) -> {}, (item)->{
             //seen
             item.setSeen(true);
             ConversationDAO.setSeen(item.getConversationID(), true);
@@ -170,7 +176,7 @@ public class FriendController extends GridPane {
                 Arrays.asList(new Pair<String, Consumer<Conversation>>(
                         "view/user/accept-svgrepo-com.png", item -> {
                             Conversation newItem = RelationshipDAO.acceptFriendRequest(item.getConversationID(), item.getName());
-                            ChatController.getDmList().add(0, newItem);
+                            ChatController.dmList.addFirst(newItem);
                             ((ObservableList<Conversation>)friendListObservable.getSource()).add(newItem);
                             friendRequestsList.getSource().remove(item);
                         }),

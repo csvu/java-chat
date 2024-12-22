@@ -5,6 +5,7 @@ import java.io.IOException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Platform;
 import mop.app.client.controller.user.ChatController;
+import mop.app.client.controller.user.FriendController;
 import mop.app.client.dto.Request;
 import mop.app.client.dto.RequestType;
 import mop.app.client.model.user.Message;
@@ -52,7 +53,9 @@ public class AsyncSocketClient extends SocketClient implements Runnable {
                 Request inputFromServer = objectMapper.readValue(rawInputFromServer, Request.class);
                 if (inputFromServer.getType() == RequestType.SERVER_MESSAGE) {
                     System.out.println("Received message from server" + inputFromServer.getData());
-                    Platform.runLater(() -> ChatController.handleNewMessage(ObjectMapperConfig.getObjectMapper().convertValue(inputFromServer.getData(), Message.class)));
+                    Platform.runLater(() -> {
+                        ChatController.handleNewMessage(ObjectMapperConfig.getObjectMapper().convertValue(inputFromServer.getData(), Message.class));
+                    });
                 }
             }
         } catch (IOException | ClassNotFoundException e) {

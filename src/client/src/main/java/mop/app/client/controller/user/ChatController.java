@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 
 
 public class ChatController extends GridPane {
-    private static ObservableList<Conversation> dmList = FXCollections.observableArrayList();;
+    public static final ObservableList<Conversation> dmList = FXCollections.observableArrayList();;
 
     private static ChatWindowController chatWindowController;
     URL placeholder = Client.class.getResource("images/place-holder.png");
@@ -225,10 +225,10 @@ public class ChatController extends GridPane {
         int cnt = 0;
         for (Conversation conv : dmList) {
             if (conv.getConversationID() == msg.getConversationId()) {
+                dmList.remove(conv);
                 conv.setSeen(false);
                 conv.setContent(msg.getContent());
                 conv.setLastContentDateTime(msg.getSentAt());
-                dmList.remove(conv);
                 dmList.add(0, conv);
                 cnt++;
                 break;
@@ -245,6 +245,7 @@ public class ChatController extends GridPane {
             dmList.add(0, conv);
         }
         chatWindowController.handleNewMessage(msg);
+        FriendController.chatWindowController.handleNewMessage(msg);
 
 
 

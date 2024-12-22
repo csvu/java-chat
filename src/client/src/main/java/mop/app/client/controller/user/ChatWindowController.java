@@ -368,17 +368,26 @@ public class ChatWindowController extends GridPane {
                         onSeen.accept(curConversation);
                     } else if (nv.doubleValue() == 0.) {
                         System.out.print("Scrolled to top");
-                        convMsg.addAll(0, MessageDAO.getMessages(curConversation.getConversationID(), cursorMsgId));
-                        if (convMsg.size() > 0) {
-                            cursorMsgId = convMsg.get(0).getMsgId();
-                        }
+                        Task<ArrayList<Message>> task = new Task<>() {
+                            @Override
+                            protected ArrayList<Message> call() {
+                                return MessageDAO.getMessages(curConversation.getConversationID(), cursorMsgId);
+                            }
+                        };
+                        task.setOnSucceeded(event -> {
+                            convMsg.addAll(0, task.getValue());
+                            if (convMsg.size() > 0) {
+                                cursorMsgId = convMsg.get(0).getMsgId();
+                            }
+                        });
+                        new Thread(task).start();
                     }
                 });
             } catch (Exception e) {
                 System.out.println("Bar Workaround");
             }
         });
-        if (convMsg != null) msgWindow.scrollTo(convMsg.size());
+        if (convMsg != null && !convMsg.isEmpty()) msgWindow.scrollTo(convMsg.size() - 1);
     }
 
     void updateChatInfo() {
@@ -494,31 +503,49 @@ public class ChatWindowController extends GridPane {
 
         convMsg.clear();
         if (item != null && (item.getType().equals("PAIR") || item.getType().equals("GROUP"))) {
-            Task<ArrayList<Message>> task = new Task<>() {
-                @Override
-                protected ArrayList<Message> call() {
-                    return MessageDAO.getMessages(item.getConversationID(), cursorMsgId);
-                }
-            };
-            task.setOnSucceeded(event -> {
-                convMsg.addAll(task.getValue());
-                if (convMsg.size() > 0) {
-                    cursorMsgId = convMsg.get(0).getMsgId();
-                }
-            });
+            Task<ArrayList<Message>> task = getArrayListTask(item);
             new Thread(task).start();
+        } else {
+            updateTopBarCol3(item);
+
+            msgWindow.setItems(convMsg);
+
+            if (convMsg.size() > 0) msgWindow.scrollTo(convMsg.size() - 1);
+
+            if (curConversation != null && curConversation.getName().equals(RegisterController.DELETED_USER)) {
+                this.setDisable(true);
+            }
         }
         
 
-        updateTopBarCol3(item);
 
-        msgWindow.setItems(convMsg);
+    }
 
-        msgWindow.scrollTo(convMsg.size());
+    private Task<ArrayList<Message>> getArrayListTask(Conversation item) {
+        Task<ArrayList<Message>> task = new Task<>() {
+            @Override
+            protected ArrayList<Message> call() {
+                return MessageDAO.getMessages(item.getConversationID(), cursorMsgId);
+            }
+        };
+        task.setOnSucceeded(event -> {
+            convMsg.addAll(task.getValue());
+            if (convMsg.size() > 0) {
+                cursorMsgId = convMsg.get(0).getMsgId();
+            }
+            updateTopBarCol3(item);
 
-        if (curConversation != null && curConversation.getName().equals(RegisterController.DELETED_USER)) {
-            this.setDisable(true);
-        }
+            msgWindow.setItems(convMsg);
+
+            if (convMsg.size() > 0) msgWindow.scrollTo(convMsg.size() - 1);
+
+
+
+            if (curConversation != null && curConversation.getName().equals(RegisterController.DELETED_USER)) {
+                this.setDisable(true);
+            }
+        });
+        return task;
     }
 
     void updateTopBarCol3(Conversation item) {
@@ -542,7 +569,7 @@ public class ChatWindowController extends GridPane {
                 Message newMsg = new Message("You", null, LocalDateTime.now(),chatArea.getText(), curConversation.getConversationID(), (int)Client.currentUser.getUserId(), task.getValue());
                 convMsg.add(newMsg);
                 chatArea.clear();
-                msgWindow.scrollTo(convMsg.size());
+                if (convMsg.size() > 0) msgWindow.scrollTo(convMsg.size() - 1);
                 onNewMessage.accept(newMsg, curConversation);
             });
             new Thread(task).start();
